@@ -1,0 +1,7 @@
+:host {
+  grid-template-rows: auto 1fr;
+}
+
+.main {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
