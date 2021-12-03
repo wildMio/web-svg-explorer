@@ -4,6 +4,7 @@ import {
   Input,
   ElementRef,
   HostBinding,
+  OnDestroy,
 } from '@angular/core';
 import { FileWithDirectoryHandle } from 'browser-fs-access';
 import {
@@ -11,9 +12,13 @@ import {
   concatMap,
   filter,
   from,
+  map,
   ReplaySubject,
+  shareReplay,
+  Subject,
   switchMap,
   take,
+  takeUntil,
   tap,
 } from 'rxjs';
 import { inView } from '../util/intersection-observer';
@@ -24,8 +29,10 @@ import { inView } from '../util/intersection-observer';
   styleUrls: ['./svg-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SvgCardComponent {
-  @HostBinding('class') class = 'grid place-items-center';
+export class SvgCardComponent implements OnDestroy {
+  @HostBinding('class') class = 'grid';
+
+  private readonly destroy$ = new Subject<void>();
 
   handle$ = new ReplaySubject<FileWithDirectoryHandle>(1);
 
@@ -48,14 +55,32 @@ export class SvgCardComponent {
   svgText$ = this.handle$.pipe(
     tap(() => this.loading$.next(true)),
     switchMap((handle) =>
-      inView(this.host.nativeElement).pipe(
+      inView(this.host.nativeElement, {
+        root: null,
+        threshold: [0.2],
+      }).pipe(
         filter((view) => view),
         take(1),
         concatMap(() => from(handle.text())),
         tap(() => this.loading$.next(false))
       )
-    )
+    ),
+    takeUntil(this.destroy$),
+    shareReplay(1)
   );
 
+  svgName$ = this.handle$.pipe(
+    map((handle) => handle.name.replace('.svg', '')),
+    takeUntil(this.destroy$),
+    shareReplay(1)
+  );
+
+  loadingDelay = `${Math.random() * 3}s`;
+
   constructor(private readonly host: ElementRef<HTMLElement>) {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

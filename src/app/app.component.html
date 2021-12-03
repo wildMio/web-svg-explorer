@@ -2,7 +2,7 @@
   <button mat-button (click)="openDirectory()">Open Directory</button>
 </header>
 
-<main class="main grid gap-4 overflow-auto">
+<main class="main grid gap-8 overflow-auto">
   <app-svg-card
     *ngFor="let handle of fileWithDirectoryHandles$ | async"
     [fileWithDirectoryHandle]="handle"
