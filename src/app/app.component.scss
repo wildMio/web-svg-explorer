@@ -2,6 +2,20 @@
   grid-template-rows: auto 1fr;
 }
 
+.title {
+  font-size: 1.7rem;
+  font-weight: 600;
+}
+
 .main {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+
+.icon-info {
+  grid-column: 1/-1;
+  transition: opacity 0.2s;
+}
+
+.invert {
+  filter: invert(1);
 }

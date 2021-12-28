@@ -1,11 +1,18 @@
 :host {
   aspect-ratio: 1;
+}
+
+.mat-card {
   grid-template-rows: 1fr auto;
+  height: 100%;
+  display: grid;
+  padding: 0.5rem;
 }
 
 .svg-wrapper {
   min-width: 24px;
-  max-width: 100%;
+  max-width: 56px;
+  max-height: 56px;
 }
 
 .loading-wrapper {
@@ -34,4 +41,12 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+img {
+  transition: filter 0.4s;
+}
+
+.invert {
+  filter: invert(1);
 }

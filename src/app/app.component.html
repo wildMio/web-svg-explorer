@@ -1,10 +1,39 @@
-<header class="flex">
-  <button mat-button (click)="openDirectory()">Open Directory</button>
+<header class="flex p-6 gap-4 items-center flex-wrap">
+  <h1 class="title">Browser Svg</h1>
+  <button mat-stroked-button (click)="openDirectory()">Open Directory</button>
+  <label>
+    Current Color
+    <div>
+      <input
+        #colorInput
+        type="text"
+        [value]="currentColor"
+        (input)="currentColor = colorInput.value"
+      />
+    </div>
+  </label>
 </header>
 
-<main class="main grid gap-8 overflow-auto">
-  <app-svg-card
-    *ngFor="let handle of fileWithDirectoryHandles$ | async"
-    [fileWithDirectoryHandle]="handle"
-  ></app-svg-card>
-</main>
+<div class="overflow-auto p-6">
+  <main class="main grid gap-8">
+    <div
+      class="icon-info flex opacity-0"
+      [class.opacity-80]="hasHandles$ | async"
+    >
+      Invert color by click
+      <span>
+        <img
+          src="assets/invert_colors.svg"
+          alt="invert svg color"
+          class="invert opacity-50"
+        /> </span
+      >.
+    </div>
+    <app-svg-card
+      *ngFor="let handle of fileWithDirectoryHandles$ | async"
+      [currentColor]="currentColor"
+      [fileWithDirectoryHandle]="handle"
+    ></app-svg-card>
+  </main>
+  <footer class="sticky top-full mt-4"></footer>
+</div>

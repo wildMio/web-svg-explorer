@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
-import { BehaviorSubject, from } from 'rxjs';
+import { BehaviorSubject, from, map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +16,12 @@ export class AppComponent {
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     []
   );
+
+  hasHandles$ = this.fileWithDirectoryHandles$.pipe(
+    map((handles) => !!handles.length)
+  );
+
+  currentColor = 'white';
 
   openDirectory() {
     from(directoryOpen()).subscribe({

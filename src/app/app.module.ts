@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 import { SvgCardComponent } from './svg-card/svg-card.component';
 import { InjectHTMLDirective } from './directive/inject-html.directive';
@@ -17,6 +18,7 @@ import { InjectHTMLDirective } from './directive/inject-html.directive';
     BrowserAnimationsModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatCardModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

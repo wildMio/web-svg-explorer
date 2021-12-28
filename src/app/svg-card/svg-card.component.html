@@ -1,22 +1,48 @@
-<div class="content-wrapper flex">
-  <div
-    *ngIf="loading$ | async"
-    class="loading-wrapper flex justify-center m-auto"
-    [style.--loading-delay]="loadingDelay"
-  >
-    <div class="loading"></div>
+<mat-card>
+  <div class="flex">
+    <div
+      *ngIf="loading$ | async"
+      class="loading-wrapper flex justify-center m-auto"
+      [style.--loading-delay]="loadingDelay"
+    >
+      <div class="loading"></div>
+    </div>
+    <ng-container *ngIf="svgUri$ | async as uri">
+      <img
+        class="m-auto svg-wrapper"
+        [src]="uri"
+        [alt]="svgName$ | async"
+        [class.invert]="invert"
+      />
+      <button
+        class="
+          absolute
+          top-0
+          right-0
+          opacity-30
+          hover:opacity-80
+          focus:opacity-100
+        "
+        (click)="invert = !invert"
+      >
+        <img
+          src="assets/invert_colors.svg"
+          alt="invert svg color"
+          [class.invert]="invert"
+        />
+      </button>
+    </ng-container>
   </div>
-  <div class="m-auto svg-wrapper" [appInjectHTML]="svgText$ | async"></div>
-</div>
 
-<div
-  class="
-    text-center
-    whitespace-nowrap
-    break-all
-    overflow-hidden overflow-ellipsis
-  "
-  [title]="svgName$ | async"
->
-  {{ svgName$ | async }}
-</div>
+  <div
+    class="
+      text-center
+      whitespace-nowrap
+      break-all
+      overflow-hidden overflow-ellipsis
+    "
+    [title]="svgName$ | async"
+  >
+    {{ svgName$ | async }}
+  </div>
+</mat-card>

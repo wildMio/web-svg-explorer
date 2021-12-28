@@ -6,6 +6,7 @@ import {
   HostBinding,
   OnDestroy,
 } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { FileWithDirectoryHandle } from 'browser-fs-access';
 import {
   BehaviorSubject,
@@ -21,6 +22,8 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
+import { encodeSVG } from '../util/encodeSvg';
+import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
 
 @Component({
@@ -30,29 +33,24 @@ import { inView } from '../util/intersection-observer';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SvgCardComponent implements OnDestroy {
-  @HostBinding('class') class = 'grid';
+  @HostBinding('class') class = 'block';
 
   private readonly destroy$ = new Subject<void>();
 
   handle$ = new ReplaySubject<FileWithDirectoryHandle>(1);
 
+  @InputToSubject('handle$')
   @Input()
-  public get fileWithDirectoryHandle(): FileWithDirectoryHandle | undefined {
-    return this._fileWithDirectoryHandle;
-  }
-  public set fileWithDirectoryHandle(
-    value: FileWithDirectoryHandle | undefined
-  ) {
-    this._fileWithDirectoryHandle = value;
-    if (value) {
-      this.handle$.next(value);
-    }
-  }
-  private _fileWithDirectoryHandle?: FileWithDirectoryHandle | undefined;
+  fileWithDirectoryHandle: FileWithDirectoryHandle | undefined;
+
+  currentColor$ = new BehaviorSubject<string | null>(null);
+  @InputToSubject()
+  @Input()
+  currentColor: string | undefined;
 
   loading$ = new BehaviorSubject(true);
 
-  svgText$ = this.handle$.pipe(
+  svgUri$ = this.handle$.pipe(
     tap(() => this.loading$.next(true)),
     switchMap((handle) =>
       inView(this.host.nativeElement, {
@@ -62,6 +60,15 @@ export class SvgCardComponent implements OnDestroy {
         filter((view) => view),
         take(1),
         concatMap(() => from(handle.text())),
+        concatMap((data) =>
+          this.currentColor$.pipe(
+            map((color) =>
+              this.domSanitizer.bypassSecurityTrustResourceUrl(
+                `data:image/svg+xml,${encodeSVG(data, color)}`
+              )
+            )
+          )
+        ),
         tap(() => this.loading$.next(false))
       )
     ),
@@ -77,7 +84,12 @@ export class SvgCardComponent implements OnDestroy {
 
   loadingDelay = `${Math.random() * 3}s`;
 
-  constructor(private readonly host: ElementRef<HTMLElement>) {}
+  invert = false;
+
+  constructor(
+    private readonly host: ElementRef<HTMLElement>,
+    private readonly domSanitizer: DomSanitizer
+  ) {}
 
   ngOnDestroy() {
     this.destroy$.next();
