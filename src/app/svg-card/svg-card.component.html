@@ -10,7 +10,7 @@
     <ng-container *ngIf="svgUri$ | async as uri">
       <img
         class="m-auto svg-wrapper"
-        lazy
+        loading="lazy"
         [src]="uri"
         [alt]="svgName$ | async"
         [class.invert]="invert"
@@ -29,7 +29,7 @@
         <img
           src="assets/invert_colors.svg"
           alt="invert svg color"
-          lazy
+          loading="lazy"
           [class.invert]="invert"
         />
       </button>
