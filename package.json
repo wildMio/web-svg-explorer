@@ -22,6 +22,7 @@
     "@angular/router": "~13.0.1",
     "browser-fs-access": "^0.21.1",
     "rxjs": "~7.4.0",
+    "svgo": "^2.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   },
