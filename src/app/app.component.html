@@ -22,14 +22,21 @@
       class="icon-info flex opacity-0"
       [class.opacity-80]="hasHandles$ | async"
     >
-      Invert color by click
-      <span>
+      Invert color
+      <span class="px-0.5">
         <img
           src="assets/invert_colors.svg"
           alt="invert svg color"
           class="invert opacity-50"
         /> </span
-      >.
+      >; Execute svgo
+      <span class="px-0.5">
+        <img
+          src="assets/optimize.svg"
+          alt="optimize svg"
+          class="invert opacity-50"
+        /> </span
+      >;
     </div>
     <app-svg-card
       *ngFor="let handle of fileWithDirectoryHandles$ | async"

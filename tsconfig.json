@@ -18,10 +18,11 @@
     "importHelpers": true,
     "target": "es2017",
     "module": "es2020",
-    "lib": [
-      "es2020",
-      "dom"
-    ]
+    "lib": ["es2020", "dom"],
+    "paths": {
+      "os": ["./node_modules/os-browserify"],
+      "path": ["./node_modules/path-browserify"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

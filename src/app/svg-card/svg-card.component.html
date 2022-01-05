@@ -15,36 +15,51 @@
         [alt]="svgName$ | async"
         [class.invert]="invert"
       />
-      <button
-        class="
-          absolute
-          top-0
-          right-0
-          opacity-30
-          hover:opacity-80
-          focus:opacity-100
-        "
-        (click)="invert = !invert"
-      >
-        <img
-          src="assets/invert_colors.svg"
-          alt="invert svg color"
-          loading="lazy"
-          [class.invert]="invert"
-        />
-      </button>
+      <div class="grid absolute top-0 right-0 justify-items-center gap-1">
+        <button
+          class="opacity-30 hover:opacity-80 focus:opacity-100"
+          (click)="invert = !invert"
+        >
+          <img
+            src="assets/invert_colors.svg"
+            alt="invert svg color"
+            loading="lazy"
+            [class.invert]="invert"
+          />
+        </button>
+        <button
+          class="opacity-30 hover:opacity-80 focus:opacity-100"
+          (click)="optimize()"
+        >
+          <img
+            src="assets/optimize.svg"
+            alt="optimize svg"
+            loading="lazy"
+            [class.invert]="invert"
+          />
+        </button>
+        <div *ngIf="pending$ | async" class="w-full text-center">...</div>
+        <button
+          *ngIf="optimizedSvg$ | async"
+          class="opacity-30 hover:opacity-80 focus:opacity-100"
+          (click)="download()"
+        >
+          <img
+            src="assets/download.svg"
+            alt="download svg"
+            loading="lazy"
+            [class.invert]="invert"
+          />
+        </button>
+      </div>
     </ng-container>
   </div>
 
   <div
-    class="
-      text-center
-      whitespace-nowrap
-      break-all
-      overflow-hidden overflow-ellipsis
-    "
+    class="text-center whitespace-nowrap break-all overflow-hidden overflow-ellipsis"
     [title]="svgName$ | async"
   >
     {{ svgName$ | async }}
+    <button (click)="optimize()">op</button>
   </div>
 </mat-card>
