@@ -14,6 +14,24 @@
       />
     </div>
   </label>
+  <div class="flex items-center ml-auto">
+    <div class="opacity-0 p-2" [class.opacity-100]="downloadZipping$ | async">
+      ...
+    </div>
+    <button
+      *ngIf="optimizedSvgMap$ | async"
+      mat-stroked-button
+      (click)="downloadAll()"
+    >
+      Download All
+    </button>
+    <div class="opacity-0 p-2" [class.opacity-100]="svgOptimizing$ | async">
+      ...
+    </div>
+    <button *ngIf="hasHandles$ | async" mat-stroked-button (click)="svgoAll()">
+      Svgo All
+    </button>
+  </div>
 </header>
 
 <div class="overflow-auto p-6">
@@ -36,12 +54,20 @@
           alt="optimize svg"
           class="invert opacity-50"
         /> </span
+      >; Download optimized svg
+      <span class="px-0.5">
+        <img
+          src="assets/download.svg"
+          alt="download optimized svg"
+          class="invert opacity-50"
+        /> </span
       >;
     </div>
     <app-svg-card
       *ngFor="let handle of fileWithDirectoryHandles$ | async"
       [currentColor]="currentColor"
       [fileWithDirectoryHandle]="handle"
+      [optimizedSvgMap]="optimizedSvgMap$ | async"
     ></app-svg-card>
   </main>
   <footer class="sticky top-full mt-4"></footer>

@@ -15,7 +15,7 @@
         [alt]="svgName$ | async"
         [class.invert]="invert"
       />
-      <div class="grid absolute top-0 right-0 justify-items-center gap-1">
+      <div class="absolute top-0 left-0">
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="invert = !invert"
@@ -27,6 +27,8 @@
             [class.invert]="invert"
           />
         </button>
+      </div>
+      <div class="grid absolute top-0 right-0 justify-items-end gap-1">
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="optimize()"
@@ -51,6 +53,9 @@
             [class.invert]="invert"
           />
         </button>
+        <div class="text-xs" [class]="compressRationClass$ | async">
+          {{ compressRatio$ | async }}
+        </div>
       </div>
     </ng-container>
   </div>
@@ -60,6 +65,5 @@
     [title]="svgName$ | async"
   >
     {{ svgName$ | async }}
-    <button (click)="optimize()">op</button>
   </div>
 </mat-card>
