@@ -32,6 +32,7 @@ import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
 import { saveAs } from 'file-saver';
 import { round } from '../util/general';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-svg-card',
@@ -149,6 +150,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   constructor(
     private readonly host: ElementRef<HTMLElement>,
     private readonly domSanitizer: DomSanitizer,
+    private readonly clipboard: Clipboard,
     private readonly svgoService: SvgoService
   ) {}
 
@@ -175,6 +177,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         concatMap(({ name, text }) => this.svgoService.optimize$(text, name)),
+        take(1),
         takeUntil(this.destroy$),
         finalize(() => this.pending$.next(false))
       )
@@ -197,5 +200,18 @@ export class SvgCardComponent implements OnInit, OnDestroy {
 
   invertColor() {
     this.colorInvert$.next(!this.colorInvert$.getValue());
+  }
+
+  copy() {
+    this.optimizedSvg$
+      .pipe(
+        map((svg) => svg?.data!),
+        take(1)
+      )
+      .subscribe({
+        next: (text) => {
+          this.clipboard.copy(text);
+        },
+      });
   }
 }

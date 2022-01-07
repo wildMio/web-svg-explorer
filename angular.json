@@ -46,14 +46,22 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
             "scripts": [],
             "webWorkerTsConfig": "tsconfig.worker.json",
-            "allowedCommonJsDependencies": ["svgo", "os", "path"],
+            "allowedCommonJsDependencies": [
+              "svgo",
+              "os",
+              "path"
+            ],
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json"
           },
@@ -116,13 +124,27 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
             "scripts": [],
             "webWorkerTsConfig": "tsconfig.worker.json"
+          }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "web-svg-explorer:build:production",
+            "firebaseProject": "svgolot",
+            "firebaseHostingSite": "svgolot"
           }
         }
       }

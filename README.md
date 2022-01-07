@@ -1,6 +1,42 @@
 # WebSvgExplorer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.1.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.1.1.
+
+## Purpose
+
+Quick svgo multiple svg files.
+
+Let's svgo a lot: <https://svgolot.web.app/>
+
+## Dependency library
+
+- Angular (<https://angular.io/>)
+- rxjs (<https://rxjs.dev/>)
+- typescript (<https://www.typescriptlang.org/>)
+- angular material (<https://material.angular.io/>)
+- tailwindcss (<https://tailwindcss.com/>)
+- svgo (<https://github.com/svg/svgo>)
+- os-browserify (<https://github.com/CoderPuppy/os-browserify>)
+- path-browserify (<https://github.com/browserify/path-browserify>)
+- browser-fs-access (<https://github.com/GoogleChromeLabs/browser-fs-access>)
+- jszip (<https://github.com/Stuk/jszip>)
+- file-saver (<https://github.com/eligrey/FileSaver.js>)
+- angularfire (<https://github.com/angular/angularfire>)
+
+### Inspired by
+
+SVGOMG (<https://jakearchibald.github.io/svgomg/>)
+
+## Icon source
+
+- https://angular.io/presskit
+- https://fonts.google.com/icons?selected=Material+Icons
+- https://iconsvg.xyz/
+- https://iconify.design/
+
+### Combine logo through
+
+excalidraw (https://excalidraw.com/)
 
 ## Development server
 

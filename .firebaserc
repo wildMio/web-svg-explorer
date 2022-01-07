@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "svgolot": {
+      "hosting": {
+        "web-svg-explorer": [
+          "svgolot"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "svgolot"
+  }
+}

@@ -1,5 +1,5 @@
 <header class="flex p-6 gap-4 items-center flex-wrap">
-  <h1 class="text-xl font-medium">Browser Svg</h1>
+  <h1 class="text-xl font-medium">SVGOLOT</h1>
   <span class="hidden sm:block">
     <button mat-stroked-button (click)="openDirectory()">Open Directory</button>
   </span>
@@ -59,7 +59,7 @@
       </label>
     </mat-card>
   </ng-template>
-  <div class="flex items-center ml-auto">
+  <div class="flex items-center ml-auto gap-4">
     <button
       *ngIf="optimizedSvgMap$ | async"
       mat-stroked-button
@@ -138,7 +138,7 @@
 <div class="overflow-auto p-6">
   <main class="main grid gap-8">
     <div
-      class="icon-info flex opacity-0 items-center gap-1"
+      class="icon-info flex flex-wrap opacity-0 items-center gap-1"
       [class.opacity-80]="hasHandles$ | async"
     >
       <span class="flex items-center">
@@ -147,7 +147,7 @@
           alt="invert svg color"
           class="invert opacity-50"
         />
-        Invert color;
+        <span> Invert color; </span>
       </span>
       <span class="flex items-center">
         <img
@@ -156,6 +156,14 @@
           class="invert opacity-50"
         />
         Execute svgo;</span
+      >
+      <span class="flex items-center">
+        <img
+          src="assets/copy.svg"
+          alt="copy optimized svg"
+          class="invert opacity-50"
+        />
+        Copy optimized svg;</span
       >
       <span class="flex items-center">
         <img

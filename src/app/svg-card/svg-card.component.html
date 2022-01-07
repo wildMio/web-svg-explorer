@@ -29,17 +29,31 @@
         </button>
       </div>
       <div class="grid absolute top-0 right-0 justify-items-end gap-1">
-        <button
-          class="opacity-30 hover:opacity-80 focus:opacity-100"
-          (click)="optimize()"
-        >
-          <img
-            src="assets/optimize.svg"
-            alt="optimize svg"
-            loading="lazy"
-            [class.invert]="colorInvert$ | async"
-          />
-        </button>
+        <div class="flex gap-1">
+          <button
+            *ngIf="optimizedSvg$ | async"
+            class="opacity-30 hover:opacity-80 focus:opacity-100"
+            (click)="copy()"
+          >
+            <img
+              src="assets/copy.svg"
+              alt="copy svg"
+              loading="lazy"
+              [class.invert]="colorInvert$ | async"
+            />
+          </button>
+          <button
+            class="opacity-30 hover:opacity-80 focus:opacity-100"
+            (click)="optimize()"
+          >
+            <img
+              src="assets/optimize.svg"
+              alt="optimize svg"
+              loading="lazy"
+              [class.invert]="colorInvert$ | async"
+            />
+          </button>
+        </div>
         <div *ngIf="pending$ | async" class="w-full text-center">...</div>
         <button
           *ngIf="optimizedSvg$ | async"

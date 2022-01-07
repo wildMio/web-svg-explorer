@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 import { SvgCardComponent } from './svg-card/svg-card.component';
 import { InjectHTMLDirective } from './directive/inject-html.directive';
@@ -27,6 +28,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
     MatTooltipModule,
     MatCheckboxModule,
     OverlayModule,
+    ClipboardModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       // Register the ServiceWorker as soon as the app is stable
