@@ -14,6 +14,7 @@ import {
   combineLatest,
   concatMap,
   filter,
+  finalize,
   from,
   map,
   ReplaySubject,
@@ -61,6 +62,11 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   @Input()
   optimizedSvgMap?: { [name: string]: OptimizedSvg } | null;
 
+  colorInvert$ = new BehaviorSubject(false);
+  @InputToSubject()
+  @Input()
+  colorInvert = false;
+
   loading$ = new BehaviorSubject(true);
 
   svgText$ = this.handle$.pipe(
@@ -102,8 +108,6 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   );
 
   loadingDelay = `${Math.random() * 3}s`;
-
-  invert = false;
 
   pending$ = new BehaviorSubject(false);
 
@@ -171,11 +175,11 @@ export class SvgCardComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         concatMap(({ name, text }) => this.svgoService.optimize$(text, name)),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
+        finalize(() => this.pending$.next(false))
       )
       .subscribe({
         next: (optimizedSvg) => {
-          this.pending$.next(false);
           this.optimizedSvg$.next(optimizedSvg);
         },
       });
@@ -189,5 +193,9 @@ export class SvgCardComponent implements OnInit, OnDestroy {
           saveAs(new Blob([svgBlob]), `${name}.svg`);
         },
       });
+  }
+
+  invertColor() {
+    this.colorInvert$.next(!this.colorInvert$.getValue());
   }
 }

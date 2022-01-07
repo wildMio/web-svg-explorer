@@ -3,17 +3,10 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-:root {
-  --font-family-text: "Open Sans", "Arial", "Helvetica", sans-serif;
-  --font-family-stylized: "Roboto Mono", "DejaVu Sans Mono", "Consolas",
-    monospace;
-}
-
 html,
 body {
   height: 100%;
 }
 body {
-  // font-family: var(--font-family-stylized);
   color-scheme: dark;
 }

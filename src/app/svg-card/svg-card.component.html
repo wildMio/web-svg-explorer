@@ -13,18 +13,18 @@
         loading="lazy"
         [src]="uri"
         [alt]="svgName$ | async"
-        [class.invert]="invert"
+        [class.invert]="colorInvert$ | async"
       />
       <div class="absolute top-0 left-0">
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
-          (click)="invert = !invert"
+          (click)="invertColor()"
         >
           <img
             src="assets/invert_colors.svg"
             alt="invert svg color"
             loading="lazy"
-            [class.invert]="invert"
+            [class.invert]="colorInvert$ | async"
           />
         </button>
       </div>
@@ -37,7 +37,7 @@
             src="assets/optimize.svg"
             alt="optimize svg"
             loading="lazy"
-            [class.invert]="invert"
+            [class.invert]="colorInvert$ | async"
           />
         </button>
         <div *ngIf="pending$ | async" class="w-full text-center">...</div>
@@ -50,7 +50,7 @@
             src="assets/download.svg"
             alt="download svg"
             loading="lazy"
-            [class.invert]="invert"
+            [class.invert]="colorInvert$ | async"
           />
         </button>
         <div class="text-xs" [class]="compressRationClass$ | async">

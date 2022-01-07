@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, HostBinding } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostBinding,
+  Inject,
+  OnInit,
+} from '@angular/core';
+import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
 import * as saveAs from 'file-saver';
 import * as JSZip from 'jszip';
@@ -6,12 +14,14 @@ import {
   BehaviorSubject,
   combineLatest,
   concatMap,
+  filter,
+  finalize,
   from,
   map,
   take,
-  tap,
 } from 'rxjs';
 import { OptimizedSvg } from 'svgo';
+import { AppPwaService } from './service/app-pwa.service';
 import { SvgoService } from './service/svgo.service';
 
 @Component({
@@ -20,7 +30,7 @@ import { SvgoService } from './service/svgo.service';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   @HostBinding('class') class = 'grid h-full';
 
   title = 'web-svg-explorer';
@@ -28,30 +38,69 @@ export class AppComponent {
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     []
   );
-
   hasHandles$ = this.fileWithDirectoryHandles$.pipe(
     map((handles) => !!handles.length)
   );
 
+  displaySettingOpen = false;
   currentColor = 'white';
+  colorInvert = false;
 
+  directoryOpening$ = new BehaviorSubject(false);
   svgOptimizing$ = new BehaviorSubject(false);
+  downloadZipping$ = new BehaviorSubject(false);
+  loading$ = combineLatest([
+    this.directoryOpening$,
+    this.svgOptimizing$,
+    this.downloadZipping$,
+  ]).pipe(map((loadings) => loadings.some((loading) => loading)));
 
   optimizedSvgMap$ = new BehaviorSubject<
     { [name: string]: OptimizedSvg } | undefined
   >(undefined);
 
-  downloadZipping$ = new BehaviorSubject(false);
+  showInstallPromotion$ = this.appPwaService.showInstallPromotion$;
+  swUpdateAvailable$ = this.swUpdate.versionUpdates.pipe(
+    filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'),
+    map((evt) => ({
+      type: 'UPDATE_AVAILABLE',
+      current: evt.currentVersion,
+      available: evt.latestVersion,
+    }))
+  );
 
-  constructor(private readonly svgoService: SvgoService) {}
+  constructor(
+    @Inject(DOCUMENT) private readonly document: Document,
+    private readonly swUpdate: SwUpdate,
+    private readonly appPwaService: AppPwaService,
+    private readonly svgoService: SvgoService
+  ) {}
+
+  ngOnInit() {
+    this.appPwaService.interceptDefaultInstall();
+  }
+
+  installPromotion() {
+    this.appPwaService.installPromotion();
+  }
+
+  reloadPage() {
+    this.swUpdate.activateUpdate().then(() => this.document.location.reload());
+  }
 
   openDirectory() {
-    from(directoryOpen()).subscribe({
-      next: (files) =>
-        this.fileWithDirectoryHandles$.next(
-          files.filter((file) => file.type === 'image/svg+xml')
-        ),
-    });
+    if (this.directoryOpening$.getValue()) {
+      return;
+    }
+    this.directoryOpening$.next(true);
+    from(directoryOpen())
+      .pipe(finalize(() => this.directoryOpening$.next(false)))
+      .subscribe({
+        next: (files) =>
+          this.fileWithDirectoryHandles$.next(
+            files.filter((file) => file.type === 'image/svg+xml')
+          ),
+      });
   }
 
   svgoAll() {
@@ -78,7 +127,7 @@ export class AppComponent {
           )
         ),
         take(1),
-        tap(() => this.svgOptimizing$.next(false))
+        finalize(() => this.svgOptimizing$.next(false))
       )
       .subscribe({
         next: (optimizedSvgMap) => {
@@ -103,7 +152,7 @@ export class AppComponent {
           zip.generateAsync;
           return from(zip.generateAsync({ type: 'blob' }));
         }),
-        tap(() => this.downloadZipping$.next(false))
+        finalize(() => this.downloadZipping$.next(false))
       )
       .subscribe({ next: (content) => saveAs(content, 'svg.zip') });
   }

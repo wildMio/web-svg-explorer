@@ -1,73 +1,177 @@
 <header class="flex p-6 gap-4 items-center flex-wrap">
-  <h1 class="title">Browser Svg</h1>
-  <button mat-stroked-button (click)="openDirectory()">Open Directory</button>
-  <label>
-    Current Color
-    <div>
-      <input
-        #colorInput
-        type="text"
-        placeholder="#ffffff / white"
-        class="pl-1"
-        [value]="currentColor"
-        (input)="currentColor = colorInput.value"
+  <h1 class="text-xl font-medium">Browser Svg</h1>
+  <span class="hidden sm:block">
+    <button mat-stroked-button (click)="openDirectory()">Open Directory</button>
+  </span>
+  <span class="sm:hidden" matTooltip="Open Directory">
+    <button mat-icon-button (click)="openDirectory()">
+      <img
+        src="assets/folder_open.svg"
+        alt="open directory icon"
+        class="m-auto"
       />
-    </div>
-  </label>
-  <div class="flex items-center ml-auto">
-    <div class="opacity-0 p-2" [class.opacity-100]="downloadZipping$ | async">
-      ...
-    </div>
-    <button
-      *ngIf="optimizedSvgMap$ | async"
-      mat-stroked-button
-      (click)="downloadAll()"
-    >
-      Download All
     </button>
-    <div class="opacity-0 p-2" [class.opacity-100]="svgOptimizing$ | async">
-      ...
-    </div>
-    <button *ngIf="hasHandles$ | async" mat-stroked-button (click)="svgoAll()">
-      Svgo All
-    </button>
-  </div>
-</header>
+  </span>
 
-<div class="overflow-auto p-6">
-  <main class="main grid gap-8">
-    <div
-      class="icon-info flex opacity-0"
-      [class.opacity-80]="hasHandles$ | async"
-    >
-      Invert color
-      <span class="px-0.5">
+  <button
+    cdkOverlayOrigin
+    #trigger="cdkOverlayOrigin"
+    mat-icon-button
+    matTooltip="Toggle svg display setting panel"
+    (click)="displaySettingOpen = !displaySettingOpen"
+  >
+    <img
+      src="assets/display_setting.svg"
+      alt="display setting icon"
+      class="m-auto"
+    />
+  </button>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="displaySettingOpen"
+  >
+    <mat-card>
+      <label>
+        Current Color
+        <div>
+          <input
+            #colorInput
+            type="text"
+            placeholder="#ffffff / white"
+            class="pl-1"
+            [value]="currentColor"
+            (input)="currentColor = colorInput.value"
+          />
+        </div>
+      </label>
+      <label class="flex items-center mt-4 justify-between cursor-pointer">
+        <mat-checkbox
+          [checked]="colorInvert"
+          (change)="colorInvert = $event.checked"
+          >Invert color
+        </mat-checkbox>
         <img
           src="assets/invert_colors.svg"
           alt="invert svg color"
           class="invert opacity-50"
-        /> </span
-      >; Execute svgo
-      <span class="px-0.5">
+        />
+      </label>
+    </mat-card>
+  </ng-template>
+  <div class="flex items-center ml-auto">
+    <button
+      *ngIf="optimizedSvgMap$ | async"
+      mat-stroked-button
+      class="shrink-button"
+      (click)="downloadAll()"
+      matTooltip="Download all"
+    >
+      <div class="flex">
+        <img
+          src="assets/download.svg"
+          alt="download svg"
+          class="invert opacity-50"
+        />
+        <img
+          src="assets/all_inclusive.svg"
+          alt="all inclusive"
+          class="invert opacity-50"
+        />
+      </div>
+    </button>
+    <button
+      *ngIf="hasHandles$ | async"
+      mat-stroked-button
+      class="shrink-button"
+      (click)="svgoAll()"
+      matTooltip="Svgo all"
+    >
+      <div class="flex">
         <img
           src="assets/optimize.svg"
           alt="optimize svg"
           class="invert opacity-50"
-        /> </span
-      >; Download optimized svg
-      <span class="px-0.5">
+        />
+        <img
+          src="assets/all_inclusive.svg"
+          alt="all inclusive"
+          class="invert opacity-50"
+        />
+      </div>
+    </button>
+  </div>
+</header>
+
+<div class="absolute top-0 right-0 p-3">
+  <div *ngIf="loading$ | async" class="h-3 w-3 relative">
+    <span
+      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-400 opacity-75"
+    ></span>
+    <span
+      class="absolute inline-flex rounded-full h-3 w-3 bg-neutral-500"
+    ></span>
+  </div>
+</div>
+
+<div class="absolute top-0 left-0">
+  <button
+    *ngIf="showInstallPromotion$ | async"
+    mat-icon-button
+    (click)="installPromotion()"
+    matTooltip="Install"
+    class="invert opacity-50 hover:opacity-80 focus:opacity-100"
+  >
+    <img src="assets/install_desktop.svg" alt="install app" class="m-auto" />
+  </button>
+  <button
+    *ngIf="swUpdateAvailable$ | async"
+    mat-icon-button
+    (click)="reloadPage()"
+    matTooltip="Reload for update"
+    class="invert opacity-50 hover:opacity-80 focus:opacity-100"
+  >
+    <img src="assets/update.svg" alt="reload app" class="m-auto" />
+  </button>
+</div>
+
+<div class="overflow-auto p-6">
+  <main class="main grid gap-8">
+    <div
+      class="icon-info flex opacity-0 items-center gap-1"
+      [class.opacity-80]="hasHandles$ | async"
+    >
+      <span class="flex items-center">
+        <img
+          src="assets/invert_colors.svg"
+          alt="invert svg color"
+          class="invert opacity-50"
+        />
+        Invert color;
+      </span>
+      <span class="flex items-center">
+        <img
+          src="assets/optimize.svg"
+          alt="optimize svg"
+          class="invert opacity-50"
+        />
+        Execute svgo;</span
+      >
+      <span class="flex items-center">
         <img
           src="assets/download.svg"
           alt="download optimized svg"
           class="invert opacity-50"
-        /> </span
-      >;
+        />
+        Download optimized svg;</span
+      >
     </div>
     <app-svg-card
       *ngFor="let handle of fileWithDirectoryHandles$ | async"
       [currentColor]="currentColor"
       [fileWithDirectoryHandle]="handle"
       [optimizedSvgMap]="optimizedSvgMap$ | async"
+      [colorInvert]="colorInvert"
     ></app-svg-card>
   </main>
   <footer class="sticky top-full mt-4"></footer>

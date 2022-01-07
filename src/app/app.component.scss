@@ -2,11 +2,6 @@
   grid-template-rows: auto 1fr;
 }
 
-.title {
-  font-size: 1.7rem;
-  font-weight: 600;
-}
-
 .main {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 }
@@ -18,4 +13,16 @@
 
 .invert {
   filter: invert(1);
+}
+
+.shrink-button {
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+.bg-neutral-400 {
+  background-color: rgb(163, 163, 163);
+}
+.bg-neutral-500 {
+  background-color: rgb(115, 115, 115);
 }
