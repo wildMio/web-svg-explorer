@@ -16,9 +16,15 @@ import { InjectHTMLDirective } from './directive/inject-html.directive';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { VirtualElementDirective } from './directive/virtual-element.directive';
 
 @NgModule({
-  declarations: [AppComponent, SvgCardComponent, InjectHTMLDirective],
+  declarations: [
+    AppComponent,
+    SvgCardComponent,
+    InjectHTMLDirective,
+    VirtualElementDirective,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
