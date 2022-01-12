@@ -6,7 +6,26 @@ addEventListener('message', ({ data: { svgString, fileName } }) => {
   postMessage({
     optimizedSvg: optimize(svgString, {
       multipass: true,
-      plugins: [{ name: 'removeViewBox', active: false }],
+      plugins: [
+        {
+          name: 'preset-default',
+          params: {
+            overrides: {
+              removeViewBox: false,
+              removeUnknownsAndDefaults: {
+                keepDataAttrs: false,
+              },
+              cleanupIDs: {
+                force: true,
+              },
+            },
+          },
+        },
+        {
+          name: 'convertStyleToAttrs',
+          active: true,
+        },
+      ],
     }),
     fileName,
   });
