@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -8,7 +9,9 @@ import {
   OnInit,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+
 import { FileWithDirectoryHandle } from 'browser-fs-access';
+import { saveAs } from 'file-saver';
 import {
   BehaviorSubject,
   combineLatest,
@@ -26,13 +29,12 @@ import {
   tap,
 } from 'rxjs';
 import { OptimizedSvg } from 'svgo';
+
 import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
+import { round } from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
-import { saveAs } from 'file-saver';
-import { round } from '../util/general';
-import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-svg-card',
@@ -116,12 +118,17 @@ export class SvgCardComponent implements OnInit, OnDestroy {
 
   optimizedSvgBlob$ = this.optimizedSvg$.pipe(
     filter((svg) => !!svg),
-    map((svg) => new Blob([svg?.data!])),
+    map((svg) => {
+      if (svg?.data) {
+        return new Blob([svg?.data]);
+      }
+      return;
+    }),
     takeUntil(this.destroy$),
     shareReplay(1)
   );
 
-  optimizedSvgSize$ = this.optimizedSvgBlob$.pipe(map((blob) => blob.size));
+  optimizedSvgSize$ = this.optimizedSvgBlob$.pipe(map((blob) => blob?.size));
 
   originalSize$ = this.handle$.pipe(map((handle) => handle.size));
 
@@ -130,7 +137,8 @@ export class SvgCardComponent implements OnInit, OnDestroy {
     this.optimizedSvgSize$,
   ]).pipe(
     map(
-      ([comparisonSize, size]) => round((size / comparisonSize) * 100, 2) + '%'
+      ([comparisonSize, size]) =>
+        round(((size ?? 0) / comparisonSize) * 100, 2) + '%'
     )
   );
 
@@ -138,7 +146,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
     this.originalSize$,
     this.optimizedSvgSize$,
   ]).pipe(
-    map(([comparisonSize, size]) =>
+    map(([comparisonSize, size = 0]) =>
       comparisonSize > size
         ? 'text-green-500'
         : comparisonSize < size
@@ -163,7 +171,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
         filter((svg) => !!svg),
         takeUntil(this.destroy$)
       )
-      .subscribe({ next: (svg) => this.optimizedSvg$.next(svg!) });
+      .subscribe({ next: (svg) => svg && this.optimizedSvg$.next(svg) });
   }
 
   ngOnDestroy() {
@@ -193,7 +201,9 @@ export class SvgCardComponent implements OnInit, OnDestroy {
       .pipe(take(1), takeUntil(this.destroy$))
       .subscribe({
         next: ({ svgBlob, name }) => {
-          saveAs(new Blob([svgBlob]), `${name}.svg`);
+          if (svgBlob) {
+            saveAs(new Blob([svgBlob]), `${name}.svg`);
+          }
         },
       });
   }
@@ -205,12 +215,14 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   copy() {
     this.optimizedSvg$
       .pipe(
-        map((svg) => svg?.data!),
+        map((svg) => svg?.data),
         take(1)
       )
       .subscribe({
         next: (text) => {
-          this.clipboard.copy(text);
+          if (text) {
+            this.clipboard.copy(text);
+          }
         },
       });
   }

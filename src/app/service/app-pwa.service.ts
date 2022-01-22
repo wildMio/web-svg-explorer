@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { BehaviorSubject, from, fromEvent } from 'rxjs';
 import { map, switchMapTo, take } from 'rxjs/operators';
 
@@ -33,8 +34,6 @@ export class AppPwaService {
   deferredPrompt$ = new BehaviorSubject<BeforeInstallPromptEvent | null>(null);
 
   showInstallPromotion$ = this.deferredPrompt$.pipe(map((prompt) => !!prompt));
-
-  constructor() {}
 
   interceptDefaultInstall() {
     fromEvent<BeforeInstallPromptEvent>(

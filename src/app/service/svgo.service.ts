@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import {
   defer,
   filter,
@@ -26,8 +27,6 @@ export class SvgoService {
   }).pipe(shareReplay(1));
 
   cacheMap: { [fileName: string]: Observable<OptimizedSvg> } = {};
-
-  constructor() {}
 
   optimize$(svgString: string, fileName: string) {
     if (this.cacheMap[fileName]) {

@@ -5,7 +5,9 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
+
 import { Subject, takeUntil } from 'rxjs';
+
 import { inView } from '../util/intersection-observer';
 
 @Directive({

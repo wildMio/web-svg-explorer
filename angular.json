@@ -57,11 +57,7 @@
             ],
             "scripts": [],
             "webWorkerTsConfig": "tsconfig.worker.json",
-            "allowedCommonJsDependencies": [
-              "svgo",
-              "os",
-              "path"
-            ],
+            "allowedCommonJsDependencies": ["svgo", "os", "path"],
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json"
           },
@@ -146,9 +142,18 @@
             "firebaseProject": "svgolot",
             "firebaseHostingSite": "svgolot"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }
   },
-  "defaultProject": "web-svg-explorer"
+  "defaultProject": "web-svg-explorer",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  }
 }

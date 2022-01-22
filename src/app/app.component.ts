@@ -7,6 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
 import * as saveAs from 'file-saver';
 import * as JSZip from 'jszip';
@@ -21,6 +22,7 @@ import {
   take,
 } from 'rxjs';
 import { OptimizedSvg } from 'svgo';
+
 import { AppPwaService } from './service/app-pwa.service';
 import { SvgoService } from './service/svgo.service';
 
@@ -146,7 +148,7 @@ export class AppComponent implements OnInit {
         take(1),
         concatMap((svgMap) => {
           const zip = new JSZip();
-          Object.entries(svgMap!).forEach(([name, svg]) => {
+          Object.entries(svgMap ?? {}).forEach(([name, svg]) => {
             zip.file(`${name}.svg`, svg.data);
           });
           zip.generateAsync;
