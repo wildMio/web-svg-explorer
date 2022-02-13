@@ -34,7 +34,7 @@
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "rxfire": "^6.0.0",
-    "rxjs": "~7.4.0",
+    "rxjs": "^7.5.4",
     "svgo": "^2.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
