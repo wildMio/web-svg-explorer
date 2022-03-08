@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { NgModule } from '@angular/core';
@@ -5,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -12,6 +15,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
+import { CompressSettingComponent } from './compress-setting/compress-setting.component';
 import { InjectHTMLDirective } from './directive/inject-html.directive';
 import { VirtualElementDirective } from './directive/virtual-element.directive';
 import { SvgCardComponent } from './svg-card/svg-card.component';
@@ -22,6 +26,7 @@ import { SvgCardComponent } from './svg-card/svg-card.component';
     SvgCardComponent,
     InjectHTMLDirective,
     VirtualElementDirective,
+    CompressSettingComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,6 +36,9 @@ import { SvgCardComponent } from './svg-card/svg-card.component';
     MatCardModule,
     MatTooltipModule,
     MatCheckboxModule,
+    MatSlideToggleModule,
+    MatSliderModule,
+    A11yModule,
     OverlayModule,
     ClipboardModule,
     ServiceWorkerModule.register('ngsw-worker.js', {

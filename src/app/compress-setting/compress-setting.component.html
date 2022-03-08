@@ -1,0 +1,32 @@
+<span class="text-gray-400 text-sm">Global settings</span>
+<mat-slide-toggle
+  [checked]="multipass$ | async"
+  (change)="updateMultipass($event.checked)"
+  >Multipass</mat-slide-toggle
+>
+<mat-slide-toggle
+  [checked]="pretty$ | async"
+  (change)="updatePretty($event.checked)"
+  >Prettify</mat-slide-toggle
+>
+<div class="relative">
+  <span class="absolute top-0 left-0">Precision</span>
+  <mat-slider
+    min="0"
+    max="8"
+    step="1"
+    value="3"
+    thumbLabel
+    class="w-full"
+    [value]="floatPrecision$ | async"
+    (change)="updateFloatPrecision($event.value)"
+  ></mat-slider>
+</div>
+<span class="text-gray-400 text-sm">Features</span>
+<mat-slide-toggle
+  *ngFor="let plugin of plugins$ | async; let index = index"
+  [name]="plugin.id"
+  [checked]="plugin.active"
+  (change)="updatePlugin(plugin, $event.checked, index)"
+  >{{ plugin.name }}</mat-slide-toggle
+>

@@ -48,6 +48,8 @@ export class AppComponent implements OnInit {
   currentColor = 'white';
   colorInvert = false;
 
+  compressSettingOpen = false;
+
   directoryOpening$ = new BehaviorSubject(false);
   svgOptimizing$ = new BehaviorSubject(false);
   downloadZipping$ = new BehaviorSubject(false);

@@ -11,18 +11,11 @@
   transition: opacity 0.2s;
 }
 
-.invert {
-  filter: invert(1);
-}
-
 .shrink-button {
   min-width: 0;
   padding: 0.25rem 0.5rem;
 }
 
-.bg-neutral-400 {
-  background-color: rgb(163, 163, 163);
-}
-.bg-neutral-500 {
-  background-color: rgb(115, 115, 115);
+.compress-setting-panel {
+  height: calc(100vh - 64px);
 }
