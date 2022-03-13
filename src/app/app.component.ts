@@ -1,11 +1,15 @@
+import { Clipboard } from '@angular/cdk/clipboard';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
   Inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
@@ -15,16 +19,23 @@ import {
   BehaviorSubject,
   combineLatest,
   concatMap,
+  distinctUntilChanged,
   filter,
   finalize,
   from,
   map,
+  of,
+  shareReplay,
+  Subject,
+  switchMap,
   take,
+  takeUntil,
 } from 'rxjs';
-import { OptimizedSvg } from 'svgo';
 
 import { AppPwaService } from './service/app-pwa.service';
+import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
+import { sliceSvgSuffix } from './util/general';
 
 @Component({
   selector: 'app-root',
@@ -32,10 +43,10 @@ import { SvgoService } from './service/svgo.service';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   @HostBinding('class') class = 'grid h-full';
 
-  title = 'web-svg-explorer';
+  private readonly destroy$ = new Subject<void>();
 
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     []
@@ -47,6 +58,7 @@ export class AppComponent implements OnInit {
   displaySettingOpen = false;
   currentColor = 'white';
   colorInvert = false;
+  showMarkup = false;
 
   compressSettingOpen = false;
 
@@ -59,9 +71,7 @@ export class AppComponent implements OnInit {
     this.downloadZipping$,
   ]).pipe(map((loadings) => loadings.some((loading) => loading)));
 
-  optimizedSvgMap$ = new BehaviorSubject<
-    { [name: string]: OptimizedSvg } | undefined
-  >(undefined);
+  optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
 
   showInstallPromotion$ = this.appPwaService.showInstallPromotion$;
   swUpdateAvailable$ = this.swUpdate.versionUpdates.pipe(
@@ -73,15 +83,55 @@ export class AppComponent implements OnInit {
     }))
   );
 
+  firstUseApp$ = new BehaviorSubject(
+    coerceBooleanProperty(localStorage.getItem('firstUseApp') ?? true)
+  );
+
+  activeHandleSubject = new BehaviorSubject<FileWithDirectoryHandle | null>(
+    null
+  );
+  activeHandle$ = this.activeHandleSubject.pipe(
+    distinctUntilChanged(),
+    takeUntil(this.destroy$),
+    shareReplay(1)
+  );
+  activeSvgText$ = this.activeHandle$.pipe(
+    switchMap((handle) => (handle ? from(handle.text()) : of(''))),
+    takeUntil(this.destroy$),
+    shareReplay(1)
+  );
+  activeOptimizedSvg$ = this.optimizedSvgMap$.pipe(
+    switchMap((svgMap) =>
+      svgMap
+        ? this.activeHandle$.pipe(
+            map((handle) => {
+              const name = sliceSvgSuffix(handle?.name);
+              return name ? svgMap[name]?.data ?? '' : '';
+            })
+          )
+        : of('')
+    ),
+    takeUntil(this.destroy$),
+    shareReplay(1)
+  );
+
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
     private readonly swUpdate: SwUpdate,
+    private readonly clipboard: Clipboard,
+    private readonly snackBar: MatSnackBar,
     private readonly appPwaService: AppPwaService,
-    private readonly svgoService: SvgoService
+    private readonly svgoService: SvgoService,
+    private readonly svgStateService: SvgStateService
   ) {}
 
   ngOnInit() {
     this.appPwaService.interceptDefaultInstall();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   installPromotion() {
@@ -93,6 +143,8 @@ export class AppComponent implements OnInit {
   }
 
   openDirectory() {
+    localStorage.setItem('firstUseApp', 'false');
+    this.firstUseApp$.next(false);
     if (this.directoryOpening$.getValue()) {
       return;
     }
@@ -119,7 +171,7 @@ export class AppComponent implements OnInit {
           combineLatest(
             Object.fromEntries(
               handles.map((handle) => {
-                const name = handle.name.replace('.svg', '');
+                const name = sliceSvgSuffix(handle.name);
                 return [
                   name,
                   from(handle.text()).pipe(
@@ -135,7 +187,7 @@ export class AppComponent implements OnInit {
       )
       .subscribe({
         next: (optimizedSvgMap) => {
-          this.optimizedSvgMap$.next(optimizedSvgMap);
+          this.svgStateService.updateOptimizedSvgMap(optimizedSvgMap);
         },
       });
   }
@@ -159,5 +211,16 @@ export class AppComponent implements OnInit {
         finalize(() => this.downloadZipping$.next(false))
       )
       .subscribe({ next: (content) => saveAs(content, 'svg.zip') });
+  }
+
+  updateActiveHandle(handle: FileWithDirectoryHandle) {
+    this.activeHandleSubject.next(handle);
+  }
+
+  copy(name: string, text: string) {
+    this.clipboard.copy(text);
+    this.snackBar.open(`Copy ${name} success.`, 'Dismiss', {
+      duration: 2000,
+    });
   }
 }

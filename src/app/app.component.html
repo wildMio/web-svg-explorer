@@ -1,17 +1,27 @@
 <header class="flex p-6 gap-4 items-center flex-wrap">
   <h1 class="text-xl font-medium">SVGOLOT</h1>
-  <span class="hidden sm:block">
-    <button mat-stroked-button (click)="openDirectory()">Open Directory</button>
-  </span>
-  <span class="sm:hidden" matTooltip="Open Directory">
-    <button mat-icon-button (click)="openDirectory()">
-      <img
-        src="assets/folder_open.svg"
-        alt="open directory icon"
-        class="m-auto"
-      />
-    </button>
-  </span>
+  <div>
+    <span class="hidden sm:block">
+      <button mat-stroked-button (click)="openDirectory()">
+        Open Directory
+      </button>
+    </span>
+    <span class="sm:hidden" matTooltip="Open Directory">
+      <button mat-icon-button (click)="openDirectory()">
+        <img
+          src="assets/folder_open.svg"
+          alt="open directory icon"
+          class="m-auto"
+        />
+      </button>
+    </span>
+    <img
+      *ngIf="firstUseApp$ | async"
+      src="assets/hint.svg"
+      alt="hint svg"
+      class="absolute"
+    />
+  </div>
   <button
     cdkOverlayOrigin
     #trigger="cdkOverlayOrigin"
@@ -30,6 +40,7 @@
     [cdkConnectedOverlayOrigin]="trigger"
     [cdkConnectedOverlayOpen]="displaySettingOpen"
     (detach)="displaySettingOpen = false"
+    (overlayOutsideClick)="displaySettingOpen = false"
   >
     <mat-card cdkTrapFocusAutoCapture cdkTrapFocus>
       <label>
@@ -57,6 +68,18 @@
           class="invert opacity-50"
         />
       </label>
+      <label class="flex items-center mt-4 justify-between cursor-pointer">
+        <mat-checkbox
+          [checked]="showMarkup"
+          (change)="showMarkup = $event.checked"
+          >Show markup
+        </mat-checkbox>
+        <img
+          src="assets/code.svg"
+          alt="show markup"
+          class="invert opacity-50"
+        />
+      </label>
     </mat-card>
   </ng-template>
   <button
@@ -77,6 +100,7 @@
     [cdkConnectedOverlayOrigin]="compressSettingTrigger"
     [cdkConnectedOverlayOpen]="compressSettingOpen"
     (detach)="compressSettingOpen = false"
+    (overlayOutsideClick)="compressSettingOpen = false"
   >
     <mat-card
       cdkTrapFocusAutoCapture
@@ -168,52 +192,116 @@
   </button>
 </div>
 
-<div class="overflow-auto p-6">
-  <main class="main grid gap-8">
-    <div
-      class="icon-info flex flex-wrap opacity-0 items-center gap-1"
-      [class.opacity-80]="hasHandles$ | async"
-    >
-      <span class="flex items-center">
-        <img
-          src="assets/invert_colors.svg"
-          alt="invert svg color"
-          class="invert opacity-50"
-        />
-        <span> Invert color; </span>
-      </span>
-      <span class="flex items-center">
-        <img
-          src="assets/optimize.svg"
-          alt="optimize svg"
-          class="invert opacity-50"
-        />
-        Execute svgo;</span
+<div
+  class="grid overflow-hidden"
+  [class.md:grid-cols-2]="showMarkup"
+  [class.grid-rows-2]="showMarkup"
+  [class.md:grid-rows-1]="showMarkup"
+>
+  <div class="overflow-auto p-6">
+    <main class="main grid gap-8">
+      <div
+        class="icon-info flex flex-wrap opacity-0 items-center gap-1"
+        [class.opacity-80]="hasHandles$ | async"
       >
-      <span class="flex items-center">
-        <img
-          src="assets/copy.svg"
-          alt="copy optimized svg"
-          class="invert opacity-50"
-        />
-        Copy optimized svg;</span
+        <span class="flex items-center">
+          <img
+            src="assets/invert_colors.svg"
+            alt="invert svg color"
+            class="invert opacity-50"
+          />
+          <span> Invert color; </span>
+        </span>
+        <span class="flex items-center">
+          <img
+            src="assets/optimize.svg"
+            alt="optimize svg"
+            class="invert opacity-50"
+          />
+          Execute svgo;</span
+        >
+        <span class="flex items-center">
+          <img
+            src="assets/copy.svg"
+            alt="copy optimized svg"
+            class="invert opacity-50"
+          />
+          Copy optimized svg;</span
+        >
+        <span class="flex items-center">
+          <img
+            src="assets/download.svg"
+            alt="download optimized svg"
+            class="invert opacity-50"
+          />
+          Download optimized svg;</span
+        >
+      </div>
+      <app-svg-card
+        *ngFor="let handle of fileWithDirectoryHandles$ | async"
+        [currentColor]="currentColor"
+        [fileWithDirectoryHandle]="handle"
+        [colorInvert]="colorInvert"
+        class="rounded outline outline-0 outline-offset-4 outline-slate-100"
+        [class.outline-1]="activeHandle$ | async | match: handle"
+        (click)="updateActiveHandle(handle)"
+      ></app-svg-card>
+    </main>
+    <footer class="sticky top-full mt-4"></footer>
+  </div>
+  <div *ngIf="showMarkup" class="bg-[#262626] grid">
+    <ng-container *ngIf="activeHandle$ | async as handle; else activeHint">
+      <div
+        class="whitespace-pre-wrap grid grid-rows-[auto_auto_1fr_auto_1fr] overflow-hidden"
       >
-      <span class="flex items-center">
-        <img
-          src="assets/download.svg"
-          alt="download optimized svg"
-          class="invert opacity-50"
-        />
-        Download optimized svg;</span
-      >
-    </div>
-    <app-svg-card
-      *ngFor="let handle of fileWithDirectoryHandles$ | async"
-      [currentColor]="currentColor"
-      [fileWithDirectoryHandle]="handle"
-      [optimizedSvgMap]="optimizedSvgMap$ | async"
-      [colorInvert]="colorInvert"
-    ></app-svg-card>
-  </main>
-  <footer class="sticky top-full mt-4"></footer>
+        <div class="p-1 flex">
+          {{ handle.name }}
+        </div>
+        <div class="p-2 flex justify-between items-center">
+          <span> Original: </span>
+          <button
+            *ngIf="activeSvgText$ | async as text"
+            class="opacity-30 hover:opacity-80 focus:opacity-100"
+            (click)="copy(handle.name, text)"
+          >
+            <img
+              src="assets/copy.svg"
+              alt="copy svg"
+              loading="lazy"
+              class="invert"
+            />
+          </button>
+        </div>
+        <div
+          class="px-3 py-1 overflow-auto opacity-50"
+          [innerText]="activeSvgText$ | async"
+        ></div>
+        <div class="p-2 flex justify-between items-center">
+          <span> Optimized: </span>
+          <button
+            *ngIf="activeOptimizedSvg$ | async as text"
+            class="opacity-30 hover:opacity-80 focus:opacity-100"
+            (click)="copy(handle.name, text)"
+          >
+            <img
+              src="assets/copy.svg"
+              alt="copy svg"
+              loading="lazy"
+              class="invert"
+            />
+          </button>
+        </div>
+        <div
+          class="px-3 py-1 overflow-auto opacity-80"
+          [innerText]="activeOptimizedSvg$ | async"
+        ></div>
+      </div>
+    </ng-container>
+
+    <ng-template #activeHint>
+      <div class="p-4 text-center text-xl">
+        Click one svg card to show markup.
+      </div>
+    </ng-template>
+  </div>
 </div>

@@ -4,13 +4,13 @@ import { Observable } from 'rxjs';
 
 const hasSupport = 'IntersectionObserver' in window;
 
-export function inView(
+export const inView = (
   element: Element,
   options: IntersectionObserverInit = {
     root: null,
     threshold: [0, 1],
   }
-): Observable<boolean> {
+): Observable<boolean> => {
   return new Observable((subscriber) => {
     if (!hasSupport) {
       subscriber.next(true);
@@ -25,4 +25,4 @@ export function inView(
 
     return () => observer.disconnect();
   });
-}
+};

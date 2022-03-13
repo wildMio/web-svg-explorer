@@ -6,8 +6,8 @@ import {
   ElementRef,
   HostBinding,
   OnDestroy,
-  OnInit,
 } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { FileWithDirectoryHandle } from 'browser-fs-access';
@@ -28,11 +28,11 @@ import {
   takeUntil,
   tap,
 } from 'rxjs';
-import { OptimizedSvg } from 'svgo';
 
+import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
-import { round } from '../util/general';
+import { round, sliceSvgSuffix } from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
 
@@ -42,7 +42,7 @@ import { inView } from '../util/intersection-observer';
   styleUrls: ['./svg-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SvgCardComponent implements OnInit, OnDestroy {
+export class SvgCardComponent implements OnDestroy {
   @HostBinding('class') class = 'block';
 
   private readonly destroy$ = new Subject<void>();
@@ -58,12 +58,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   @Input()
   currentColor: string | undefined;
 
-  optimizedSvgMap$ = new BehaviorSubject<
-    { [name: string]: OptimizedSvg } | undefined
-  >(undefined);
-  @InputToSubject()
-  @Input()
-  optimizedSvgMap?: { [name: string]: OptimizedSvg } | null;
+  optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
 
   colorInvert$ = new BehaviorSubject(false);
   @InputToSubject()
@@ -105,7 +100,7 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   );
 
   svgName$ = this.handle$.pipe(
-    map((handle) => handle.name.replace('.svg', '')),
+    map(({ name }) => sliceSvgSuffix(name)),
     takeUntil(this.destroy$),
     shareReplay(1)
   );
@@ -114,7 +109,11 @@ export class SvgCardComponent implements OnInit, OnDestroy {
 
   pending$ = new BehaviorSubject(false);
 
-  optimizedSvg$ = new BehaviorSubject<OptimizedSvg | null>(null);
+  optimizedSvg$ = this.svgName$.pipe(
+    switchMap((name) =>
+      this.optimizedSvgMap$.pipe(map((svgMap) => svgMap?.[name]))
+    )
+  );
 
   optimizedSvgBlob$ = this.optimizedSvg$.pipe(
     filter((svg) => !!svg),
@@ -159,20 +158,10 @@ export class SvgCardComponent implements OnInit, OnDestroy {
     private readonly host: ElementRef<HTMLElement>,
     private readonly domSanitizer: DomSanitizer,
     private readonly clipboard: Clipboard,
-    private readonly svgoService: SvgoService
+    private readonly snackBar: MatSnackBar,
+    private readonly svgoService: SvgoService,
+    private readonly svgStateService: SvgStateService
   ) {}
-
-  ngOnInit(): void {
-    this.svgName$
-      .pipe(
-        switchMap((name) =>
-          this.optimizedSvgMap$.pipe(map((svgMap) => svgMap?.[name]))
-        ),
-        filter((svg) => !!svg),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({ next: (svg) => svg && this.optimizedSvg$.next(svg) });
-  }
 
   ngOnDestroy() {
     this.destroy$.next();
@@ -184,14 +173,18 @@ export class SvgCardComponent implements OnInit, OnDestroy {
     combineLatest({ name: this.svgName$, text: this.svgText$ })
       .pipe(
         take(1),
-        concatMap(({ name, text }) => this.svgoService.optimize$(text, name)),
+        concatMap(({ name, text }) =>
+          this.svgoService
+            .optimize$(text, name)
+            .pipe(map((optimizedSvg) => ({ name, optimizedSvg })))
+        ),
         take(1),
         takeUntil(this.destroy$),
         finalize(() => this.pending$.next(false))
       )
       .subscribe({
-        next: (optimizedSvg) => {
-          this.optimizedSvg$.next(optimizedSvg);
+        next: ({ name, optimizedSvg }) => {
+          this.svgStateService.updateOptimizedSvg(name, optimizedSvg);
         },
       });
   }
@@ -213,15 +206,15 @@ export class SvgCardComponent implements OnInit, OnDestroy {
   }
 
   copy() {
-    this.optimizedSvg$
-      .pipe(
-        map((svg) => svg?.data),
-        take(1)
-      )
+    combineLatest({ svg: this.optimizedSvg$, name: this.svgName$ })
+      .pipe(take(1), takeUntil(this.destroy$))
       .subscribe({
-        next: (text) => {
-          if (text) {
-            this.clipboard.copy(text);
+        next: ({ svg, name }) => {
+          if (svg?.data) {
+            this.clipboard.copy(svg.data);
+            this.snackBar.open(`Copy ${name} success.`, 'Dismiss', {
+              duration: 2000,
+            });
           }
         },
       });

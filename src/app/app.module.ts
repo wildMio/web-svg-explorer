@@ -8,6 +8,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -18,6 +19,7 @@ import { AppComponent } from './app.component';
 import { CompressSettingComponent } from './compress-setting/compress-setting.component';
 import { InjectHTMLDirective } from './directive/inject-html.directive';
 import { VirtualElementDirective } from './directive/virtual-element.directive';
+import { MatchPipe } from './pipe/match.pipe';
 import { SvgCardComponent } from './svg-card/svg-card.component';
 
 @NgModule({
@@ -27,6 +29,7 @@ import { SvgCardComponent } from './svg-card/svg-card.component';
     InjectHTMLDirective,
     VirtualElementDirective,
     CompressSettingComponent,
+    MatchPipe,
   ],
   imports: [
     BrowserModule,
@@ -38,6 +41,7 @@ import { SvgCardComponent } from './svg-card/svg-card.component';
     MatCheckboxModule,
     MatSlideToggleModule,
     MatSliderModule,
+    MatSnackBarModule,
     A11yModule,
     OverlayModule,
     ClipboardModule,
