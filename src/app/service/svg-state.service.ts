@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, debounceTime, map } from 'rxjs';
 import { OptimizedSvg } from 'svgo';
 
 @Injectable({
@@ -14,6 +14,11 @@ export class SvgStateService {
   }>(this.optimizeSvgMap);
 
   optimizedSvgMap$ = this.optimizedSvgMapSubject.pipe();
+
+  hasOptimizedSvgMap$ = this.optimizedSvgMap$.pipe(
+    debounceTime(200),
+    map((svgMap) => !!Object.keys(svgMap).length)
+  );
 
   updateOptimizedSvg(name: string, svg: OptimizedSvg) {
     this.optimizeSvgMap[name] = svg;

@@ -111,7 +111,7 @@
   </ng-template>
   <div class="flex items-center ml-auto gap-4">
     <button
-      *ngIf="optimizedSvgMap$ | async"
+      *ngIf="hasOptimizedSvgMap$ | async"
       mat-stroked-button
       class="shrink-button"
       (click)="downloadAll()"

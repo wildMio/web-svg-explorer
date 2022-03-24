@@ -72,6 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ]).pipe(map((loadings) => loadings.some((loading) => loading)));
 
   optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
+  hasOptimizedSvgMap$ = this.svgStateService.hasOptimizedSvgMap$;
 
   showInstallPromotion$ = this.appPwaService.showInstallPromotion$;
   swUpdateAvailable$ = this.swUpdate.versionUpdates.pipe(

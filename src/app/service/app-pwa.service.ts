@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, from, fromEvent } from 'rxjs';
-import { map, switchMapTo, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 export interface BeforeInstallPromptEvent extends Event {
   /**
@@ -74,7 +74,10 @@ export class AppPwaService {
       return;
     }
     from(deferredPrompt?.prompt())
-      .pipe(switchMapTo(from(deferredPrompt.userChoice)), take(1))
+      .pipe(
+        switchMap(() => from(deferredPrompt.userChoice)),
+        take(1)
+      )
       .subscribe({
         next: () => {
           this.deferredPrompt$.next(null);
