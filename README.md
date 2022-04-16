@@ -8,6 +8,10 @@ Quick svgo multiple svg files.
 
 Let's svgo a lot: <https://svgolot.web.app/>
 
+### Preview
+
+[![Web svg explorer preview](./doc/preview.webp)](./doc/preview.webp)
+
 ## Dependency library
 
 - Angular (<https://angular.io/>)
@@ -29,14 +33,14 @@ SVGOMG (<https://jakearchibald.github.io/svgomg/>)
 
 ## Icon source
 
-- https://angular.io/presskit
-- https://fonts.google.com/icons?selected=Material+Icons
-- https://iconsvg.xyz/
-- https://iconify.design/
+- <https://angular.io/presskit>
+- <https://fonts.google.com/icons?selected=Material+Icons>
+- <https://iconsvg.xyz/>
+- <https://iconify.design/>
 
 ### Combine logo through
 
-excalidraw (https://excalidraw.com/)
+excalidraw (<https://excalidraw.com/>)
 
 ## Development server
 
