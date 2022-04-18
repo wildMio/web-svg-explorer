@@ -34,7 +34,7 @@ import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
 import { round, sliceSvgSuffix } from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
-import { inView } from '../util/intersection-observer';
+import { genInView } from '../util/intersection-observer';
 
 @Component({
   selector: 'app-svg-card',
@@ -70,10 +70,10 @@ export class SvgCardComponent implements OnDestroy {
   svgText$ = this.handle$.pipe(
     tap(() => this.loading$.next(true)),
     switchMap((handle) =>
-      inView(this.host.nativeElement, {
+      genInView({
         root: null,
         threshold: [0.2],
-      }).pipe(
+      })(this.host.nativeElement).pipe(
         filter((view) => view),
         take(1),
         tap(() => handle.size),
