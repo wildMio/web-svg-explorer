@@ -51,8 +51,8 @@
             type="text"
             placeholder="#ffffff / white"
             class="pl-1"
-            [value]="currentColor"
-            (input)="currentColor = colorInput.value"
+            [value]="currentColor$ | async"
+            (input)="currentColor$.next(colorInput.value)"
           />
         </div>
       </label>
@@ -239,7 +239,7 @@
       </div>
       <app-svg-card
         *ngFor="let handle of fileWithDirectoryHandles$ | async"
-        [currentColor]="currentColor"
+        [currentColor]="debounceCurrentColor$ | async"
         [fileWithDirectoryHandle]="handle"
         [colorInvert]="colorInvert"
         class="rounded outline outline-0 outline-offset-4 outline-slate-100"

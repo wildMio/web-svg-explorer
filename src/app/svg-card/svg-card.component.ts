@@ -56,7 +56,7 @@ export class SvgCardComponent implements OnDestroy {
   currentColor$ = new BehaviorSubject<string | null>(null);
   @InputToSubject()
   @Input()
-  currentColor: string | undefined;
+  currentColor: string | null | undefined;
 
   optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
 

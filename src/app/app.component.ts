@@ -19,6 +19,7 @@ import {
   BehaviorSubject,
   combineLatest,
   concatMap,
+  debounceTime,
   distinctUntilChanged,
   filter,
   finalize,
@@ -56,7 +57,8 @@ export class AppComponent implements OnInit, OnDestroy {
   );
 
   displaySettingOpen = false;
-  currentColor = 'white';
+  currentColor$ = new BehaviorSubject('white');
+  debounceCurrentColor$ = this.currentColor$.pipe(debounceTime(200));
   colorInvert = false;
   showMarkup = false;
 
