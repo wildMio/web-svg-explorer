@@ -1,0 +1,45 @@
+<ng-container *ngIf="handle; else activeHint">
+  <div
+    class="whitespace-pre-wrap grid grid-rows-[auto_auto_1fr_auto_1fr] overflow-hidden"
+  >
+    <div class="p-1 flex">
+      {{ handle.name }}
+    </div>
+    <div class="p-2 flex justify-between items-center">
+      <span> Original: </span>
+      <button
+        *ngIf="originalText"
+        class="opacity-30 hover:opacity-80 focus:opacity-100"
+        (click)="copy(handle.name, originalText)"
+      >
+        <img
+          src="assets/copy.svg"
+          alt="copy svg"
+          loading="lazy"
+          class="invert"
+        />
+      </button>
+    </div>
+    <div class="px-3 py-1 overflow-auto opacity-50">{{ originalText }}</div>
+    <div class="p-2 flex justify-between items-center">
+      <span> Optimized: </span>
+      <button
+        *ngIf="optimizedText"
+        class="opacity-30 hover:opacity-80 focus:opacity-100"
+        (click)="copy(handle.name, optimizedText)"
+      >
+        <img
+          src="assets/copy.svg"
+          alt="copy svg"
+          loading="lazy"
+          class="invert"
+        />
+      </button>
+    </div>
+    <div class="px-3 py-1 overflow-auto opacity-80">{{ optimizedText }}</div>
+  </div>
+</ng-container>
+
+<ng-template #activeHint>
+  <div class="p-4 text-center text-xl">Click one svg card to show markup.</div>
+</ng-template>

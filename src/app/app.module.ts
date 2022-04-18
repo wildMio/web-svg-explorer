@@ -21,6 +21,7 @@ import { InjectHTMLDirective } from './directive/inject-html.directive';
 import { VirtualElementDirective } from './directive/virtual-element.directive';
 import { MatchPipe } from './pipe/match.pipe';
 import { SvgCardComponent } from './svg-card/svg-card.component';
+import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SvgCardComponent } from './svg-card/svg-card.component';
     VirtualElementDirective,
     CompressSettingComponent,
     MatchPipe,
+    SvgMarkupComponent,
   ],
   imports: [
     BrowserModule,

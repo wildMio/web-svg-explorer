@@ -1,4 +1,3 @@
-import { Clipboard } from '@angular/cdk/clipboard';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { DOCUMENT } from '@angular/common';
 import {
@@ -9,7 +8,6 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
@@ -121,8 +119,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
     private readonly swUpdate: SwUpdate,
-    private readonly clipboard: Clipboard,
-    private readonly snackBar: MatSnackBar,
     private readonly appPwaService: AppPwaService,
     private readonly svgoService: SvgoService,
     private readonly svgStateService: SvgStateService
@@ -218,12 +214,5 @@ export class AppComponent implements OnInit, OnDestroy {
 
   updateActiveHandle(handle: FileWithDirectoryHandle) {
     this.activeHandleSubject.next(handle);
-  }
-
-  copy(name: string, text: string) {
-    this.clipboard.copy(text);
-    this.snackBar.open(`Copy ${name} success.`, 'Dismiss', {
-      duration: 2000,
-    });
   }
 }
