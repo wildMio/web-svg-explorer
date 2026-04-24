@@ -1,4 +1,12 @@
-import { Component, ChangeDetectionStrategy, HostBinding } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  HostBinding,
+  inject,
+} from '@angular/core';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatSlider, MatSliderThumb } from '@angular/material/slider';
 
 import { SvgoService } from '../service/svgo.service';
 
@@ -7,8 +15,11 @@ import { SvgoService } from '../service/svgo.service';
   templateUrl: './compress-setting.component.html',
   styleUrls: ['./compress-setting.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatSlideToggle, MatSlider, MatSliderThumb, AsyncPipe],
 })
 export class CompressSettingComponent {
+  private readonly svgoService = inject(SvgoService);
+
   @HostBinding('class') class = 'grid gap-4';
 
   multipass$ = this.svgoService.multipass$;
@@ -16,8 +27,6 @@ export class CompressSettingComponent {
   transformPrecision$ = this.svgoService.transformPrecision$;
   pretty$ = this.svgoService.pretty$;
   plugins$ = this.svgoService.plugins$;
-
-  constructor(private readonly svgoService: SvgoService) {}
 
   updateMultipass(multipass: boolean) {
     this.multipass$.next(multipass);

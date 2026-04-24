@@ -1,83 +1,88 @@
-<mat-card appVirtualElement>
+<mat-card appearance="outlined" appVirtualElement>
   <div class="flex">
-    <div
-      *ngIf="loading$ | async"
-      class="loading-wrapper flex justify-center m-auto"
-      [style.--loading-delay]="loadingDelay"
-    >
-      <div class="loading"></div>
-    </div>
-    <ng-container *ngIf="svgUri$ | async as uri">
+    @if (loading$ | async) {
+      <div
+        class="loading-wrapper flex justify-center m-auto"
+        [style.--loading-delay]="loadingDelay"
+        >
+        <div class="loading"></div>
+      </div>
+    }
+    @if (svgUri$ | async; as uri) {
       <img
         class="m-auto svg-wrapper"
         loading="lazy"
         [src]="uri"
         [alt]="svgName$ | async"
         [class.invert]="colorInvert$ | async"
-      />
+        />
       <div class="absolute top-0 left-0">
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="invertColor()"
-        >
+          >
           <img
             src="assets/invert_colors.svg"
             alt="invert svg color"
             loading="lazy"
             [class.invert]="colorInvert$ | async"
-          />
+            />
         </button>
       </div>
       <div class="grid absolute top-0 right-0 justify-items-end gap-1">
         <div class="flex gap-1">
-          <button
-            *ngIf="optimizedSvg$ | async"
-            class="opacity-30 hover:opacity-80 focus:opacity-100"
-            (click)="copy()"
-          >
-            <img
-              src="assets/copy.svg"
-              alt="copy svg"
-              loading="lazy"
-              [class.invert]="colorInvert$ | async"
-            />
-          </button>
+          @if (optimizedSvg$ | async) {
+            <button
+              class="opacity-30 hover:opacity-80 focus:opacity-100"
+              (click)="copy()"
+              >
+              <img
+                src="assets/copy.svg"
+                alt="copy svg"
+                loading="lazy"
+                [class.invert]="colorInvert$ | async"
+                />
+            </button>
+          }
           <button
             class="opacity-30 hover:opacity-80 focus:opacity-100"
             (click)="optimize()"
-          >
+            >
             <img
               src="assets/optimize.svg"
               alt="optimize svg"
               loading="lazy"
               [class.invert]="colorInvert$ | async"
-            />
+              />
           </button>
         </div>
-        <div *ngIf="pending$ | async" class="w-full text-center">...</div>
-        <button
-          *ngIf="optimizedSvg$ | async"
-          class="opacity-30 hover:opacity-80 focus:opacity-100"
-          (click)="download()"
-        >
-          <img
-            src="assets/download.svg"
-            alt="download svg"
-            loading="lazy"
-            [class.invert]="colorInvert$ | async"
-          />
-        </button>
+        @if (pending$ | async) {
+          <div class="w-full text-center">...</div>
+        }
+        @if (optimizedSvg$ | async) {
+          <button
+            class="opacity-30 hover:opacity-80 focus:opacity-100"
+            (click)="download()"
+            >
+            <img
+              src="assets/download.svg"
+              alt="download svg"
+              loading="lazy"
+              [class.invert]="colorInvert$ | async"
+              />
+          </button>
+        }
         <div class="text-xs" [class]="compressRationClass$ | async">
           {{ compressRatio$ | async }}
         </div>
       </div>
-    </ng-container>
+    }
   </div>
 
   <div
     class="text-center whitespace-nowrap break-all overflow-hidden overflow-ellipsis"
     [title]="svgName$ | async"
-  >
+    >
     {{ svgName$ | async }}
   </div>
 </mat-card>

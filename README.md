@@ -18,12 +18,8 @@ Let's svgo a lot: <https://svgolot.web.app/>
 - angular material (<https://material.angular.io/>)
 - tailwindcss (<https://tailwindcss.com/>)
 - svgo (<https://github.com/svg/svgo>)
-- os-browserify (<https://github.com/CoderPuppy/os-browserify>)
-- path-browserify (<https://github.com/browserify/path-browserify>)
 - browser-fs-access (<https://github.com/GoogleChromeLabs/browser-fs-access>)
-- jszip (<https://github.com/Stuk/jszip>)
-- file-saver (<https://github.com/eligrey/FileSaver.js>)
-- angularfire (<https://github.com/angular/angularfire>)
+- fflate (<https://github.com/101arrowz/fflate>)
 
 ### Inspired by
 

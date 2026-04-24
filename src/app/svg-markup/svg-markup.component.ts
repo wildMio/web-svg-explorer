@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   Input,
   HostBinding,
+  inject,
 } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -16,16 +17,14 @@ import { FileWithDirectoryHandle } from 'browser-fs-access';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SvgMarkupComponent {
+  private readonly clipboard = inject(Clipboard);
+  private readonly snackBar = inject(MatSnackBar);
+
   @HostBinding('class') class = 'grid bg-[#262626] h-full';
 
   @Input() handle?: FileWithDirectoryHandle | null;
   @Input() originalText?: string | null;
   @Input() optimizedText?: string | null;
-
-  constructor(
-    private readonly clipboard: Clipboard,
-    private readonly snackBar: MatSnackBar
-  ) {}
 
   copy(name: string, text: string) {
     this.clipboard.copy(text);

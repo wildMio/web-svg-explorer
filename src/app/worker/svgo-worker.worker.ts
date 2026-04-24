@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 
-import { optimize, Config as OptimizeOptions } from 'svgo';
+import { optimize } from 'svgo/dist/svgo.browser.js';
+
+import type { Config as OptimizeOptions } from 'svgo';
 
 interface SVGOMessage {
   svgString: string;

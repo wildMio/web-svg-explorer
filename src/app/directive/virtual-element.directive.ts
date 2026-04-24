@@ -4,22 +4,19 @@ import {
   OnDestroy,
   OnInit,
   Renderer2,
+  inject,
 } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 
 import { inView } from '../util/intersection-observer';
 
-@Directive({
-  selector: '[appVirtualElement]',
-})
+@Directive({ selector: '[appVirtualElement]' })
 export class VirtualElementDirective implements OnInit, OnDestroy {
-  destroy$ = new Subject<void>();
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly renderer = inject(Renderer2);
 
-  constructor(
-    private readonly host: ElementRef<HTMLElement>,
-    private readonly renderer: Renderer2
-  ) {}
+  destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     const el = this.host.nativeElement;

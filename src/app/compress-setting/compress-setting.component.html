@@ -3,43 +3,38 @@
   [checked]="multipass$ | async"
   (change)="updateMultipass($event.checked)"
   >Multipass</mat-slide-toggle
->
-<mat-slide-toggle
-  [checked]="pretty$ | async"
-  (change)="updatePretty($event.checked)"
-  >Prettify</mat-slide-toggle
->
-<div class="relative">
-  <span class="absolute top-0 left-0">Number Precision</span>
-  <mat-slider
-    min="0"
-    max="8"
-    step="1"
-    value="3"
-    thumbLabel
-    class="w-full"
-    [value]="floatPrecision$ | async"
-    (change)="updateFloatPrecision($event.value)"
-  ></mat-slider>
-</div>
-<div class="relative">
-  <span class="absolute top-0 left-0">Transform Precision</span>
-  <mat-slider
-    min="0"
-    max="8"
-    step="1"
-    value="5"
-    thumbLabel
-    class="w-full"
-    [value]="transformPrecision$ | async"
-    (change)="updateTransformPrecision($event.value)"
-  ></mat-slider>
-</div>
-<span class="text-gray-400 text-sm">Features</span>
-<mat-slide-toggle
-  *ngFor="let plugin of plugins$ | async; let index = index"
-  [name]="plugin.id"
-  [checked]="plugin.active"
-  (change)="updatePlugin(plugin, $event.checked, index)"
-  >{{ plugin.name }}</mat-slide-toggle
->
+  >
+  <mat-slide-toggle
+    [checked]="pretty$ | async"
+    (change)="updatePretty($event.checked)"
+    >Prettify</mat-slide-toggle
+    >
+    <div class="relative">
+      <span class="absolute top-0 left-0">Number Precision</span>
+      <mat-slider
+        min="0"
+        max="8"
+        step="1"
+        thumbLabel
+        class="w-full"
+      #ngSlider><input matSliderThumb [value]="floatPrecision$ | async" (change)="updateFloatPrecision({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}.value)" #ngSliderThumb="matSliderThumb" value="3" /></mat-slider>
+    </div>
+    <div class="relative">
+      <span class="absolute top-0 left-0">Transform Precision</span>
+      <mat-slider
+        min="0"
+        max="8"
+        step="1"
+        thumbLabel
+        class="w-full"
+      #ngSlider><input matSliderThumb [value]="transformPrecision$ | async" (change)="updateTransformPrecision({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value}.value)" #ngSliderThumb="matSliderThumb" value="5" /></mat-slider>
+    </div>
+    <span class="text-gray-400 text-sm">Features</span>
+    @for (plugin of plugins$ | async; track plugin; let index = $index) {
+      <mat-slide-toggle
+        [name]="plugin.id"
+        [checked]="plugin.active"
+        (change)="updatePlugin(plugin, $event.checked, index)"
+        >{{ plugin.name }}</mat-slide-toggle
+        >
+      }

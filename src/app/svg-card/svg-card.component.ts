@@ -1,4 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
+import { AsyncPipe } from '@angular/common';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -8,12 +9,13 @@ import {
   OnDestroy,
   ChangeDetectorRef,
   NgZone,
+  inject,
 } from '@angular/core';
+import { MatCard } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { FileWithDirectoryHandle } from 'browser-fs-access';
-import { saveAs } from 'file-saver';
 import {
   BehaviorSubject,
   combineLatest,
@@ -31,10 +33,11 @@ import {
   tap,
 } from 'rxjs';
 
+import { VirtualElementDirective } from '../directive/virtual-element.directive';
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
-import { round, sliceSvgSuffix } from '../util/general';
+import { downloadBlob, round, sliceSvgSuffix } from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
 
@@ -43,8 +46,18 @@ import { inView } from '../util/intersection-observer';
   templateUrl: './svg-card.component.html',
   styleUrls: ['./svg-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatCard, VirtualElementDirective, AsyncPipe],
 })
 export class SvgCardComponent implements OnDestroy {
+  private readonly zone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly domSanitizer = inject(DomSanitizer);
+  private readonly clipboard = inject(Clipboard);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly svgoService = inject(SvgoService);
+  private readonly svgStateService = inject(SvgStateService);
+
   @HostBinding('class') class = 'block';
 
   private readonly destroy$ = new Subject<void>();
@@ -160,17 +173,6 @@ export class SvgCardComponent implements OnDestroy {
     )
   );
 
-  constructor(
-    private readonly zone: NgZone,
-    private readonly cdr: ChangeDetectorRef,
-    private readonly host: ElementRef<HTMLElement>,
-    private readonly domSanitizer: DomSanitizer,
-    private readonly clipboard: Clipboard,
-    private readonly snackBar: MatSnackBar,
-    private readonly svgoService: SvgoService,
-    private readonly svgStateService: SvgStateService
-  ) {}
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -203,7 +205,7 @@ export class SvgCardComponent implements OnDestroy {
       .subscribe({
         next: ({ svgBlob, name }) => {
           if (svgBlob) {
-            saveAs(new Blob([svgBlob]), `${name}.svg`);
+            downloadBlob(svgBlob, `${name}.svg`);
           }
         },
       });

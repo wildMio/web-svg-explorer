@@ -5,3 +5,14 @@ export const round = (num: number, places: number) => {
 
 export const sliceSvgSuffix = (text?: string) =>
   text?.replace('.svg', '') ?? '';
+
+export const downloadBlob = (blob: Blob, fileName: string) => {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+
+  anchor.href = objectUrl;
+  anchor.download = fileName;
+  anchor.click();
+
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+};

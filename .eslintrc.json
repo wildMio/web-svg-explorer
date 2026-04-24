@@ -1,11 +1,17 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*"],
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "parserOptions": {
-        "project": ["tsconfig.json"],
+        "project": [
+          "tsconfig.json"
+        ],
         "createDefaultProgram": true
       },
       "extends": [
@@ -15,7 +21,9 @@
         "plugin:@angular-eslint/template/process-inline-templates",
         "prettier"
       ],
-      "plugins": ["eslint-plugin-import"],
+      "plugins": [
+        "eslint-plugin-import"
+      ],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@angular-eslint/directive-selector": [
@@ -41,7 +49,14 @@
             "groups": [
               "builtin",
               "external",
-              ["internal", "index", "sibling", "parent", "object", "type"]
+              [
+                "internal",
+                "index",
+                "sibling",
+                "parent",
+                "object",
+                "type"
+              ]
             ],
             "pathGroups": [
               {
@@ -64,15 +79,28 @@
               "object",
               "type"
             ],
-            "alphabetize": { "order": "asc", "caseInsensitive": true }
+            "alphabetize": {
+              "order": "asc",
+              "caseInsensitive": true
+            }
           }
         ],
-        "import/newline-after-import": ["error", { "count": 1 }]
+        "import/newline-after-import": [
+          "error",
+          {
+            "count": 1
+          }
+        ]
       }
     },
     {
-      "files": ["*.html"],
-      "extends": ["plugin:@angular-eslint/template/recommended", "prettier"],
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended",
+        "prettier"
+      ],
       "rules": {}
     }
   ]

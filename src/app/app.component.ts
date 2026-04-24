@@ -1,18 +1,24 @@
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { DOCUMENT } from '@angular/common';
+import { CdkOverlayOrigin, CdkConnectedOverlay } from '@angular/cdk/overlay';
+import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
-  Inject,
   OnDestroy,
   OnInit,
+  DOCUMENT,
+  inject,
 } from '@angular/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard } from '@angular/material/card';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatTooltip } from '@angular/material/tooltip';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
-import * as saveAs from 'file-saver';
-import * as JSZip from 'jszip';
+import { strToU8, zipSync } from 'fflate';
 import {
   BehaviorSubject,
   combineLatest,
@@ -31,18 +37,43 @@ import {
   takeUntil,
 } from 'rxjs';
 
+import { CompressSettingComponent } from './compress-setting/compress-setting.component';
+import { MatchPipe } from './pipe/match.pipe';
 import { AppPwaService } from './service/app-pwa.service';
 import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
-import { sliceSvgSuffix } from './util/general';
+import { SvgCardComponent } from './svg-card/svg-card.component';
+import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
+import { downloadBlob, sliceSvgSuffix } from './util/general';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatButton,
+    MatTooltip,
+    MatIconButton,
+    CdkOverlayOrigin,
+    CdkConnectedOverlay,
+    MatCard,
+    CdkTrapFocus,
+    MatCheckbox,
+    CompressSettingComponent,
+    SvgCardComponent,
+    SvgMarkupComponent,
+    AsyncPipe,
+    MatchPipe,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private readonly document = inject<Document>(DOCUMENT);
+  private readonly swUpdate = inject(SwUpdate);
+  private readonly appPwaService = inject(AppPwaService);
+  private readonly svgoService = inject(SvgoService);
+  private readonly svgStateService = inject(SvgStateService);
+
   @HostBinding('class') class = 'grid h-full';
 
   private readonly destroy$ = new Subject<void>();
@@ -115,14 +146,6 @@ export class AppComponent implements OnInit, OnDestroy {
     takeUntil(this.destroy$),
     shareReplay(1)
   );
-
-  constructor(
-    @Inject(DOCUMENT) private readonly document: Document,
-    private readonly swUpdate: SwUpdate,
-    private readonly appPwaService: AppPwaService,
-    private readonly svgoService: SvgoService,
-    private readonly svgStateService: SvgStateService
-  ) {}
 
   ngOnInit() {
     this.appPwaService.interceptDefaultInstall();
@@ -200,16 +223,24 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         concatMap((svgMap) => {
-          const zip = new JSZip();
-          Object.entries(svgMap ?? {}).forEach(([name, svg]) => {
-            zip.file(`${name}.svg`, svg.data);
-          });
-          zip.generateAsync;
-          return from(zip.generateAsync({ type: 'blob' }));
+          const zipContent = zipSync(
+            Object.fromEntries(
+              Object.entries(svgMap ?? {}).map(([name, svg]) => [
+                `${name}.svg`,
+                strToU8(svg.data),
+              ])
+            )
+          );
+
+          return of(
+            new Blob([zipContent.buffer as ArrayBuffer], {
+              type: 'application/zip',
+            })
+          );
         }),
         finalize(() => this.downloadZipping$.next(false))
       )
-      .subscribe({ next: (content) => saveAs(content, 'svg.zip') });
+      .subscribe({ next: (content) => downloadBlob(content, 'svg.zip') });
   }
 
   updateActiveHandle(handle: FileWithDirectoryHandle) {
