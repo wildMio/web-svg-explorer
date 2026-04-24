@@ -13,6 +13,7 @@ export class CompressSettingComponent {
 
   multipass$ = this.svgoService.multipass$;
   floatPrecision$ = this.svgoService.floatPrecision$;
+  transformPrecision$ = this.svgoService.transformPrecision$;
   pretty$ = this.svgoService.pretty$;
   plugins$ = this.svgoService.plugins$;
 
@@ -23,6 +24,9 @@ export class CompressSettingComponent {
   }
   updateFloatPrecision(floatPrecision: number | null) {
     this.floatPrecision$.next(floatPrecision ?? 0);
+  }
+  updateTransformPrecision(transformPrecision: number | null) {
+    this.transformPrecision$.next(transformPrecision ?? 0);
   }
   updatePretty(pretty: boolean) {
     this.pretty$.next(pretty);

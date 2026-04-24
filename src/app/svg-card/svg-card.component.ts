@@ -6,6 +6,8 @@ import {
   ElementRef,
   HostBinding,
   OnDestroy,
+  ChangeDetectorRef,
+  NgZone,
 } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -34,7 +36,7 @@ import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
 import { round, sliceSvgSuffix } from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
-import { genInView } from '../util/intersection-observer';
+import { inView } from '../util/intersection-observer';
 
 @Component({
   selector: 'app-svg-card',
@@ -70,10 +72,7 @@ export class SvgCardComponent implements OnDestroy {
   svgText$ = this.handle$.pipe(
     tap(() => this.loading$.next(true)),
     switchMap((handle) =>
-      genInView({
-        root: null,
-        threshold: [0.2],
-      })(this.host.nativeElement).pipe(
+      inView(this.host.nativeElement).pipe(
         filter((view) => view),
         take(1),
         tap(() => handle.size),
@@ -94,7 +93,14 @@ export class SvgCardComponent implements OnDestroy {
         )
       )
     ),
-    tap(() => this.loading$.next(false)),
+    tap(() => {
+      this.loading$.next(false);
+      this.zone.runOutsideAngular(() => {
+        requestAnimationFrame(() => {
+          this.cdr.detectChanges();
+        });
+      });
+    }),
     takeUntil(this.destroy$),
     shareReplay(1)
   );
@@ -155,6 +161,8 @@ export class SvgCardComponent implements OnDestroy {
   );
 
   constructor(
+    private readonly zone: NgZone,
+    private readonly cdr: ChangeDetectorRef,
     private readonly host: ElementRef<HTMLElement>,
     private readonly domSanitizer: DomSanitizer,
     private readonly clipboard: Clipboard,

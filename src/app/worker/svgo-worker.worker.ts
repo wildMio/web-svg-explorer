@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { optimize, OptimizeOptions } from 'svgo';
+import { optimize, Config as OptimizeOptions } from 'svgo';
 
 interface SVGOMessage {
   svgString: string;

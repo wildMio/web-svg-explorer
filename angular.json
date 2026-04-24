@@ -162,6 +162,7 @@
   },
   "defaultProject": "web-svg-explorer",
   "cli": {
+    "analytics": "fed3fa7a-8ed0-4598-bf2a-22798673c3d5",
     "defaultCollection": "@angular-eslint/schematics"
   }
 }

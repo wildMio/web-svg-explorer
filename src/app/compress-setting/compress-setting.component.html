@@ -10,7 +10,7 @@
   >Prettify</mat-slide-toggle
 >
 <div class="relative">
-  <span class="absolute top-0 left-0">Precision</span>
+  <span class="absolute top-0 left-0">Number Precision</span>
   <mat-slider
     min="0"
     max="8"
@@ -20,6 +20,19 @@
     class="w-full"
     [value]="floatPrecision$ | async"
     (change)="updateFloatPrecision($event.value)"
+  ></mat-slider>
+</div>
+<div class="relative">
+  <span class="absolute top-0 left-0">Transform Precision</span>
+  <mat-slider
+    min="0"
+    max="8"
+    step="1"
+    value="5"
+    thumbLabel
+    class="w-full"
+    [value]="transformPrecision$ | async"
+    (change)="updateTransformPrecision($event.value)"
   ></mat-slider>
 </div>
 <span class="text-gray-400 text-sm">Features</span>

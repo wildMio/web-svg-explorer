@@ -15,7 +15,7 @@ import {
   take,
   throwError,
 } from 'rxjs';
-import { OptimizedSvg } from 'svgo';
+import { Output as OptimizedSvg } from 'svgo';
 
 const setting = {
   plugins: [
@@ -75,7 +75,7 @@ const setting = {
       active: true,
     },
     {
-      id: 'cleanupIDs',
+      id: 'cleanupIds',
       name: 'Clean up IDs',
       active: true,
     },
@@ -234,6 +234,11 @@ const setting = {
       name: 'Remove script elements',
       active: false,
     },
+    {
+      id: 'removeOffCanvasPaths',
+      name: 'Remove out-of-bounds paths',
+      active: false,
+    },
   ],
 };
 
@@ -256,24 +261,27 @@ export class SvgoService {
 
   multipass$ = new BehaviorSubject(true);
   floatPrecision$ = new BehaviorSubject(3);
+  transformPrecision$ = new BehaviorSubject(5);
   pretty$ = new BehaviorSubject(false);
   plugins$ = new BehaviorSubject(setting.plugins);
 
   options$ = combineLatest([
     this.multipass$,
     this.floatPrecision$,
+    this.transformPrecision$,
     this.pretty$,
     this.plugins$,
   ]).pipe(
     auditTime(0),
-    map(([multipass, floatPrecision, pretty, plugins]) => ({
+    map(([multipass, floatPrecision, transformPrecision, pretty, plugins]) => ({
       multipass,
       floatPrecision,
+      transformPrecision,
       plugins: plugins
         .filter(({ active }) => active)
         .map(({ id }) => ({
           name: id,
-          params: { floatPrecision: 3 },
+          params: { floatPrecision, transformPrecision },
         })),
       js2svg: {
         indent: 2,
@@ -290,9 +298,17 @@ export class SvgoService {
 
   private monitorFingerprint() {
     this.options$.subscribe({
-      next: ({ multipass, floatPrecision, js2svg, plugins }) => {
+      next: ({
+        multipass,
+        floatPrecision,
+        transformPrecision,
+        js2svg,
+        plugins,
+      }) => {
         const activePluginIdSet = new Set(plugins?.map(({ name }) => name));
-        const fingerprint = `${Number(multipass)},${floatPrecision},${Number(
+        const fingerprint = `${Number(
+          multipass
+        )},${floatPrecision},${transformPrecision},${Number(
           js2svg?.pretty ?? 0
         )},${setting.plugins
           .map(({ id }) => Number(activePluginIdSet.has(id)))

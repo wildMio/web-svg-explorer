@@ -22,7 +22,8 @@
     "paths": {
       "os": ["./node_modules/os-browserify"],
       "path": ["./node_modules/path-browserify"]
-    }
+    },
+    "noImplicitAny": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

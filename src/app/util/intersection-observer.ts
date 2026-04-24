@@ -11,7 +11,7 @@ export const genInView = (
 ) => {
   const entries$ = new Subject<IntersectionObserverEntry[]>();
   const observer = new IntersectionObserver(
-    (entries) => entries$.next(entries),
+    (entries) => entries$.next(entries.reverse()),
     options
   );
   return (element: Element) => {
