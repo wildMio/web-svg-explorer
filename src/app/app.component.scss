@@ -1,21 +1,5 @@
 :host {
-  grid-template-rows: auto 1fr;
-}
-
-.main {
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-}
-
-.icon-info {
-  grid-column: 1/-1;
-  transition: opacity 0.2s;
-}
-
-.shrink-button {
-  min-width: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-.compress-setting-panel {
-  height: calc(100vh - 64px);
+  grid-template-rows: 1fr;
+  min-height: 100%;
+  position: relative;
 }

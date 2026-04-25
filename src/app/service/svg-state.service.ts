@@ -18,7 +18,7 @@ export class SvgStateService {
 
   hasOptimizedSvgMap$ = this.optimizedSvgMap$.pipe(
     debounceTime(200),
-    map((svgMap) => !!Object.keys(svgMap).length)
+    map((svgMap) => !!Object.keys(svgMap).length),
   );
 
   updateOptimizedSvg(name: string, svg: OptimizedSvg) {
@@ -27,7 +27,12 @@ export class SvgStateService {
   }
 
   updateOptimizedSvgMap(svgMap: { [name: string]: OptimizedSvg }) {
-    this.optimizeSvgMap = { ...this.optimizeSvgMap, ...svgMap };
+    this.optimizeSvgMap = { ...svgMap };
+    this.optimizedSvgMapSubject.next(this.optimizeSvgMap);
+  }
+
+  resetOptimizedSvgMap() {
+    this.optimizeSvgMap = {};
     this.optimizedSvgMapSubject.next(this.optimizeSvgMap);
   }
 }

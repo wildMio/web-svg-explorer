@@ -1,45 +1,82 @@
 :host {
-  aspect-ratio: 1;
+  display: block;
+  min-height: 17rem;
 }
 
-.mat-mdc-card {
-  grid-template-rows: 1fr auto;
-  height: 100%;
+:host(.block) {
+  width: 100%;
+}
+
+.asset-card__toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.asset-card__canvas {
   display: grid;
-  padding: 0.5rem;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  width: 100%;
 }
 
 .svg-wrapper {
-  min-width: 24px;
-  max-width: 56px;
-  max-height: 56px;
+  position: relative;
+  z-index: 1;
+  min-width: 40px;
+  max-width: 88px;
+  max-height: 88px;
 }
 
 .loading-wrapper {
-  width: 30px;
-  height: 30px;
-  animation: rotate 4.3s linear infinite;
-  animation-delay: var(--loading-delay);
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  width: min(68%, 7rem);
 }
 
 .loading {
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  border: 2px solid transparent;
-  border-top-color: white;
-  border-bottom-color: white;
-  animation: rotate 1s ease-in-out infinite;
-  animation-delay: calc(var(--a));
+  width: 100%;
+  border: 1px solid var(--stroke-soft);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 100%
+    ),
+    var(--surface-2);
+  background-size: 240% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  animation-delay: var(--loading-delay);
 }
 
-@keyframes rotate {
+.loading--preview {
+  max-width: 5rem;
+  aspect-ratio: 1;
+  border-radius: 1rem;
+}
+
+.loading--line {
+  max-width: 4rem;
+  height: 0.65rem;
+  border-radius: 999px;
+}
+
+@keyframes shimmer {
   0% {
-    transform: rotate(0);
+    background-position: 100% 0;
   }
 
   100% {
-    transform: rotate(360deg);
+    background-position: -100% 0;
   }
 }
 

@@ -1,0 +1,119 @@
+:host {
+  min-height: 0;
+}
+
+.markup-shell,
+.markup-empty {
+  height: 100%;
+  border: 1px solid var(--stroke-soft);
+  border-radius: 1rem;
+  background: var(--surface-1);
+}
+
+.markup-shell {
+  display: grid;
+  grid-template-rows: auto 1fr 1fr;
+  gap: 1rem;
+  min-height: 0;
+  padding: 1rem;
+}
+
+.markup-shell__header,
+.markup-section__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+}
+
+.markup-shell__eyebrow {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.markup-shell h2,
+.markup-section h3,
+.markup-empty h2 {
+  margin: 0.25rem 0 0;
+  letter-spacing: -0.02em;
+}
+
+.markup-pill,
+.markup-copy {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.72rem;
+  padding: 0.42rem 0.72rem;
+  border: 1px solid var(--stroke-strong);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.markup-pill--accent {
+  border-color: rgba(102, 195, 178, 0.28);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.markup-copy {
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.markup-copy:hover {
+  border-color: var(--stroke-strong);
+  background: var(--surface-3);
+  transform: translateY(-1px);
+}
+
+.markup-copy:focus-visible {
+  outline: 2px solid rgba(102, 195, 178, 0.22);
+  outline-offset: 2px;
+}
+
+.markup-section {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.markup-section p,
+.markup-empty p {
+  margin: 0.3rem 0 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.markup-code {
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--stroke-soft);
+  border-radius: 0.9rem;
+  background: var(--surface-code);
+  padding: 1rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.markup-code--muted {
+  color: rgba(239, 247, 248, 0.72);
+}
+
+.markup-empty {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  text-align: center;
+}

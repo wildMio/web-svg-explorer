@@ -20,7 +20,7 @@ export class SvgMarkupComponent {
   private readonly clipboard = inject(Clipboard);
   private readonly snackBar = inject(MatSnackBar);
 
-  @HostBinding('class') class = 'grid bg-[#262626] h-full';
+  @HostBinding('class') class = 'block h-full';
 
   @Input() handle?: FileWithDirectoryHandle | null;
   @Input() originalText?: string | null;

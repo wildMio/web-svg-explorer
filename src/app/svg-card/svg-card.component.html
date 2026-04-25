@@ -1,40 +1,37 @@
-<mat-card appearance="outlined" appVirtualElement>
-  <div class="flex">
-    @if (loading$ | async) {
-      <div
-        class="loading-wrapper flex justify-center m-auto"
-        [style.--loading-delay]="loadingDelay"
-      >
-        <div class="loading"></div>
-      </div>
-    }
+<mat-card appearance="outlined" appVirtualElement class="asset-card">
+  <div class="asset-card__preview">
     @if (svgUri$ | async; as uri) {
-      <img
-        class="m-auto svg-wrapper"
-        loading="lazy"
-        [src]="uri"
-        [alt]="svgName$ | async"
-        [class.invert]="colorInvert$ | async"
-      />
-      <div class="absolute top-0 left-0">
-        <button
-          class="opacity-30 hover:opacity-80 focus:opacity-100"
-          (click)="invertColor()"
+      <div class="asset-card__toolbar">
+        <div
+          class="asset-card__state"
+          [class.asset-card__state--success]="optimizedSvg$ | async"
+          [class.asset-card__state--pending]="pending$ | async"
         >
-          <img
-            src="assets/invert_colors.svg"
-            alt="invert svg color"
-            loading="lazy"
-            [class.invert]="colorInvert$ | async"
-          />
-        </button>
-      </div>
-      <div class="grid absolute top-0 right-0 justify-items-end gap-1">
-        <div class="flex gap-1">
+          {{ cardStateLabel$ | async }}
+        </div>
+
+        <div class="asset-card__actions">
+          <button
+            type="button"
+            class="asset-card__icon-button"
+            aria-label="Invert preview color"
+            [attr.aria-pressed]="colorInvert$ | async"
+            (click)="invertColor(); $event.stopPropagation()"
+          >
+            <img
+              src="assets/invert_colors.svg"
+              alt="invert svg color"
+              loading="lazy"
+              [class.invert]="colorInvert$ | async"
+            />
+          </button>
+
           @if (optimizedSvg$ | async) {
             <button
-              class="opacity-30 hover:opacity-80 focus:opacity-100"
-              (click)="copy()"
+              type="button"
+              class="asset-card__icon-button"
+              aria-label="Copy optimized svg"
+              (click)="copy(); $event.stopPropagation()"
             >
               <img
                 src="assets/copy.svg"
@@ -44,9 +41,13 @@
               />
             </button>
           }
+
           <button
-            class="opacity-30 hover:opacity-80 focus:opacity-100"
-            (click)="optimize()"
+            type="button"
+            class="asset-card__icon-button"
+            aria-label="Optimize svg"
+            [disabled]="pending$ | async"
+            (click)="optimize(); $event.stopPropagation()"
           >
             <img
               src="assets/optimize.svg"
@@ -55,34 +56,71 @@
               [class.invert]="colorInvert$ | async"
             />
           </button>
+
+          @if (optimizedSvg$ | async) {
+            <button
+              type="button"
+              class="asset-card__icon-button"
+              aria-label="Download optimized svg"
+              (click)="download(); $event.stopPropagation()"
+            >
+              <img
+                src="assets/download.svg"
+                alt="download svg"
+                loading="lazy"
+                [class.invert]="colorInvert$ | async"
+              />
+            </button>
+          }
         </div>
-        @if (pending$ | async) {
-          <div class="w-full text-center">...</div>
-        }
-        @if (optimizedSvg$ | async) {
-          <button
-            class="opacity-30 hover:opacity-80 focus:opacity-100"
-            (click)="download()"
-          >
-            <img
-              src="assets/download.svg"
-              alt="download svg"
-              loading="lazy"
-              [class.invert]="colorInvert$ | async"
-            />
-          </button>
-        }
-        <div class="text-xs" [class]="compressRationClass$ | async">
+      </div>
+
+      <div class="asset-card__canvas">
+        <img
+          class="svg-wrapper"
+          loading="lazy"
+          [src]="uri"
+          [alt]="svgName$ | async"
+          [class.invert]="colorInvert$ | async"
+        />
+      </div>
+
+      @if (optimizedSvg$ | async) {
+        <div
+          class="asset-card__ratio text-xs"
+          [class]="compressRatioClass$ | async"
+        >
           {{ compressRatio$ | async }}
+        </div>
+      }
+    } @else if (loading$ | async) {
+      <div class="asset-card__canvas">
+        <div class="loading-wrapper" [style.--loading-delay]="loadingDelay">
+          <div class="loading loading--preview" aria-hidden="true"></div>
+          <div class="loading loading--line" aria-hidden="true"></div>
         </div>
       </div>
     }
   </div>
 
-  <div
-    class="text-center whitespace-nowrap break-all overflow-hidden text-ellipsis"
-    [title]="svgName$ | async"
-  >
-    {{ svgName$ | async }}
+  <div class="asset-card__meta">
+    <div class="asset-card__name" [title]="svgName$ | async">
+      {{ svgName$ | async }}
+    </div>
+
+    <div class="asset-card__detail-row">
+      <span>Original</span>
+      <strong>{{ originalSizeLabel$ | async }}</strong>
+    </div>
+
+    <div class="asset-card__detail-row">
+      <span>Optimized</span>
+      <strong>{{ optimizedSizeLabel$ | async }}</strong>
+    </div>
+
+    <div class="asset-card__detail-row asset-card__detail-row--muted">
+      <span>Delta</span>
+      <strong>{{ deltaLabel$ | async }}</strong>
+    </div>
   </div>
 </mat-card>

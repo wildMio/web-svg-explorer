@@ -37,7 +37,12 @@ import { VirtualElementDirective } from '../directive/virtual-element.directive'
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
 import { encodeSVG } from '../util/encodeSvg';
-import { downloadBlob, round, sliceSvgSuffix } from '../util/general';
+import {
+  downloadBlob,
+  formatBytes,
+  round,
+  sliceSvgSuffix,
+} from '../util/general';
 import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
 
@@ -149,6 +154,37 @@ export class SvgCardComponent implements OnDestroy {
   optimizedSvgSize$ = this.optimizedSvgBlob$.pipe(map((blob) => blob?.size));
 
   originalSize$ = this.handle$.pipe(map((handle) => handle.size));
+  originalSizeLabel$ = this.originalSize$.pipe(
+    map((size) => formatBytes(size)),
+  );
+  optimizedSizeLabel$ = this.optimizedSvg$.pipe(
+    map((svg) =>
+      svg?.data ? formatBytes(new Blob([svg.data]).size) : 'Not optimized yet',
+    ),
+  );
+  deltaLabel$ = combineLatest([this.originalSize$, this.optimizedSvg$]).pipe(
+    map(([originalSize, optimizedSvg]) => {
+      if (!optimizedSvg?.data) {
+        return 'Run optimize to compare';
+      }
+
+      const optimizedSize = new Blob([optimizedSvg.data]).size;
+      const delta = originalSize - optimizedSize;
+
+      return delta >= 0
+        ? `${formatBytes(delta)} saved`
+        : `${formatBytes(Math.abs(delta))} larger`;
+    }),
+  );
+  cardStateLabel$ = combineLatest([this.pending$, this.optimizedSvg$]).pipe(
+    map(([pending, optimizedSvg]) => {
+      if (pending) {
+        return 'Optimizing';
+      }
+
+      return optimizedSvg ? 'Optimized' : 'Original';
+    }),
+  );
 
   compressRatio$ = combineLatest([
     this.originalSize$,
@@ -160,15 +196,15 @@ export class SvgCardComponent implements OnDestroy {
     ),
   );
 
-  compressRationClass$ = combineLatest([
+  compressRatioClass$ = combineLatest([
     this.originalSize$,
     this.optimizedSvgSize$,
   ]).pipe(
     map(([comparisonSize, size = 0]) =>
       comparisonSize > size
-        ? 'text-green-500'
+        ? 'asset-card__ratio--positive'
         : comparisonSize < size
-          ? 'text-red-500'
+          ? 'asset-card__ratio--negative'
           : '',
     ),
   );
@@ -179,6 +215,10 @@ export class SvgCardComponent implements OnDestroy {
   }
 
   optimize() {
+    if (this.pending$.getValue()) {
+      return;
+    }
+
     this.pending$.next(true);
     combineLatest({ name: this.svgName$, text: this.svgText$ })
       .pipe(

@@ -3,6 +3,24 @@ export const round = (num: number, places: number) => {
   return Math.floor(Math.round(num * mult)) / mult;
 };
 
+export const formatBytes = (bytes: number) => {
+  if (!Number.isFinite(bytes)) {
+    return '--';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let unitIndex = 0;
+  let value = bytes;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  const precision = unitIndex === 0 || value >= 100 ? 0 : 1;
+  return `${round(value, precision)} ${units[unitIndex]}`;
+};
+
 export const sliceSvgSuffix = (text?: string) =>
   text?.replace('.svg', '') ?? '';
 

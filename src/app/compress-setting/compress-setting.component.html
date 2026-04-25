@@ -1,58 +1,129 @@
-<span class="text-gray-400 text-sm">Global settings</span>
-<mat-slide-toggle
-  [checked]="multipass$ | async"
-  (change)="updateMultipass($event.checked)"
-  >Multipass</mat-slide-toggle
->
-<mat-slide-toggle
-  [checked]="pretty$ | async"
-  (change)="updatePretty($event.checked)"
-  >Prettify</mat-slide-toggle
->
-<div class="relative">
-  <span class="absolute top-0 left-0">Number Precision</span>
-  <mat-slider min="0" max="8" step="1" thumbLabel class="w-full" #ngSlider
-    ><input
-      matSliderThumb
-      [value]="floatPrecision$ | async"
-      (change)="
-        updateFloatPrecision(
-          {
-            source: ngSliderThumb,
-            parent: ngSlider,
-            value: ngSliderThumb.value,
-          }.value
-        )
-      "
-      #ngSliderThumb="matSliderThumb"
-      value="3"
-  /></mat-slider>
-</div>
-<div class="relative">
-  <span class="absolute top-0 left-0">Transform Precision</span>
-  <mat-slider min="0" max="8" step="1" thumbLabel class="w-full" #ngSlider
-    ><input
-      matSliderThumb
-      [value]="transformPrecision$ | async"
-      (change)="
-        updateTransformPrecision(
-          {
-            source: ngSliderThumb,
-            parent: ngSlider,
-            value: ngSliderThumb.value,
-          }.value
-        )
-      "
-      #ngSliderThumb="matSliderThumb"
-      value="5"
-  /></mat-slider>
-</div>
-<span class="text-gray-400 text-sm">Features</span>
-@for (plugin of plugins$ | async; track plugin; let index = $index) {
-  <mat-slide-toggle
-    [name]="plugin.id"
-    [checked]="plugin.active"
-    (change)="updatePlugin(plugin, $event.checked, index)"
-    >{{ plugin.name }}</mat-slide-toggle
-  >
-}
+<section class="settings-section">
+  <div class="settings-section__header">
+    <span class="settings-section__eyebrow">Core behavior</span>
+    <p>Define how aggressively the shared SVGO profile rewrites every asset.</p>
+  </div>
+
+  <div class="settings-toggle">
+    <div class="settings-toggle__copy">
+      <strong>Multipass</strong>
+      <span
+        >Run multiple optimization passes to squeeze out redundant markup.</span
+      >
+    </div>
+    <mat-slide-toggle
+      aria-label="Toggle multipass optimization"
+      [checked]="multipass$ | async"
+      (change)="updateMultipass($event.checked)"
+    ></mat-slide-toggle>
+  </div>
+
+  <div class="settings-toggle">
+    <div class="settings-toggle__copy">
+      <strong>Prettify output</strong>
+      <span
+        >Keep optimized markup easier to audit during review and handoff.</span
+      >
+    </div>
+    <mat-slide-toggle
+      aria-label="Toggle pretty output"
+      [checked]="pretty$ | async"
+      (change)="updatePretty($event.checked)"
+    ></mat-slide-toggle>
+  </div>
+</section>
+
+<section class="settings-section">
+  <div class="settings-section__header">
+    <span class="settings-section__eyebrow">Precision</span>
+    <p>
+      Balance file size and rendering fidelity for numeric and transform values.
+    </p>
+  </div>
+
+  <div class="settings-slider">
+    <div class="settings-slider__label">
+      <span>Number precision</span>
+      <strong>{{ floatPrecision$ | async }}</strong>
+    </div>
+    <mat-slider
+      min="0"
+      max="8"
+      step="1"
+      thumbLabel
+      class="settings-slider__control"
+      #ngSlider
+    >
+      <input
+        matSliderThumb
+        [value]="floatPrecision$ | async"
+        (change)="
+          updateFloatPrecision(
+            {
+              source: ngSliderThumb,
+              parent: ngSlider,
+              value: ngSliderThumb.value,
+            }.value
+          )
+        "
+        #ngSliderThumb="matSliderThumb"
+        value="3"
+    /></mat-slider>
+  </div>
+
+  <div class="settings-slider">
+    <div class="settings-slider__label">
+      <span>Transform precision</span>
+      <strong>{{ transformPrecision$ | async }}</strong>
+    </div>
+    <mat-slider
+      min="0"
+      max="8"
+      step="1"
+      thumbLabel
+      class="settings-slider__control"
+      #ngSlider
+    >
+      <input
+        matSliderThumb
+        [value]="transformPrecision$ | async"
+        (change)="
+          updateTransformPrecision(
+            {
+              source: ngSliderThumb,
+              parent: ngSlider,
+              value: ngSliderThumb.value,
+            }.value
+          )
+        "
+        #ngSliderThumb="matSliderThumb"
+        value="5"
+    /></mat-slider>
+  </div>
+</section>
+
+<section class="settings-section">
+  <div class="settings-section__header">
+    <span class="settings-section__eyebrow">Plugins</span>
+    <p>
+      Enable or disable individual transforms inside the active optimization
+      profile.
+    </p>
+  </div>
+
+  <div class="settings-plugin-grid">
+    @for (plugin of plugins$ | async; track plugin; let index = $index) {
+      <div class="settings-toggle">
+        <div class="settings-toggle__copy">
+          <strong>{{ plugin.name }}</strong>
+          <span>{{ plugin.id }}</span>
+        </div>
+        <mat-slide-toggle
+          [name]="plugin.id"
+          [checked]="plugin.active"
+          (change)="updatePlugin(plugin, $event.checked, index)"
+        ></mat-slide-toggle>
+      </div>
+    }
+  </div>
+</section>

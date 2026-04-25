@@ -1,6 +1,9 @@
 import { CdkTrapFocus } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { CdkOverlayOrigin, CdkConnectedOverlay } from '@angular/cdk/overlay';
+import {
+  CdkOverlayOrigin,
+  CdkConnectedOverlay,
+  type ConnectedPosition,
+} from '@angular/cdk/overlay';
 import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -11,10 +14,9 @@ import {
   DOCUMENT,
   inject,
 } from '@angular/core';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatTooltip } from '@angular/material/tooltip';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
@@ -53,8 +55,6 @@ import { downloadBlob, sliceSvgSuffix } from './util/general';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatButton,
-    MatTooltip,
-    MatIconButton,
     CdkOverlayOrigin,
     CdkConnectedOverlay,
     MatCard,
@@ -74,12 +74,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
 
-  @HostBinding('class') class = 'grid h-full';
+  @HostBinding('class') class = 'app-root-host';
 
   private readonly destroy$ = new Subject<void>();
 
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     [],
+  );
+  fileCount$ = this.fileWithDirectoryHandles$.pipe(
+    map((handles) => handles.length),
   );
   hasHandles$ = this.fileWithDirectoryHandles$.pipe(
     map((handles) => !!handles.length),
@@ -91,19 +94,93 @@ export class AppComponent implements OnInit, OnDestroy {
   colorInvert = false;
   showMarkup = false;
 
+  readonly overlayPositions: ConnectedPosition[] = [
+    {
+      originX: 'end',
+      originY: 'bottom',
+      overlayX: 'end',
+      overlayY: 'top',
+      offsetY: 12,
+    },
+    {
+      originX: 'start',
+      originY: 'bottom',
+      overlayX: 'start',
+      overlayY: 'top',
+      offsetY: 12,
+    },
+    {
+      originX: 'end',
+      originY: 'top',
+      overlayX: 'end',
+      overlayY: 'bottom',
+      offsetY: -12,
+    },
+    {
+      originX: 'start',
+      originY: 'top',
+      overlayX: 'start',
+      overlayY: 'bottom',
+      offsetY: -12,
+    },
+  ];
+
   compressSettingOpen = false;
 
   directoryOpening$ = new BehaviorSubject(false);
   svgOptimizing$ = new BehaviorSubject(false);
   downloadZipping$ = new BehaviorSubject(false);
+  directoryReviewed$ = new BehaviorSubject(false);
   loading$ = combineLatest([
     this.directoryOpening$,
     this.svgOptimizing$,
     this.downloadZipping$,
   ]).pipe(map((loadings) => loadings.some((loading) => loading)));
+  statusLabel$ = combineLatest([
+    this.directoryOpening$,
+    this.svgOptimizing$,
+    this.downloadZipping$,
+    this.hasHandles$,
+    this.directoryReviewed$,
+  ]).pipe(
+    map(
+      ([
+        directoryOpening,
+        svgOptimizing,
+        downloadZipping,
+        hasHandles,
+        directoryReviewed,
+      ]) => {
+        if (directoryOpening) {
+          return 'Scanning directory';
+        }
+
+        if (svgOptimizing) {
+          return 'Optimizing SVG assets';
+        }
+
+        if (downloadZipping) {
+          return 'Preparing ZIP export';
+        }
+
+        if (hasHandles) {
+          return 'Batch ready';
+        }
+
+        if (directoryReviewed) {
+          return 'No SVG files found';
+        }
+
+        return 'Awaiting directory';
+      },
+    ),
+  );
 
   optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
   hasOptimizedSvgMap$ = this.svgStateService.hasOptimizedSvgMap$;
+  optimizedCount$ = this.optimizedSvgMap$.pipe(
+    map((svgMap) => Object.keys(svgMap).length),
+  );
 
   showInstallPromotion$ = this.appPwaService.showInstallPromotion$;
   swUpdateAvailable$ = this.swUpdate.versionUpdates.pipe(
@@ -113,10 +190,6 @@ export class AppComponent implements OnInit, OnDestroy {
       current: evt.currentVersion,
       available: evt.latestVersion,
     })),
-  );
-
-  firstUseApp$ = new BehaviorSubject(
-    coerceBooleanProperty(localStorage.getItem('firstUseApp') ?? true),
   );
 
   activeHandleSubject = new BehaviorSubject<FileWithDirectoryHandle | null>(
@@ -165,8 +238,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   openDirectory() {
-    localStorage.setItem('firstUseApp', 'false');
-    this.firstUseApp$.next(false);
     if (this.directoryOpening$.getValue()) {
       return;
     }
@@ -174,10 +245,16 @@ export class AppComponent implements OnInit, OnDestroy {
     from(directoryOpen())
       .pipe(finalize(() => this.directoryOpening$.next(false)))
       .subscribe({
-        next: (files) =>
-          this.fileWithDirectoryHandles$.next(
-            files.filter((file) => file.type === 'image/svg+xml'),
-          ),
+        next: (files) => {
+          const svgFiles = files.filter(
+            (file) => file.type === 'image/svg+xml',
+          );
+
+          this.directoryReviewed$.next(true);
+          this.fileWithDirectoryHandles$.next(svgFiles);
+          this.activeHandleSubject.next(svgFiles[0] ?? null);
+          this.svgStateService.resetOptimizedSvgMap();
+        },
       });
   }
 

@@ -52,20 +52,6 @@ export class AppPwaService {
         this.deferredPrompt$.next(null);
       },
     });
-
-    fromEvent(
-      window.matchMedia('(display-mode: standalone)'),
-      'change',
-    ).subscribe({
-      next: (evt) => {
-        let displayMode = 'browser';
-        if ((evt as any).matches) {
-          displayMode = 'standalone';
-        }
-        // Log display mode change to analytics
-        console.log('DISPLAY_MODE_CHANGED', displayMode);
-      },
-    });
   }
 
   installPromotion() {
@@ -83,17 +69,5 @@ export class AppPwaService {
           this.deferredPrompt$.next(null);
         },
       });
-  }
-
-  getPWADisplayMode() {
-    const isStandalone = window.matchMedia(
-      '(display-mode: standalone)',
-    ).matches;
-    if (document.referrer.startsWith('android-app://')) {
-      return 'twa';
-    } else if ((navigator as any).standalone || isStandalone) {
-      return 'standalone';
-    }
-    return 'browser';
   }
 }

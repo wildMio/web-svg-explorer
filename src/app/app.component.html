@@ -1,101 +1,206 @@
-<header class="flex p-6 gap-4 items-center flex-wrap">
-  <h1 class="text-xl font-medium">SVGOLOT</h1>
-  <div>
-    <span class="hidden sm:block">
-      <button mat-stroked-button (click)="openDirectory()">
-        Open Directory
-      </button>
-    </span>
-    <span class="sm:hidden" matTooltip="Open Directory">
-      <button mat-icon-button (click)="openDirectory()">
-        <img
-          src="assets/folder_open.svg"
-          alt="open directory icon"
-          class="m-auto"
-        />
-      </button>
-    </span>
-    @if (firstUseApp$ | async) {
-      <img src="assets/hint.svg" alt="hint svg" class="absolute" />
-    }
-  </div>
-  <button
-    cdkOverlayOrigin
-    #trigger="cdkOverlayOrigin"
-    mat-icon-button
-    matTooltip="Toggle svg display setting panel"
-    (click)="displaySettingOpen = !displaySettingOpen"
-  >
-    <img
-      src="assets/display_setting.svg"
-      alt="display setting icon"
-      class="m-auto"
-    />
-  </button>
+<div class="app-shell">
+  <header class="app-header" [class.app-header--compact]="hasHandles$ | async">
+    <div class="app-header__main">
+      <div class="app-header__copy">
+        <div class="eyebrow-row">
+          <span class="eyebrow">SVG Asset Operations</span>
+          <span
+            class="status-pill"
+            [class.status-pill--busy]="loading$ | async"
+          >
+            {{ statusLabel$ | async }}
+          </span>
+        </div>
+
+        <h1>SVGOLOT</h1>
+        @if (hasHandles$ | async) {
+          <p>
+            Keep the active batch in view, inspect the selected asset, and
+            export once the directory is ready.
+          </p>
+        } @else {
+          <p>
+            Batch-review SVG assets, compare output, and export optimized files
+            without leaving the workspace.
+          </p>
+        }
+      </div>
+
+      <div class="app-header__meta">
+        <dl class="header-facts">
+          <div class="header-fact">
+            <dt>Batch</dt>
+            <dd>{{ fileCount$ | async }} assets</dd>
+          </div>
+          <div class="header-fact">
+            <dt>Optimized</dt>
+            <dd>{{ optimizedCount$ | async }} ready</dd>
+          </div>
+          <div class="header-fact">
+            <dt>Markup</dt>
+            <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
+          </div>
+        </dl>
+
+        <div class="utility-actions">
+          <a
+            mat-stroked-button
+            href="https://github.com/wildMio/web-svg-explorer"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View source
+          </a>
+          @if (showInstallPromotion$ | async) {
+            <button mat-stroked-button (click)="installPromotion()">
+              Install app
+            </button>
+          }
+          @if (swUpdateAvailable$ | async) {
+            <button mat-stroked-button (click)="reloadPage()">
+              Apply update
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar-panel">
+      <div class="toolbar-panel__group">
+        <button
+          mat-stroked-button
+          class="toolbar-button toolbar-button--primary"
+          (click)="openDirectory()"
+          [disabled]="loading$ | async"
+        >
+          Open SVG directory
+        </button>
+
+        @if (hasHandles$ | async) {
+          <button
+            mat-stroked-button
+            class="toolbar-button"
+            (click)="svgoAll()"
+            [disabled]="loading$ | async"
+          >
+            Optimize {{ fileCount$ | async }} files
+          </button>
+        }
+
+        @if (hasOptimizedSvgMap$ | async) {
+          <button
+            mat-stroked-button
+            class="toolbar-button"
+            (click)="downloadAll()"
+            [disabled]="loading$ | async"
+          >
+            Export optimized ZIP
+          </button>
+        }
+      </div>
+
+      <div class="toolbar-panel__group">
+        <button
+          cdkOverlayOrigin
+          #trigger="cdkOverlayOrigin"
+          mat-stroked-button
+          class="toolbar-button"
+          [class.toolbar-button--active]="displaySettingOpen"
+          (click)="displaySettingOpen = !displaySettingOpen"
+        >
+          Display preferences
+        </button>
+        <button
+          cdkOverlayOrigin
+          #compressSettingTrigger="cdkOverlayOrigin"
+          mat-stroked-button
+          class="toolbar-button"
+          [class.toolbar-button--active]="compressSettingOpen"
+          (click)="compressSettingOpen = !compressSettingOpen"
+        >
+          Compression profile
+        </button>
+      </div>
+    </div>
+  </header>
+
   <ng-template
     cdkConnectedOverlay
     [cdkConnectedOverlayOrigin]="trigger"
     [cdkConnectedOverlayOpen]="displaySettingOpen"
+    [cdkConnectedOverlayPositions]="overlayPositions"
+    [cdkConnectedOverlayPush]="true"
+    [cdkConnectedOverlayViewportMargin]="16"
     (detach)="displaySettingOpen = false"
     (overlayOutsideClick)="displaySettingOpen = false"
   >
-    <mat-card appearance="outlined" cdkTrapFocusAutoCapture cdkTrapFocus>
-      <label>
-        Current Color
-        <div>
+    <mat-card
+      appearance="outlined"
+      cdkTrapFocusAutoCapture
+      cdkTrapFocus
+      class="popover-panel"
+    >
+      <div class="panel-heading">
+        <span class="panel-heading__eyebrow">Display</span>
+        <h2>Preview preferences</h2>
+        <p>
+          Adjust preview contrast and inspection density for the current
+          session.
+        </p>
+      </div>
+
+      <div class="popover-panel__body">
+        <label class="field-group">
+          <span class="field-group__label">Preview color</span>
           <input
             #colorInput
             type="text"
             placeholder="#ffffff / white"
-            class="pl-1"
+            class="panel-input"
             [value]="currentColor$ | async"
             (input)="currentColor$.next(colorInput.value)"
           />
-        </div>
-      </label>
-      <label class="flex items-center mt-4 justify-between cursor-pointer">
-        <mat-checkbox
-          [checked]="colorInvert"
-          (change)="colorInvert = $event.checked"
-          >Invert color
-        </mat-checkbox>
-        <img
-          src="assets/invert_colors.svg"
-          alt="invert svg color"
-          class="invert opacity-50"
-        />
-      </label>
-      <label class="flex items-center mt-4 justify-between cursor-pointer">
-        <mat-checkbox
-          [checked]="showMarkup"
-          (change)="showMarkup = $event.checked"
-          >Show markup
-        </mat-checkbox>
-        <img
-          src="assets/code.svg"
-          alt="show markup"
-          class="invert opacity-50"
-        />
-      </label>
+        </label>
+
+        <label class="panel-toggle-row">
+          <div>
+            <span class="panel-toggle-row__title">Invert preview</span>
+            <p>Flip the preview fill for dark-on-light SVG sets.</p>
+          </div>
+          <mat-checkbox
+            [checked]="colorInvert"
+            (change)="colorInvert = $event.checked"
+          ></mat-checkbox>
+        </label>
+
+        <label class="panel-toggle-row">
+          <div>
+            <span class="panel-toggle-row__title">Show markup panel</span>
+            <p>
+              Keep source and optimized markup visible beside the asset grid.
+            </p>
+          </div>
+          <mat-checkbox
+            [checked]="showMarkup"
+            (change)="showMarkup = $event.checked"
+          ></mat-checkbox>
+        </label>
+      </div>
+
+      <p class="panel-note">
+        These preferences only affect preview and inspection for the current
+        session.
+      </p>
     </mat-card>
   </ng-template>
-  <button
-    cdkOverlayOrigin
-    #compressSettingTrigger="cdkOverlayOrigin"
-    mat-icon-button
-    matTooltip="Toggle compress setting panel"
-    (click)="compressSettingOpen = !compressSettingOpen"
-  >
-    <img
-      src="assets/toggles.svg"
-      alt="compress setting icon"
-      class="m-auto w-full h-full p-1"
-    />
-  </button>
+
   <ng-template
     cdkConnectedOverlay
     [cdkConnectedOverlayOrigin]="compressSettingTrigger"
     [cdkConnectedOverlayOpen]="compressSettingOpen"
+    [cdkConnectedOverlayPositions]="overlayPositions"
+    [cdkConnectedOverlayPush]="true"
+    [cdkConnectedOverlayViewportMargin]="16"
     (detach)="compressSettingOpen = false"
     (overlayOutsideClick)="compressSettingOpen = false"
   >
@@ -103,164 +208,175 @@
       appearance="outlined"
       cdkTrapFocusAutoCapture
       cdkTrapFocus
-      class="compress-setting-panel overflow-auto"
-      ><app-compress-setting></app-compress-setting
-    ></mat-card>
-  </ng-template>
-  <div class="flex items-center ml-auto gap-4">
-    @if (hasOptimizedSvgMap$ | async) {
-      <button
-        mat-stroked-button
-        class="shrink-button"
-        (click)="downloadAll()"
-        matTooltip="Download all"
-      >
-        <div class="flex">
-          <img
-            src="assets/download.svg"
-            alt="download svg"
-            class="invert opacity-50"
-          />
-          <img
-            src="assets/all_inclusive.svg"
-            alt="all inclusive"
-            class="invert opacity-50"
-          />
-        </div>
-      </button>
-    }
-    @if (hasHandles$ | async) {
-      <button
-        mat-stroked-button
-        class="shrink-button"
-        (click)="svgoAll()"
-        matTooltip="Svgo all"
-      >
-        <div class="flex">
-          <img
-            src="assets/optimize.svg"
-            alt="optimize svg"
-            class="invert opacity-50"
-          />
-          <img
-            src="assets/all_inclusive.svg"
-            alt="all inclusive"
-            class="invert opacity-50"
-          />
-        </div>
-      </button>
-    }
-    <a
-      mat-icon-button
-      href="https://github.com/wildMio/web-svg-explorer"
-      class="text-slate-100"
+      class="popover-panel popover-panel--wide compress-setting-panel"
     >
-      <img src="assets/github.svg" alt="github" class="w-full h-full p-1" />
-    </a>
-  </div>
-</header>
-
-<div class="absolute top-0 right-0 p-3">
-  @if (loading$ | async) {
-    <div class="h-3 w-3 relative">
-      <span
-        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-400 opacity-75"
-      ></span>
-      <span
-        class="absolute inline-flex rounded-full h-3 w-3 bg-neutral-500"
-      ></span>
-    </div>
-  }
-</div>
-
-<div class="absolute top-0 left-0">
-  @if (showInstallPromotion$ | async) {
-    <button
-      mat-icon-button
-      (click)="installPromotion()"
-      matTooltip="Install"
-      class="invert opacity-50 hover:opacity-80 focus:opacity-100"
-    >
-      <img src="assets/install_desktop.svg" alt="install app" class="m-auto" />
-    </button>
-  }
-  @if (swUpdateAvailable$ | async) {
-    <button
-      mat-icon-button
-      (click)="reloadPage()"
-      matTooltip="Reload for update"
-      class="invert opacity-50 hover:opacity-80 focus:opacity-100"
-    >
-      <img src="assets/update.svg" alt="reload app" class="m-auto" />
-    </button>
-  }
-</div>
-
-<div
-  class="grid overflow-hidden"
-  [class.md:grid-cols-2]="showMarkup"
-  [class.grid-rows-2]="showMarkup"
-  [class.md:grid-rows-1]="showMarkup"
->
-  <div class="overflow-auto p-6">
-    <main class="main grid gap-8">
-      <div
-        class="icon-info flex flex-wrap opacity-0 items-center gap-1"
-        [class.opacity-80]="hasHandles$ | async"
-      >
-        <span class="flex items-center">
-          <img
-            src="assets/invert_colors.svg"
-            alt="invert svg color"
-            class="invert opacity-50"
-          />
-          <span> Invert color; </span>
-        </span>
-        <span class="flex items-center">
-          <img
-            src="assets/optimize.svg"
-            alt="optimize svg"
-            class="invert opacity-50"
-          />
-          Execute svgo;</span
-        >
-        <span class="flex items-center">
-          <img
-            src="assets/copy.svg"
-            alt="copy optimized svg"
-            class="invert opacity-50"
-          />
-          Copy optimized svg;</span
-        >
-        <span class="flex items-center">
-          <img
-            src="assets/download.svg"
-            alt="download optimized svg"
-            class="invert opacity-50"
-          />
-          Download optimized svg;</span
-        >
+      <div class="panel-heading">
+        <span class="panel-heading__eyebrow">Optimization</span>
+        <h2>Compression profile</h2>
+        <p>
+          Tune the shared SVGO profile before applying changes across the
+          current workspace.
+        </p>
       </div>
-      @for (handle of fileWithDirectoryHandles$ | async; track handle) {
-        <app-svg-card
-          [currentColor]="debounceCurrentColor$ | async"
-          [fileWithDirectoryHandle]="handle"
-          [colorInvert]="colorInvert"
-          class="rounded-sm outline outline-0 outline-offset-4 outline-slate-100"
-          [class.outline-1]="activeHandle$ | async | match: handle"
-          (click)="updateActiveHandle(handle)"
-        ></app-svg-card>
+      <div class="popover-panel__body popover-panel__body--dense">
+        <app-compress-setting></app-compress-setting>
+      </div>
+
+      <p class="panel-note">
+        Profile changes apply to single-card optimization, batch optimization,
+        and ZIP export in this workspace.
+      </p>
+    </mat-card>
+  </ng-template>
+
+  <div class="workspace" [class.workspace--markup]="showMarkup">
+    <section class="workspace__main">
+      @if (hasHandles$ | async) {
+        <div class="workspace-summary">
+          <div>
+            <span class="workspace-summary__eyebrow">Current batch</span>
+            @if (activeHandle$ | async; as activeHandle) {
+              <h2>{{ activeHandle.name }}</h2>
+              <p>
+                Review the selected asset while batch optimization and export
+                remain available for the full directory.
+              </p>
+            } @else {
+              <h2>No SVG selected</h2>
+              <p>
+                Pick a card to inspect source, output, and compression deltas.
+              </p>
+            }
+          </div>
+
+          <div class="workspace-summary__meta">
+            <div class="workspace-summary__chips">
+              <span class="workspace-chip"
+                >{{ fileCount$ | async }} assets loaded</span
+              >
+              <span class="workspace-chip"
+                >Preview {{ currentColor$ | async }}</span
+              >
+              @if (colorInvert) {
+                <span class="workspace-chip">Inverted preview</span>
+              }
+              @if (hasOptimizedSvgMap$ | async) {
+                <span class="workspace-chip workspace-chip--accent">
+                  {{ optimizedCount$ | async }} optimized
+                </span>
+              } @else {
+                <span class="workspace-chip">Awaiting optimization</span>
+              }
+              <span
+                class="workspace-chip"
+                [class.workspace-chip--accent]="showMarkup"
+              >
+                Markup {{ showMarkup ? "visible" : "hidden" }}
+              </span>
+            </div>
+
+            <p class="workspace-summary__hint">
+              Use card actions for one-off fixes, then switch to the toolbar
+              when the whole batch is ready.
+            </p>
+          </div>
+        </div>
+
+        <div class="workspace-grid">
+          <main class="main">
+            @for (handle of fileWithDirectoryHandles$ | async; track handle) {
+              <app-svg-card
+                [currentColor]="debounceCurrentColor$ | async"
+                [fileWithDirectoryHandle]="handle"
+                [colorInvert]="colorInvert"
+                class="svg-card-host"
+                [class.active-card]="activeHandle$ | async | match: handle"
+                (click)="updateActiveHandle(handle)"
+              ></app-svg-card>
+            }
+          </main>
+        </div>
+      } @else {
+        <mat-card appearance="outlined" class="empty-state">
+          <span class="empty-state__badge">
+            {{
+              (directoryReviewed$ | async)
+                ? "No SVG files found"
+                : "Workspace ready"
+            }}
+          </span>
+          <div class="empty-state__content">
+            <div>
+              <h2>
+                {{
+                  (directoryReviewed$ | async)
+                    ? "Choose another directory with SVG assets"
+                    : "Open a directory to start an SVG review batch"
+                }}
+              </h2>
+              <p>
+                SVGOLOT loads each SVG into a focused review workflow so you can
+                inspect output, tune the shared profile, and export only when
+                the batch is ready to ship.
+              </p>
+            </div>
+
+            <div class="empty-state__actions">
+              <button
+                mat-stroked-button
+                class="toolbar-button toolbar-button--primary"
+                (click)="openDirectory()"
+                [disabled]="loading$ | async"
+              >
+                Open SVG directory
+              </button>
+            </div>
+          </div>
+
+          <ol class="empty-state__flow">
+            <li class="empty-state__step">
+              <span class="empty-state__step-index">01</span>
+              <div class="empty-state__step-copy">
+                <strong>Load a directory</strong>
+                <span>
+                  Import a folder of SVG assets so the workspace can build a
+                  review batch and select the first file automatically.
+                </span>
+              </div>
+            </li>
+            <li class="empty-state__step">
+              <span class="empty-state__step-index">02</span>
+              <div class="empty-state__step-copy">
+                <strong>Inspect and tune</strong>
+                <span>
+                  Review previews, keep markup beside the asset grid, and tune
+                  the shared SVGO profile before changing the whole batch.
+                </span>
+              </div>
+            </li>
+            <li class="empty-state__step">
+              <span class="empty-state__step-index">03</span>
+              <div class="empty-state__step-copy">
+                <strong>Optimize with control</strong>
+                <span>
+                  Run one-off fixes from a card or optimize the full directory,
+                  then export only when the output is ready to hand off.
+                </span>
+              </div>
+            </li>
+          </ol>
+        </mat-card>
       }
-    </main>
-    <footer class="sticky top-full mt-4"></footer>
+    </section>
+
+    @if (showMarkup) {
+      <aside class="workspace__markup">
+        <app-svg-markup
+          [handle]="activeHandle$ | async"
+          [originalText]="activeSvgText$ | async"
+          [optimizedText]="activeOptimizedSvg$ | async"
+        ></app-svg-markup>
+      </aside>
+    }
   </div>
-  @if (showMarkup) {
-    <div>
-      <app-svg-markup
-        [handle]="activeHandle$ | async"
-        [originalText]="activeSvgText$ | async"
-        [optimizedText]="activeOptimizedSvg$ | async"
-      ></app-svg-markup>
-    </div>
-  }
 </div>
