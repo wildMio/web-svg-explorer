@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { BehaviorSubject, debounceTime, map } from 'rxjs';
 
-import type { Output as OptimizedSvg } from 'svgo';
+import type { Output as OptimizedSvg } from 'svgo/browser';
 
 @Injectable({
   providedIn: 'root',

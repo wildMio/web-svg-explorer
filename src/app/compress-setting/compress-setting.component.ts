@@ -43,7 +43,7 @@ export class CompressSettingComponent {
   updatePlugin(
     plugin: { id: string; name: string },
     active: boolean,
-    index: number
+    index: number,
   ) {
     this.plugins$.getValue().splice(index, 1, { ...plugin, active });
     this.plugins$.next(this.plugins$.getValue());

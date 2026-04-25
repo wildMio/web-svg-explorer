@@ -4,7 +4,7 @@
       <div
         class="loading-wrapper flex justify-center m-auto"
         [style.--loading-delay]="loadingDelay"
-        >
+      >
         <div class="loading"></div>
       </div>
     }
@@ -15,18 +15,18 @@
         [src]="uri"
         [alt]="svgName$ | async"
         [class.invert]="colorInvert$ | async"
-        />
+      />
       <div class="absolute top-0 left-0">
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="invertColor()"
-          >
+        >
           <img
             src="assets/invert_colors.svg"
             alt="invert svg color"
             loading="lazy"
             [class.invert]="colorInvert$ | async"
-            />
+          />
         </button>
       </div>
       <div class="grid absolute top-0 right-0 justify-items-end gap-1">
@@ -35,25 +35,25 @@
             <button
               class="opacity-30 hover:opacity-80 focus:opacity-100"
               (click)="copy()"
-              >
+            >
               <img
                 src="assets/copy.svg"
                 alt="copy svg"
                 loading="lazy"
                 [class.invert]="colorInvert$ | async"
-                />
+              />
             </button>
           }
           <button
             class="opacity-30 hover:opacity-80 focus:opacity-100"
             (click)="optimize()"
-            >
+          >
             <img
               src="assets/optimize.svg"
               alt="optimize svg"
               loading="lazy"
               [class.invert]="colorInvert$ | async"
-              />
+            />
           </button>
         </div>
         @if (pending$ | async) {
@@ -63,13 +63,13 @@
           <button
             class="opacity-30 hover:opacity-80 focus:opacity-100"
             (click)="download()"
-            >
+          >
             <img
               src="assets/download.svg"
               alt="download svg"
               loading="lazy"
               [class.invert]="colorInvert$ | async"
-              />
+            />
           </button>
         }
         <div class="text-xs" [class]="compressRationClass$ | async">
@@ -80,9 +80,9 @@
   </div>
 
   <div
-    class="text-center whitespace-nowrap break-all overflow-hidden overflow-ellipsis"
+    class="text-center whitespace-nowrap break-all overflow-hidden text-ellipsis"
     [title]="svgName$ | async"
-    >
+  >
     {{ svgName$ | async }}
   </div>
 </mat-card>

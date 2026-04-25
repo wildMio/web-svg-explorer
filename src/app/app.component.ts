@@ -79,10 +79,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
-    []
+    [],
   );
   hasHandles$ = this.fileWithDirectoryHandles$.pipe(
-    map((handles) => !!handles.length)
+    map((handles) => !!handles.length),
   );
 
   displaySettingOpen = false;
@@ -112,25 +112,25 @@ export class AppComponent implements OnInit, OnDestroy {
       type: 'UPDATE_AVAILABLE',
       current: evt.currentVersion,
       available: evt.latestVersion,
-    }))
+    })),
   );
 
   firstUseApp$ = new BehaviorSubject(
-    coerceBooleanProperty(localStorage.getItem('firstUseApp') ?? true)
+    coerceBooleanProperty(localStorage.getItem('firstUseApp') ?? true),
   );
 
   activeHandleSubject = new BehaviorSubject<FileWithDirectoryHandle | null>(
-    null
+    null,
   );
   activeHandle$ = this.activeHandleSubject.pipe(
     distinctUntilChanged(),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
   activeSvgText$ = this.activeHandle$.pipe(
     switchMap((handle) => (handle ? from(handle.text()) : of(''))),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
   activeOptimizedSvg$ = this.optimizedSvgMap$.pipe(
     switchMap((svgMap) =>
@@ -138,13 +138,13 @@ export class AppComponent implements OnInit, OnDestroy {
         ? this.activeHandle$.pipe(
             map((handle) => {
               const name = sliceSvgSuffix(handle?.name);
-              return name ? svgMap[name]?.data ?? '' : '';
-            })
+              return name ? (svgMap[name]?.data ?? '') : '';
+            }),
           )
-        : of('')
+        : of(''),
     ),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   ngOnInit() {
@@ -176,7 +176,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (files) =>
           this.fileWithDirectoryHandles$.next(
-            files.filter((file) => file.type === 'image/svg+xml')
+            files.filter((file) => file.type === 'image/svg+xml'),
           ),
       });
   }
@@ -197,15 +197,15 @@ export class AppComponent implements OnInit, OnDestroy {
                 return [
                   name,
                   from(handle.text()).pipe(
-                    concatMap((text) => this.svgoService.optimize$(text, name))
+                    concatMap((text) => this.svgoService.optimize$(text, name)),
                   ),
                 ];
-              })
-            )
-          )
+              }),
+            ),
+          ),
         ),
         take(1),
-        finalize(() => this.svgOptimizing$.next(false))
+        finalize(() => this.svgOptimizing$.next(false)),
       )
       .subscribe({
         next: (optimizedSvgMap) => {
@@ -228,17 +228,17 @@ export class AppComponent implements OnInit, OnDestroy {
               Object.entries(svgMap ?? {}).map(([name, svg]) => [
                 `${name}.svg`,
                 strToU8(svg.data),
-              ])
-            )
+              ]),
+            ),
           );
 
           return of(
             new Blob([zipContent.buffer as ArrayBuffer], {
               type: 'application/zip',
-            })
+            }),
           );
         }),
-        finalize(() => this.downloadZipping$.next(false))
+        finalize(() => this.downloadZipping$.next(false)),
       )
       .subscribe({ next: (content) => downloadBlob(content, 'svg.zip') });
   }

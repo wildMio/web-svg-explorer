@@ -5,7 +5,7 @@ const symbols = /[\r\n%#()<>?[\\\]^`{|}]/g;
 
 export const encodeSVG = (
   data: string,
-  replaceCurrentColor?: string | null
+  replaceCurrentColor?: string | null,
 ) => {
   // Use single quotes instead of double to avoid encoding.
   // if (externalQuotesValue === `double`) {

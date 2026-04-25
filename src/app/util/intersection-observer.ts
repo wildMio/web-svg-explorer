@@ -7,12 +7,12 @@ export const genInView = (
   options = {
     root: null,
     threshold: [0, 1],
-  }
+  },
 ) => {
   const entries$ = new Subject<IntersectionObserverEntry[]>();
   const observer = new IntersectionObserver(
     (entries) => entries$.next(entries.reverse()),
-    options
+    options,
   );
   return (element: Element) => {
     return new Observable<boolean>((subscriber) => {
@@ -26,7 +26,7 @@ export const genInView = (
           map((entries) => entries.find(({ target }) => target === element)),
           filter((entry) => !!entry),
           map((entry) => entry?.isIntersecting),
-          distinctUntilChanged()
+          distinctUntilChanged(),
         )
         .subscribe({
           next: (visible) => {

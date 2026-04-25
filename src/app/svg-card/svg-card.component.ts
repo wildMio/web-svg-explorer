@@ -89,11 +89,11 @@ export class SvgCardComponent implements OnDestroy {
         filter((view) => view),
         take(1),
         tap(() => handle.size),
-        concatMap(() => from(handle.text()))
-      )
+        concatMap(() => from(handle.text())),
+      ),
     ),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   svgUri$ = this.svgText$.pipe(
@@ -101,10 +101,10 @@ export class SvgCardComponent implements OnDestroy {
       this.currentColor$.pipe(
         map((color) =>
           this.domSanitizer.bypassSecurityTrustResourceUrl(
-            `data:image/svg+xml,${encodeSVG(data, color)}`
-          )
-        )
-      )
+            `data:image/svg+xml,${encodeSVG(data, color)}`,
+          ),
+        ),
+      ),
     ),
     tap(() => {
       this.loading$.next(false);
@@ -115,13 +115,13 @@ export class SvgCardComponent implements OnDestroy {
       });
     }),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   svgName$ = this.handle$.pipe(
     map(({ name }) => sliceSvgSuffix(name)),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   loadingDelay = `${Math.random() * 3}s`;
@@ -130,8 +130,8 @@ export class SvgCardComponent implements OnDestroy {
 
   optimizedSvg$ = this.svgName$.pipe(
     switchMap((name) =>
-      this.optimizedSvgMap$.pipe(map((svgMap) => svgMap?.[name]))
-    )
+      this.optimizedSvgMap$.pipe(map((svgMap) => svgMap?.[name])),
+    ),
   );
 
   optimizedSvgBlob$ = this.optimizedSvg$.pipe(
@@ -143,7 +143,7 @@ export class SvgCardComponent implements OnDestroy {
       return;
     }),
     takeUntil(this.destroy$),
-    shareReplay(1)
+    shareReplay(1),
   );
 
   optimizedSvgSize$ = this.optimizedSvgBlob$.pipe(map((blob) => blob?.size));
@@ -156,8 +156,8 @@ export class SvgCardComponent implements OnDestroy {
   ]).pipe(
     map(
       ([comparisonSize, size]) =>
-        round(((size ?? 0) / comparisonSize) * 100, 2) + '%'
-    )
+        round(((size ?? 0) / comparisonSize) * 100, 2) + '%',
+    ),
   );
 
   compressRationClass$ = combineLatest([
@@ -168,9 +168,9 @@ export class SvgCardComponent implements OnDestroy {
       comparisonSize > size
         ? 'text-green-500'
         : comparisonSize < size
-        ? 'text-red-500'
-        : ''
-    )
+          ? 'text-red-500'
+          : '',
+    ),
   );
 
   ngOnDestroy() {
@@ -186,11 +186,11 @@ export class SvgCardComponent implements OnDestroy {
         concatMap(({ name, text }) =>
           this.svgoService
             .optimize$(text, name)
-            .pipe(map((optimizedSvg) => ({ name, optimizedSvg })))
+            .pipe(map((optimizedSvg) => ({ name, optimizedSvg }))),
         ),
         take(1),
         takeUntil(this.destroy$),
-        finalize(() => this.pending$.next(false))
+        finalize(() => this.pending$.next(false)),
       )
       .subscribe({
         next: ({ name, optimizedSvg }) => {

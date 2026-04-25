@@ -38,7 +38,7 @@ export class AppPwaService {
   interceptDefaultInstall() {
     fromEvent<BeforeInstallPromptEvent>(
       window,
-      'beforeinstallprompt'
+      'beforeinstallprompt',
     ).subscribe({
       next: (event) => {
         event.preventDefault();
@@ -55,7 +55,7 @@ export class AppPwaService {
 
     fromEvent(
       window.matchMedia('(display-mode: standalone)'),
-      'change'
+      'change',
     ).subscribe({
       next: (evt) => {
         let displayMode = 'browser';
@@ -76,7 +76,7 @@ export class AppPwaService {
     from(deferredPrompt?.prompt())
       .pipe(
         switchMap(() => from(deferredPrompt.userChoice)),
-        take(1)
+        take(1),
       )
       .subscribe({
         next: () => {
@@ -87,7 +87,7 @@ export class AppPwaService {
 
   getPWADisplayMode() {
     const isStandalone = window.matchMedia(
-      '(display-mode: standalone)'
+      '(display-mode: standalone)',
     ).matches;
     if (document.referrer.startsWith('android-app://')) {
       return 'twa';

@@ -16,7 +16,7 @@ import {
   throwError,
 } from 'rxjs';
 
-import type { Output as OptimizedSvg } from 'svgo';
+import type { Output as OptimizedSvg } from 'svgo/browser';
 
 const setting = {
   plugins: [

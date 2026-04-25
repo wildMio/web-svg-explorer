@@ -1,7 +1,7 @@
 @if (handle) {
   <div
     class="whitespace-pre-wrap grid grid-rows-[auto_auto_1fr_auto_1fr] overflow-hidden"
-    >
+  >
     <div class="p-1 flex">
       {{ handle.name }}
     </div>
@@ -11,13 +11,13 @@
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="copy(handle.name, originalText)"
-          >
+        >
           <img
             src="assets/copy.svg"
             alt="copy svg"
             loading="lazy"
             class="invert"
-            />
+          />
         </button>
       }
     </div>
@@ -28,13 +28,13 @@
         <button
           class="opacity-30 hover:opacity-80 focus:opacity-100"
           (click)="copy(handle.name, optimizedText)"
-          >
+        >
           <img
             src="assets/copy.svg"
             alt="copy svg"
             loading="lazy"
             class="invert"
-            />
+          />
         </button>
       }
     </div>
@@ -43,4 +43,3 @@
 } @else {
   <div class="p-4 text-center text-xl">Click one svg card to show markup.</div>
 }
-
