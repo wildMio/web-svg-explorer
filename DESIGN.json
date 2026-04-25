@@ -1,0 +1,309 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-04-25T00:00:00Z",
+  "title": "Design System: SVGOLOT",
+  "extensions": {
+    "colorMeta": {
+      "base-ink": {
+        "role": "neutral",
+        "displayName": "Base Ink",
+        "description": "Application background and outer shell.",
+        "tonalRamp": [
+          "#0B1015",
+          "#10161D",
+          "#151D25",
+          "#1B252F",
+          "#22303B",
+          "#31414D",
+          "#5C717C",
+          "#B5C6CD"
+        ]
+      },
+      "panel-slate": {
+        "role": "neutral",
+        "displayName": "Panel Slate",
+        "description": "Primary panel surface for the shell, workspace summary, empty state, and cards."
+      },
+      "control-slate": {
+        "role": "neutral",
+        "displayName": "Control Slate",
+        "description": "Nested control surface for buttons, chips, inputs, and setting rows."
+      },
+      "raised-slate": {
+        "role": "neutral",
+        "displayName": "Raised Slate",
+        "description": "Active or hover lift for controls that need stronger separation."
+      },
+      "code-well": {
+        "role": "neutral",
+        "displayName": "Code Well",
+        "description": "Dense code and markup surface.",
+        "tonalRamp": [
+          "#0C1319",
+          "#111921",
+          "#18222B",
+          "#23303A",
+          "#34424D",
+          "#556571",
+          "#83919A",
+          "#D5DEE2"
+        ]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Soft Line",
+        "description": "Resting border and separator color."
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "description": "Stronger outline for interactive controls."
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Primary Text",
+        "description": "Main text color for headings and controls."
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "description": "Supporting copy, helper text, and lower-priority metadata."
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "description": "Eyebrows and tertiary status labels."
+      },
+      "action-teal": {
+        "role": "primary",
+        "displayName": "Action Teal",
+        "description": "Primary action, active selection, and focus accent.",
+        "tonalRamp": [
+          "#183C37",
+          "#23554D",
+          "#2F7066",
+          "#3F8E81",
+          "#66C3B2",
+          "#7ED0C1",
+          "#A8E1D8",
+          "#E3F6F1"
+        ]
+      },
+      "action-teal-soft": {
+        "role": "accent",
+        "displayName": "Action Teal Soft",
+        "description": "Quiet primary button fill and active shell tint."
+      },
+      "warning-amber": {
+        "role": "accent",
+        "displayName": "Warning Amber",
+        "description": "In-progress and caution state."
+      },
+      "success-sage": {
+        "role": "accent",
+        "displayName": "Success Sage",
+        "description": "Optimized and successful state."
+      },
+      "danger-rose": {
+        "role": "accent",
+        "displayName": "Danger Rose",
+        "description": "Negative delta or error-risk state."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Workspace title and highest-level app heading."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Panel titles, batch summary, and major section headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Asset names and emphasized row titles inside dense UI."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Primary explanatory copy and empty-state instructions."
+      },
+      "supporting": {
+        "displayName": "Supporting",
+        "purpose": "Chips, helper text, metadata rows, and secondary copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrows, state pills, and compact section markers."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Markup panes and machine-oriented content."
+      }
+    },
+    "shadows": [
+      {
+        "name": "Soft Lift",
+        "value": "0 12px 28px rgba(5, 9, 12, 0.18)",
+        "purpose": "Popover surfaces and hovered cards."
+      },
+      {
+        "name": "Selected Halo",
+        "value": "0 0 0 1px rgba(102, 195, 178, 0.18), 0 12px 28px rgba(5, 9, 12, 0.18)",
+        "purpose": "Active asset card only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "interaction-default",
+        "value": "180ms ease",
+        "purpose": "Buttons, cards, chips, and controls."
+      },
+      {
+        "name": "preview-filter",
+        "value": "400ms ease",
+        "purpose": "Preview invert and filter transitions on SVGs."
+      },
+      {
+        "name": "loading-spin",
+        "value": "1s ease-in-out infinite",
+        "purpose": "Inner loading indicator."
+      },
+      {
+        "name": "loading-orbit",
+        "value": "4.3s linear infinite",
+        "purpose": "Outer loading wrapper."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "layout-stack",
+        "value": "1100px"
+      },
+      {
+        "name": "markup-collapse",
+        "value": "960px"
+      },
+      {
+        "name": "mobile-toolbar",
+        "value": "720px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Toolbar Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main entry point and batch action. The accent stays soft at rest and lifts only on interaction.",
+      "html": "<button class=\"ds-btn-primary\">Open SVG directory</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 16px; border: 1px solid rgba(102, 195, 178, 0.3); border-radius: 14px; background: rgba(102, 195, 178, 0.14); color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; } .ds-btn-primary:hover { background: rgba(255, 255, 255, 0.04); border-color: #66c3b2; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); } .ds-btn-primary:focus-visible { outline: 2px solid rgba(102, 195, 178, 0.24); outline-offset: 2px; }"
+    },
+    {
+      "name": "Workspace Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Compact summary chip for batch, preview, and optimization state.",
+      "html": "<span class=\"ds-chip ds-chip--accent\">12 optimized</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; border-radius: 11px; padding: 6px 13px; background: #1b252f; color: rgba(219, 229, 234, 0.76); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.86rem; font-weight: 500; } .ds-chip--accent { background: rgba(102, 195, 178, 0.14); color: #66c3b2; }"
+    },
+    {
+      "name": "Asset Card",
+      "kind": "card",
+      "description": "Signature component. Combines preview, state, actions, and file metadata in one dense review unit.",
+      "html": "<article class=\"ds-asset-card\"><div class=\"ds-asset-preview\"><span class=\"ds-asset-state\">Optimized</span><button class=\"ds-asset-action\" aria-label=\"Optimize\">+</button><div class=\"ds-asset-glyph\">SVG</div><span class=\"ds-asset-ratio\">58%</span></div><div class=\"ds-asset-meta\"><strong class=\"ds-asset-name\">system-icon</strong><div class=\"ds-asset-row\"><span>Original</span><strong>14.2 KB</strong></div><div class=\"ds-asset-row\"><span>Optimized</span><strong>8.2 KB</strong></div><div class=\"ds-asset-row ds-asset-row--muted\"><span>Delta</span><strong>6.0 KB saved</strong></div></div></article>",
+      "css": ".ds-asset-card { display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 16px; background: #151e26; color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; } .ds-asset-card:hover { transform: translateY(-1px); border-color: rgba(153, 178, 188, 0.28); box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); } .ds-asset-preview { position: relative; display: grid; place-items: center; min-height: 184px; padding: 16px; border-bottom: 1px solid rgba(153, 178, 188, 0.16); background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.015) 100%); } .ds-asset-state { position: absolute; top: 12px; left: 12px; border-radius: 999px; padding: 5px 10px; background: rgba(114, 191, 149, 0.14); color: #72bf95; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; } .ds-asset-action { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 11px; background: #1b252f; color: #eef3f5; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease; } .ds-asset-action:hover { background: #22303b; border-color: rgba(153, 178, 188, 0.28); transform: translateY(-1px); } .ds-asset-glyph { display: inline-flex; align-items: center; justify-content: center; width: 88px; height: 88px; border-radius: 14px; border: 1px dashed rgba(153, 178, 188, 0.28); color: rgba(219, 229, 234, 0.76); font-size: 0.9rem; font-weight: 600; } .ds-asset-ratio { position: absolute; right: 12px; bottom: 12px; border-radius: 999px; padding: 4px 9px; background: rgba(9, 12, 16, 0.74); color: #72bf95; font-size: 0.75rem; font-weight: 700; } .ds-asset-meta { display: grid; gap: 9px; padding: 15px 16px 16px; } .ds-asset-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.96rem; font-weight: 600; } .ds-asset-row { display: flex; justify-content: space-between; gap: 16px; color: rgba(219, 229, 234, 0.76); font-size: 0.86rem; } .ds-asset-row strong { color: #eef3f5; font-size: 0.86rem; font-weight: 600; text-align: right; } .ds-asset-row--muted strong { color: rgba(219, 229, 234, 0.76); }"
+    },
+    {
+      "name": "Settings Row",
+      "kind": "custom",
+      "description": "Shared row pattern for toggles and sliders inside the compression profile panel.",
+      "html": "<label class=\"ds-setting-row\"><span class=\"ds-setting-copy\"><strong>Multipass</strong><small>Run multiple optimization passes to squeeze out redundant markup.</small></span><span class=\"ds-setting-toggle\" aria-hidden=\"true\"></span></label>",
+      "css": ".ds-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 16px; border-radius: 16px; background: #1b252f; color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-setting-copy { display: grid; gap: 4px; } .ds-setting-copy strong { font-size: 0.96rem; font-weight: 600; } .ds-setting-copy small { color: rgba(219, 229, 234, 0.76); font-size: 0.86rem; line-height: 1.55; } .ds-setting-toggle { width: 40px; height: 24px; border-radius: 999px; background: rgba(102, 195, 178, 0.45); position: relative; flex: none; } .ds-setting-toggle::after { content: ''; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: #66c3b2; }"
+    },
+    {
+      "name": "Markup Code Well",
+      "kind": "custom",
+      "refersTo": "code-well",
+      "description": "Monospace code surface for original and optimized markup.",
+      "html": "<pre class=\"ds-code-well\">&lt;svg viewBox=\"0 0 24 24\"&gt;...&lt;/svg&gt;</pre>",
+      "css": ".ds-code-well { margin: 0; padding: 16px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 14px; background: #111921; color: #eef3f5; font-family: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Monaco, Consolas, monospace; font-size: 0.875rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }"
+    },
+    {
+      "name": "Popover Panel",
+      "kind": "card",
+      "refersTo": "panel-surface",
+      "description": "Floating settings panel. One of the few places where elevation is present at rest.",
+      "html": "<section class=\"ds-popover\"><span class=\"ds-popover-eyebrow\">Optimization</span><h3 class=\"ds-popover-title\">Compression profile</h3><p class=\"ds-popover-copy\">Tune the shared SVGO profile before applying changes across the current workspace.</p></section>",
+      "css": ".ds-popover { display: grid; gap: 8px; width: min(320px, 100%); padding: 18px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 16px; background: #151e26; box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-popover-eyebrow { color: rgba(181, 198, 205, 0.68); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-popover-title { margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; } .ds-popover-copy { margin: 0; color: rgba(219, 229, 234, 0.76); font-size: 1rem; line-height: 1.55; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Asset Review Bench",
+    "overview": "SVGOLOT feels like an inspection bench for production SVG assets, not a gallery or a marketing shell. The interface stays dark, restrained, and operational so previews, metadata, and markup can sit in one workspace without competing for attention. It rejects decorative dashboard tropes and keeps color reserved for action, selection, and state.",
+    "keyCharacteristics": [
+      "Dark, low-glare shell with blue-green tinted neutrals.",
+      "One operational teal accent used for action, selection, and active state.",
+      "Native sans typography with a compact fixed scale.",
+      "Flat resting surfaces, with elevation reserved for hover, popover, and selected state.",
+      "Dense workflow where preview, metadata, settings, and markup remain tightly coupled."
+    ],
+    "rules": [
+      {
+        "name": "The Quiet Shell Rule",
+        "section": "colors",
+        "body": "Neutrals do most of the work. Accent belongs to actions and current state, not decoration."
+      },
+      {
+        "name": "The Inspection Contrast Rule",
+        "section": "colors",
+        "body": "Preview, metadata, and code surfaces must separate clearly without jumping to pure black or pure white."
+      },
+      {
+        "name": "The One-Action Accent Rule",
+        "section": "colors",
+        "body": "Action Teal is the only high-attention accent. Warning, success, and danger colors are for status only."
+      },
+      {
+        "name": "The One-Family Rule",
+        "section": "typography",
+        "body": "Use the native sans stack for headings, buttons, labels, and body text. Do not introduce display typography into operational UI."
+      },
+      {
+        "name": "The Fixed-Scale Rule",
+        "section": "typography",
+        "body": "Product UI here uses a fixed scale, not fluid type. Headings stay predictable as layout compresses."
+      },
+      {
+        "name": "The Mono-Where-It-Earns-It Rule",
+        "section": "typography",
+        "body": "Monospace is for markup and machine-facing content only, not decorative labeling."
+      },
+      {
+        "name": "The Resting Flat Rule",
+        "section": "elevation",
+        "body": "Shell surfaces, summaries, and panels stay flat while idle. Shadow is a state signal, not a permanent texture."
+      },
+      {
+        "name": "The Floating-Only Rule",
+        "section": "elevation",
+        "body": "Popovers and selected cards may lift. Static layout containers separate with borders and tone, not shadow."
+      }
+    ],
+    "dos": [
+      "Do keep the outer app on Base Ink and reserve brighter neutrals for nested working surfaces.",
+      "Do use Action Teal for primary action, current selection, active chips, and focus only.",
+      "Do keep important batch state visible in the shell, such as asset count, optimization progress, preview mode, and markup visibility.",
+      "Do keep first-run empty states procedural, teaching the workflow rather than advertising the app.",
+      "Do use the same rounded and border vocabulary across buttons, chips, cards, settings rows, and inputs.",
+      "Do keep code and preview surfaces side by side when space allows, then stack them structurally on narrow screens."
+    ],
+    "donts": [
+      "Don't make this feel like a marketing landing page, a playful icon toy, or a generic CRUD admin.",
+      "Don't introduce decorative dashboards, loud gradients, novelty motion, or cluttered icon galleries.",
+      "Don't turn the asset grid into a gallery with hidden file state. Original size, optimized size, and delta remain visible.",
+      "Don't use a second accent color or apply teal broadly to inactive surfaces.",
+      "Don't hide optimization state behind vague copy, icon-only cues, or hard-to-scan panel hierarchy.",
+      "Don't add nested cards, colored side-stripe callouts, glassmorphism, or glowing hero metrics."
+    ]
+  }
+}
