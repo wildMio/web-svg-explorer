@@ -2,14 +2,6 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { enableProdMode, importProvidersFrom } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -26,14 +18,6 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       BrowserModule,
       BrowserAnimationsModule,
-      MatButtonModule,
-      MatProgressSpinnerModule,
-      MatCardModule,
-      MatTooltipModule,
-      MatCheckboxModule,
-      MatSlideToggleModule,
-      MatSliderModule,
-      MatSnackBarModule,
       A11yModule,
       OverlayModule,
       ClipboardModule,

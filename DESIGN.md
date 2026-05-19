@@ -1,22 +1,25 @@
 ---
 name: SVGOLOT
-description: Restrained dark workbench for SVG review, optimization, and export.
+description: Dual-theme matte workbench for SVG review, optimization, and export.
 colors:
-  base-ink: "#10161D"
-  panel-slate: "#151E26"
-  control-slate: "#1B252F"
-  raised-slate: "#22303B"
-  code-well: "#111921"
-  line-soft: "#99B2BC29"
-  line-strong: "#99B2BC47"
-  text-primary: "#EEF3F5"
-  text-secondary: "#DBE5EAC2"
-  text-muted: "#B5C6CDAD"
-  action-teal: "#66C3B2"
-  action-teal-soft: "#66C3B224"
-  warning-amber: "#D9A95A"
-  success-sage: "#72BF95"
-  danger-rose: "#D98686"
+  base-ink: "#12100D"
+  panel-slate: "#1A1713"
+  control-slate: "#221D17"
+  raised-slate: "#2B241D"
+  code-well: "#15120F"
+  line-soft: "#C7AE8229"
+  line-strong: "#C7AE8247"
+  text-primary: "#F0E6D3"
+  text-secondary: "#F0E6D3C7"
+  text-muted: "#C9B792A3"
+  action-ochre: "#C6A05A"
+  action-ochre-soft: "#C6A05A24"
+  warning-amber: "#C28A4C"
+  success-sage: "#90A06E"
+  danger-rose: "#B67765"
+  warm-paper: "#EFE6D7"
+  paper-panel: "#F5EEE1"
+  paper-control: "#EBDFCB"
 typography:
   display:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
@@ -72,7 +75,7 @@ spacing:
   3xl: "48px"
 components:
   button-primary:
-    backgroundColor: "{colors.action-teal-soft}"
+    backgroundColor: "{colors.action-ochre-soft}"
     textColor: "{colors.text-primary}"
     rounded: "{rounded.lg}"
     height: "42px"
@@ -109,44 +112,45 @@ components:
 
 **Creative North Star: "The Asset Review Bench"**
 
-A frontend engineer is reviewing a directory of exported icons beside an editor, browser devtools, and a design source file, usually in a workspace already dominated by dark code surfaces. SVGOLOT should feel like the quiet inspection bench in that flow: low-glare, explicit about state, and dense enough to keep preview, metadata, settings, and markup in one place.
+A frontend engineer is reviewing a directory of exported icons beside an editor, browser devtools, and a design source file. Sometimes that happens late in a dim workspace beside dark code surfaces, sometimes during daylight QA on a bright desk. SVGOLOT should feel like the same quiet inspection bench in both scenes: low-glare, explicit about state, and dense enough to keep preview, metadata, settings, and markup in one place.
 
-The system is restrained and operational. It uses tinted dark neutrals, one controlled teal accent, native-feeling typography, and minimal elevation so the SVG assets stay central. It explicitly rejects marketing-page behavior, playful gallery energy, and decorative dashboard tropes. This is a product tool. Design serves review speed and trust in output.
+The system is restrained and operational. It uses matte soot dark neutrals, warm paper light neutrals, one controlled vintage-yellow accent, native-feeling typography, and minimal elevation so the SVG assets stay central. The light and dark themes should feel like the same product under different ambient light, not two different visual systems. It explicitly rejects marketing-page behavior, playful gallery energy, and decorative dashboard tropes. This is a product tool. Design serves review speed and trust in output.
 
 **Key Characteristics:**
 
-- Dark, low-glare shell with blue-green tinted neutrals.
-- One operational teal accent used for primary action, selection, and active state.
+- Matte soot dark mode and warm paper light mode share the same component structure and contrast logic.
+- One operational vintage-yellow accent used for primary action, selection, and active state.
 - Native sans typography with a compact fixed scale.
 - Flat resting surfaces, with elevation reserved for hover, popover, and selected state.
 - Dense but readable workflow, where preview, metadata, markup, and settings remain tightly coupled.
 
 ## 2. Colors: The Low-Glare Workbench Palette
 
-A restrained palette built from cool dark neutrals and one controlled teal accent, with secondary colors reserved for state rather than decoration.
+A restrained paired palette built from matte soot dark neutrals, warm paper light neutrals, and one controlled vintage-yellow accent, with secondary colors reserved for state rather than decoration.
 
 ### Primary
 
-- **Action Teal** (#66C3B2): Primary actions, active chips, selected asset state, and focus accents. This is the only expressive accent in the system.
+- **Action Ochre** (#C6A05A dark, #8F6A25 light): Primary actions, active chips, selected asset state, and focus accents. This is the only expressive accent in the system.
 
 ### Neutral
 
-- **Base Ink** (#10161D): App background and outer frame.
-- **Panel Slate** (#151E26): Main shell panels, summary bars, empty state, and asset cards.
-- **Control Slate** (#1B252F): Buttons, inputs, toggle rows, chips, and small control surfaces.
-- **Raised Slate** (#22303B): Hover and active lift for controls that need a stronger state layer.
-- **Code Well** (#111921): Markup surface and dense code background.
-- **Soft Line** (#99B2BC29): Resting borders and separators.
-- **Strong Line** (#99B2BC47): Emphasized control outlines and stronger interaction edges.
-- **Primary Text** (#EEF3F5): Main content and labels.
-- **Secondary Text** (#DBE5EAC2): Explanatory copy, helper text, and lower-priority metadata.
-- **Muted Text** (#B5C6CDAD): Eyebrows, tertiary labels, and recessed state language.
+- **Base Ink** (#12100D dark): App background and outer frame in the matte dark theme.
+- **Warm Paper** (#EFE6D7 light): App background in the light theme, intentionally off-white to avoid glare.
+- **Panel Slate** (#1A1713 dark, #F5EEE1 light): Main shell panels, summary bars, empty state, and asset cards.
+- **Control Slate** (#221D17 dark, #EBDFCB light): Buttons, inputs, toggle rows, chips, and small control surfaces.
+- **Raised Slate** (#2B241D dark, #DFCFB4 light): Hover and active lift for controls that need a stronger state layer.
+- **Code Well** (#15120F dark, #E7DECD light): Markup surface and dense code background.
+- **Soft Line** (rgba(199, 174, 130, 0.16) dark, rgba(88, 69, 42, 0.12) light): Resting borders and separators.
+- **Strong Line** (rgba(199, 174, 130, 0.28) dark, rgba(88, 69, 42, 0.22) light): Emphasized control outlines and stronger interaction edges.
+- **Primary Text** (#F0E6D3 dark, #231C15 light): Main content and labels.
+- **Secondary Text** (rgba(240, 230, 211, 0.78) dark, rgba(35, 28, 21, 0.76) light): Explanatory copy, helper text, and lower-priority metadata.
+- **Muted Text** (rgba(201, 183, 146, 0.64) dark, rgba(92, 72, 46, 0.60) light): Eyebrows, tertiary labels, and recessed state language.
 
 ### State Signals
 
-- **Warning Amber** (#D9A95A): Long-running work and in-progress state.
-- **Success Sage** (#72BF95): Completed optimization and successful state.
-- **Danger Rose** (#D98686): Error-risk or negative-change state.
+- **Warning Amber** (#C28A4C dark, #A76E30 light): Long-running work and in-progress state.
+- **Success Sage** (#90A06E dark, #6F7B4D light): Completed optimization and successful state.
+- **Danger Rose** (#B67765 dark, #9B5E4F light): Error-risk or negative-change state.
 
 ### Named Rules
 
@@ -154,7 +158,9 @@ A restrained palette built from cool dark neutrals and one controlled teal accen
 
 **The Inspection Contrast Rule.** Preview, metadata, and code surfaces must separate clearly without jumping to pure black or pure white.
 
-**The One-Action Accent Rule.** Action Teal is the only high-attention accent. Warning, success, and danger colors are for status only.
+**The One-Action Accent Rule.** Action Ochre is the only high-attention accent. Warning, success, and danger colors are for status only.
+
+**The Same Bench Rule.** Dark and light mode must preserve the same hierarchy, spacing, and interaction language. Only the ambient surface and contrast profile should change.
 
 ## 3. Typography: Native and Code-Adjacent
 
@@ -190,8 +196,8 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 
 ### Shadow Vocabulary
 
-- **Soft Lift** (`0 12px 28px rgba(5, 9, 12, 0.18)`): Hovered asset cards and floating popovers.
-- **Selected Halo** (`0 0 0 1px rgba(102, 195, 178, 0.18), 0 12px 28px rgba(5, 9, 12, 0.18)`): Active asset card only.
+- **Soft Lift** (`0 14px 32px rgba(7, 6, 4, 0.24)`): Hovered asset cards and floating popovers.
+- **Selected Halo** (`0 0 0 1px rgba(198, 160, 90, 0.20), 0 14px 32px rgba(7, 6, 4, 0.24)`): Active asset card only.
 
 ### Named Rules
 
@@ -204,14 +210,14 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 ### Buttons
 
 - **Shape:** Rounded but compact, using a 14px radius for toolbar actions.
-- **Primary:** Soft teal background, strong outline, 42px minimum height, and quiet emphasis instead of a loud filled CTA.
-- **Hover / Focus:** Slight vertical lift, stronger border, and a clear focus outline in transparent teal.
+- **Primary:** Soft vintage-yellow background, strong outline, 42px minimum height, and quiet emphasis instead of a loud filled CTA.
+- **Hover / Focus:** Slight vertical lift, stronger border, and a clear focus outline in transparent ochre.
 - **Secondary:** Same shape and height as primary, but built on Control Slate with the same border vocabulary.
 
 ### Chips
 
 - **Style:** Compact status chips use Control Slate with 11px corners and medium-weight text.
-- **State:** Active or optimized chips tint toward teal; idle chips stay neutral.
+- **State:** Active or optimized chips tint toward ochre; idle chips stay neutral.
 
 ### Cards / Containers
 
@@ -224,24 +230,41 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 ### Inputs / Fields
 
 - **Style:** Inputs sit on Control Slate with a 13px radius and strong border vocabulary.
-- **Focus:** Focus uses a 2px teal-tinted outline with offset, not glow-heavy decoration.
+- **Focus:** Focus uses a 2px ochre-tinted outline with offset, not glow-heavy decoration.
 - **Error / Disabled:** Keep the same structure, change only line and state color.
 
 ### Navigation / Toolbar
 
 - **Style:** The header and toolbar behave like one operational strip, not a marketing hero.
 - **Typography:** Workspace facts and tool labels use the same native sans vocabulary as the rest of the app.
+- **App Utility:** The light/dark theme switch stays in the header utility cluster so the operator can change ambient contrast without opening a settings panel.
+- **Compact Mode:** A minimal compact toggle can live beside the theme switch. When enabled, secondary batch context moves into the display popup so the asset grid can take priority.
 - **Responsive Behavior:** On narrow screens, toolbar groups stack structurally rather than shrinking type or inventing a different pattern.
 
 ### Asset Card
 
 - **Preview Zone:** SVG preview sits in a quiet framed well with the status pill in the top-left and card actions in the top-right.
+- **Selection Control:** Each card can expose a small quick-preview checkbox without competing with the primary optimize, copy, and download actions.
 - **State Vocabulary:** Original, optimizing, and optimized states are explicit. Ratio badges and metadata rows make file changes inspectable without opening markup.
-- **Interaction:** Hover adds a soft lift. Selection adds the teal halo. The card must read as both preview and file-state summary.
+- **Compact Density:** In compact mode, cards reduce preview height and footer detail so more assets remain visible in the same viewport.
+- **Interaction:** Hover adds a soft lift. Selection adds the ochre halo. The card must read as both preview and file-state summary.
+
+### Quick Preview Dock
+
+- **Placement:** A fixed dock can sit above the bottom edge when the operator has explicitly picked icons for comparison.
+- **Behavior:** The dock should show only chosen items, allow fast removal, and let the operator refocus the main selection without losing the batch grid.
+
+### Toast Feedback
+
+- **Placement:** Toasts live in a fixed viewport near the top-right of the bench, then shift downward on narrow screens so they do not crowd toolbar controls.
+- **Tone:** Success feedback should stay compact, lightly elevated, and tinted by semantic state instead of looking like a blocking alert.
+- **Interaction:** Toasts auto-dismiss quickly, but always keep a visible manual dismiss affordance for keyboard and touch use.
 
 ### Settings Rows and Markup Wells
 
-- **Settings Rows:** Each toggle or slider row uses the same Control Slate surface, border language, and compact spacing as toolbar controls.
+- **Preset Rail:** The compression profile begins with a three-option preset rail for Safe, Balanced, and Max compression. It should read like a dense workbench decision strip, not like tabs or marketing cards.
+- **Settings Rows:** Each toggle, switch, or precision range row uses the same Control Slate surface, border language, and compact spacing as toolbar controls.
+- **Custom Control Chrome:** Display and optimization popovers should use the app's own switch and range styling so both panels feel like the same bench instead of mixing in vendor-default control visuals.
 - **Markup Wells:** Code surfaces use Code Well with mono type, 14px corners, and a border rather than ornamental glow.
 
 ## 6. Do's and Don'ts
@@ -249,7 +272,9 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 ### Do:
 
 - **Do** keep the outer app on Base Ink and reserve brighter neutrals for nested working surfaces.
-- **Do** use Action Teal for primary action, current selection, active chips, and focus only.
+- **Do** use Action Ochre for primary action, current selection, active chips, and focus only.
+- **Do** keep the light/dark theme switch visible at the shell level rather than hiding it in a secondary panel.
+- **Do** move secondary batch facts into the display popup when compact mode is active instead of deleting them.
 - **Do** keep important batch state visible in the shell, such as asset count, optimization progress, preview mode, and markup visibility.
 - **Do** keep first-run empty states procedural, teaching the workflow rather than advertising the app.
 - **Do** use the same rounded and border vocabulary across buttons, chips, cards, settings rows, and inputs.
@@ -260,6 +285,6 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 - **Don't** make this feel like a marketing landing page, a playful icon toy, or a generic CRUD admin.
 - **Don't** introduce decorative dashboards, loud gradients, novelty motion, or cluttered icon galleries.
 - **Don't** turn the asset grid into a gallery with hidden file state. Original size, optimized size, and delta remain visible.
-- **Don't** use a second accent color or apply teal broadly to inactive surfaces.
+- **Don't** use a second accent color or apply vintage yellow broadly to inactive surfaces.
 - **Don't** hide optimization state behind vague copy, icon-only cues, or hard-to-scan panel hierarchy.
 - **Don't** add nested cards, colored side-stripe callouts, glassmorphism, or glowing hero metrics.

@@ -1,0 +1,33 @@
+@if (items$ | async; as items) {
+  @if (items.length) {
+    <section
+      class="toast-viewport"
+      aria-label="Notifications"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
+      @for (toast of items; track toast.id) {
+        <article
+          class="toast"
+          [class.toast--success]="toast.tone === 'success'"
+          [class.toast--warning]="toast.tone === 'warning'"
+          [class.toast--danger]="toast.tone === 'danger'"
+          role="status"
+        >
+          <div class="toast__copy">
+            <span>{{ toast.message }}</span>
+          </div>
+
+          <button
+            type="button"
+            class="toast__dismiss"
+            aria-label="Dismiss notification"
+            (click)="dismiss(toast.id)"
+          >
+            ×
+          </button>
+        </article>
+      }
+    </section>
+  }
+}

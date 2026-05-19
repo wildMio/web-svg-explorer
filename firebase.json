@@ -1,7 +1,7 @@
 {
   "hosting": {
     "target": "web-svg-explorer",
-    "public": "dist/web-svg-explorer",
+    "public": "dist/web-svg-explorer/browser",
     "ignore": ["**/.*"],
     "headers": [
       {

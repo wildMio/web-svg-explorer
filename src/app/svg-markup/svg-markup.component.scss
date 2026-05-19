@@ -55,7 +55,7 @@
 }
 
 .markup-pill--accent {
-  border-color: rgba(102, 195, 178, 0.28);
+  border-color: var(--accent-border);
   background: var(--accent-soft);
   color: var(--accent);
 }
@@ -75,7 +75,7 @@
 }
 
 .markup-copy:focus-visible {
-  outline: 2px solid rgba(102, 195, 178, 0.22);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .markup-code--muted {
-  color: rgba(239, 247, 248, 0.72);
+  color: var(--text-secondary);
 }
 
 .markup-empty {

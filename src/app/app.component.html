@@ -1,4 +1,8 @@
-<div class="app-shell">
+<div
+  class="app-shell"
+  [class.app-shell--compact-view]="compactView"
+  [class.app-shell--has-preview-dock]="hasQuickPreviewHandles$ | async"
+>
   <header class="app-header" [class.app-header--compact]="hasHandles$ | async">
     <div class="app-header__main">
       <div class="app-header__copy">
@@ -13,7 +17,12 @@
         </div>
 
         <h1>SVGOLOT</h1>
-        @if (hasHandles$ | async) {
+        @if (compactView) {
+          <p>
+            Compact view keeps the grid in focus while batch context moves into
+            the display popup.
+          </p>
+        } @else if (hasHandles$ | async) {
           <p>
             Keep the active batch in view, inspect the selected asset, and
             export once the directory is ready.
@@ -27,24 +36,62 @@
       </div>
 
       <div class="app-header__meta">
-        <dl class="header-facts">
-          <div class="header-fact">
-            <dt>Batch</dt>
-            <dd>{{ fileCount$ | async }} assets</dd>
-          </div>
-          <div class="header-fact">
-            <dt>Optimized</dt>
-            <dd>{{ optimizedCount$ | async }} ready</dd>
-          </div>
-          <div class="header-fact">
-            <dt>Markup</dt>
-            <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
-          </div>
-        </dl>
+        @if (!compactView) {
+          <dl class="header-facts">
+            <div class="header-fact">
+              <dt>Batch</dt>
+              <dd>{{ fileCount$ | async }} assets</dd>
+            </div>
+            <div class="header-fact">
+              <dt>Optimized</dt>
+              <dd>{{ optimizedCount$ | async }} ready</dd>
+            </div>
+            <div class="header-fact">
+              <dt>Markup</dt>
+              <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
+            </div>
+          </dl>
+        }
 
         <div class="utility-actions">
+          <button
+            type="button"
+            class="utility-toggle"
+            [class.utility-toggle--active]="compactView"
+            [attr.aria-pressed]="compactView"
+            (click)="toggleCompactView()"
+          >
+            Compact
+          </button>
+
+          <div class="theme-switch" role="group" aria-label="Theme">
+            <span class="theme-switch__label">Theme</span>
+
+            <div class="theme-switch__options">
+              <button
+                type="button"
+                class="theme-switch__button"
+                [class.theme-switch__button--active]="themeMode === 'dark'"
+                [attr.aria-pressed]="themeMode === 'dark'"
+                (click)="setTheme('dark')"
+              >
+                Dark
+              </button>
+
+              <button
+                type="button"
+                class="theme-switch__button"
+                [class.theme-switch__button--active]="themeMode === 'light'"
+                [attr.aria-pressed]="themeMode === 'light'"
+                (click)="setTheme('light')"
+              >
+                Light
+              </button>
+            </div>
+          </div>
+
           <a
-            mat-stroked-button
+            class="app-button"
             href="https://github.com/wildMio/web-svg-explorer"
             target="_blank"
             rel="noreferrer"
@@ -52,12 +99,16 @@
             View source
           </a>
           @if (showInstallPromotion$ | async) {
-            <button mat-stroked-button (click)="installPromotion()">
+            <button
+              type="button"
+              class="app-button"
+              (click)="installPromotion()"
+            >
               Install app
             </button>
           }
           @if (swUpdateAvailable$ | async) {
-            <button mat-stroked-button (click)="reloadPage()">
+            <button type="button" class="app-button" (click)="reloadPage()">
               Apply update
             </button>
           }
@@ -68,8 +119,9 @@
     <div class="toolbar-panel">
       <div class="toolbar-panel__group">
         <button
-          mat-stroked-button
+          type="button"
           class="toolbar-button toolbar-button--primary"
+          class="app-button toolbar-button toolbar-button--primary"
           (click)="openDirectory()"
           [disabled]="loading$ | async"
         >
@@ -78,8 +130,8 @@
 
         @if (hasHandles$ | async) {
           <button
-            mat-stroked-button
-            class="toolbar-button"
+            type="button"
+            class="app-button toolbar-button"
             (click)="svgoAll()"
             [disabled]="loading$ | async"
           >
@@ -89,8 +141,8 @@
 
         @if (hasOptimizedSvgMap$ | async) {
           <button
-            mat-stroked-button
-            class="toolbar-button"
+            type="button"
+            class="app-button toolbar-button"
             (click)="downloadAll()"
             [disabled]="loading$ | async"
           >
@@ -103,22 +155,22 @@
         <button
           cdkOverlayOrigin
           #trigger="cdkOverlayOrigin"
-          mat-stroked-button
-          class="toolbar-button"
+          type="button"
+          class="app-button toolbar-button"
           [class.toolbar-button--active]="displaySettingOpen"
           (click)="displaySettingOpen = !displaySettingOpen"
         >
-          Display preferences
+          Review display
         </button>
         <button
           cdkOverlayOrigin
           #compressSettingTrigger="cdkOverlayOrigin"
-          mat-stroked-button
-          class="toolbar-button"
+          type="button"
+          class="app-button toolbar-button"
           [class.toolbar-button--active]="compressSettingOpen"
           (click)="compressSettingOpen = !compressSettingOpen"
         >
-          Compression profile
+          Optimization profile
         </button>
       </div>
     </div>
@@ -134,64 +186,151 @@
     (detach)="displaySettingOpen = false"
     (overlayOutsideClick)="displaySettingOpen = false"
   >
-    <mat-card
-      appearance="outlined"
+    <section
       cdkTrapFocusAutoCapture
       cdkTrapFocus
-      class="popover-panel"
+      class="popover-panel popover-panel--review"
+      role="dialog"
+      aria-label="Display and reference"
     >
       <div class="panel-heading">
-        <span class="panel-heading__eyebrow">Display</span>
-        <h2>Preview preferences</h2>
+        <span class="panel-heading__eyebrow">Review</span>
+        <h2>Display & reference</h2>
         <p>
-          Adjust preview contrast and inspection density for the current
-          session.
+          Change only how you inspect the current session. Optimized output and
+          exports stay untouched.
         </p>
       </div>
 
       <div class="popover-panel__body">
-        <label class="field-group">
-          <span class="field-group__label">Preview color</span>
-          <input
-            #colorInput
-            type="text"
-            placeholder="#ffffff / white"
-            class="panel-input"
-            [value]="currentColor$ | async"
-            (input)="currentColor$.next(colorInput.value)"
-          />
-        </label>
-
-        <label class="panel-toggle-row">
-          <div>
-            <span class="panel-toggle-row__title">Invert preview</span>
-            <p>Flip the preview fill for dark-on-light SVG sets.</p>
+        <div class="popover-summary">
+          <div class="popover-summary__header">
+            <span class="field-group__label">Current review setup</span>
+            <span class="popover-summary__badge">
+              {{ compactView ? "Compact layout" : "Comfort layout" }}
+            </span>
           </div>
-          <mat-checkbox
-            [checked]="colorInvert"
-            (change)="colorInvert = $event.checked"
-          ></mat-checkbox>
-        </label>
 
-        <label class="panel-toggle-row">
-          <div>
-            <span class="panel-toggle-row__title">Show markup panel</span>
-            <p>
-              Keep source and optimized markup visible beside the asset grid.
-            </p>
-          </div>
-          <mat-checkbox
-            [checked]="showMarkup"
-            (change)="showMarkup = $event.checked"
-          ></mat-checkbox>
-        </label>
+          <dl class="popover-summary__facts">
+            <div>
+              <dt>Preview fill</dt>
+              <dd>{{ currentColor$ | async }}</dd>
+            </div>
+            <div>
+              <dt>Invert fill</dt>
+              <dd>{{ colorInvert ? "On" : "Off" }}</dd>
+            </div>
+            <div>
+              <dt>Markup</dt>
+              <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
+            </div>
+            <div>
+              <dt>Quick preview</dt>
+              <dd>{{ quickPreviewCount$ | async }} pinned</dd>
+            </div>
+            @if (compactView) {
+              <div>
+                <dt>Batch</dt>
+                <dd>{{ fileCount$ | async }} assets</dd>
+              </div>
+              <div>
+                <dt>Optimized</dt>
+                <dd>{{ optimizedCount$ | async }} ready</dd>
+              </div>
+            }
+          </dl>
+        </div>
+
+        <div class="panel-section">
+          <label class="field-group">
+            <span class="field-group__label">Preview fill</span>
+            <input
+              #colorInput
+              type="text"
+              placeholder="white / #111111 / currentColor"
+              class="panel-input"
+              [value]="currentColor$ | async"
+              (input)="currentColor$.next(colorInput.value)"
+            />
+            <span class="field-group__hint">
+              Use a named color or hex value to check icons against light and
+              dark surfaces.
+            </span>
+          </label>
+
+          <label class="panel-toggle-row">
+            <div>
+              <span class="panel-toggle-row__title">Invert preview fill</span>
+              <p>
+                Helpful when the source artwork was drawn for the opposite
+                background tone.
+              </p>
+            </div>
+            <span class="ui-switch">
+              <input
+                #invertPreviewToggle
+                type="checkbox"
+                class="ui-switch__input"
+                [checked]="colorInvert"
+                (change)="colorInvert = invertPreviewToggle.checked"
+              />
+              <span class="ui-switch__track"></span>
+              <span class="ui-switch__state">{{
+                colorInvert ? "On" : "Off"
+              }}</span>
+            </span>
+          </label>
+
+          <label class="panel-toggle-row">
+            <div>
+              <span class="panel-toggle-row__title"
+                >Keep markup beside grid</span
+              >
+              <p>
+                Keep original and optimized markup open beside the asset grid
+                while reviewing changes.
+              </p>
+            </div>
+            <span class="ui-switch">
+              <input
+                #markupToggle
+                type="checkbox"
+                class="ui-switch__input"
+                [checked]="showMarkup"
+                (change)="showMarkup = markupToggle.checked"
+              />
+              <span class="ui-switch__track"></span>
+              <span class="ui-switch__state">{{
+                showMarkup ? "On" : "Off"
+              }}</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="panel-guidance">
+          <span class="panel-guidance__eyebrow">How to use it</span>
+          <ul>
+            <li>
+              Change preview fill when you need to verify dark icons on light
+              surfaces, or the reverse.
+            </li>
+            <li>
+              Tick card checkboxes to pin assets into the quick preview strip at
+              the bottom of the workspace.
+            </li>
+            <li>
+              Use the compact toggle in the header when you want to scan larger
+              batches with less surrounding detail.
+            </li>
+          </ul>
+        </div>
       </div>
 
       <p class="panel-note">
-        These preferences only affect preview and inspection for the current
-        session.
+        Display settings only affect preview and inspection in this session.
+        They never rewrite optimized or exported SVG files.
       </p>
-    </mat-card>
+    </section>
   </ng-template>
 
   <ng-template
@@ -204,18 +343,19 @@
     (detach)="compressSettingOpen = false"
     (overlayOutsideClick)="compressSettingOpen = false"
   >
-    <mat-card
-      appearance="outlined"
+    <section
       cdkTrapFocusAutoCapture
       cdkTrapFocus
-      class="popover-panel popover-panel--wide compress-setting-panel"
+      class="popover-panel popover-panel--wide popover-panel--profile compress-setting-panel"
+      role="dialog"
+      aria-label="Optimization profile"
     >
       <div class="panel-heading">
         <span class="panel-heading__eyebrow">Optimization</span>
-        <h2>Compression profile</h2>
+        <h2>Optimization profile</h2>
         <p>
-          Tune the shared SVGO profile before applying changes across the
-          current workspace.
+          These settings change how optimized SVG output is rewritten for
+          single-file optimize, batch optimize, and ZIP export.
         </p>
       </div>
       <div class="popover-panel__body popover-panel__body--dense">
@@ -223,16 +363,23 @@
       </div>
 
       <p class="panel-note">
-        Profile changes apply to single-card optimization, batch optimization,
-        and ZIP export in this workspace.
+        Profile changes affect optimized output, not just preview. Restore the
+        defaults if a custom combination starts breaking assets.
       </p>
-    </mat-card>
+    </section>
   </ng-template>
 
-  <div class="workspace" [class.workspace--markup]="showMarkup">
+  <div
+    class="workspace"
+    [class.workspace--markup]="showMarkup"
+    [class.workspace--compact]="compactView"
+  >
     <section class="workspace__main">
       @if (hasHandles$ | async) {
-        <div class="workspace-summary">
+        <div
+          class="workspace-summary"
+          [class.workspace-summary--compact]="compactView"
+        >
           <div>
             <span class="workspace-summary__eyebrow">Current batch</span>
             @if (activeHandle$ | async; as activeHandle) {
@@ -249,55 +396,74 @@
             }
           </div>
 
-          <div class="workspace-summary__meta">
-            <div class="workspace-summary__chips">
-              <span class="workspace-chip"
-                >{{ fileCount$ | async }} assets loaded</span
-              >
-              <span class="workspace-chip"
-                >Preview {{ currentColor$ | async }}</span
-              >
-              @if (colorInvert) {
-                <span class="workspace-chip">Inverted preview</span>
-              }
-              @if (hasOptimizedSvgMap$ | async) {
-                <span class="workspace-chip workspace-chip--accent">
-                  {{ optimizedCount$ | async }} optimized
+          @if (!compactView) {
+            <div class="workspace-summary__meta">
+              <div class="workspace-summary__chips">
+                <span class="workspace-chip"
+                  >{{ fileCount$ | async }} assets loaded</span
+                >
+                <span class="workspace-chip"
+                  >Preview {{ currentColor$ | async }}</span
+                >
+                @if (colorInvert) {
+                  <span class="workspace-chip">Inverted preview</span>
+                }
+                @if (hasOptimizedSvgMap$ | async) {
+                  <span class="workspace-chip workspace-chip--accent">
+                    {{ optimizedCount$ | async }} optimized
+                  </span>
+                } @else {
+                  <span class="workspace-chip">Awaiting optimization</span>
+                }
+                <span
+                  class="workspace-chip"
+                  [class.workspace-chip--accent]="showMarkup"
+                >
+                  Markup {{ showMarkup ? "visible" : "hidden" }}
                 </span>
-              } @else {
-                <span class="workspace-chip">Awaiting optimization</span>
-              }
-              <span
-                class="workspace-chip"
-                [class.workspace-chip--accent]="showMarkup"
-              >
-                Markup {{ showMarkup ? "visible" : "hidden" }}
-              </span>
-            </div>
+                @if (quickPreviewCount$ | async) {
+                  <span class="workspace-chip">
+                    {{ quickPreviewCount$ | async }} in quick preview
+                  </span>
+                }
+              </div>
 
-            <p class="workspace-summary__hint">
-              Use card actions for one-off fixes, then switch to the toolbar
-              when the whole batch is ready.
-            </p>
-          </div>
+              <p class="workspace-summary__hint">
+                Use card actions for one-off fixes, then switch to the toolbar
+                when the whole batch is ready.
+              </p>
+            </div>
+          }
         </div>
 
         <div class="workspace-grid">
-          <main class="main">
-            @for (handle of fileWithDirectoryHandles$ | async; track handle) {
-              <app-svg-card
-                [currentColor]="debounceCurrentColor$ | async"
-                [fileWithDirectoryHandle]="handle"
-                [colorInvert]="colorInvert"
-                class="svg-card-host"
-                [class.active-card]="activeHandle$ | async | match: handle"
-                (click)="updateActiveHandle(handle)"
-              ></app-svg-card>
-            }
-          </main>
+          @if (quickPreviewHandleNames$ | async; as quickPreviewHandleNames) {
+            <main class="main" [class.main--compact]="compactView">
+              @for (handle of fileWithDirectoryHandles$ | async; track handle) {
+                <app-svg-card
+                  [currentColor]="debounceCurrentColor$ | async"
+                  [fileWithDirectoryHandle]="handle"
+                  [colorInvert]="colorInvert"
+                  [compact]="compactView"
+                  [quickPreviewSelected]="
+                    quickPreviewHandleNames.has(handle.name)
+                  "
+                  class="svg-card-host"
+                  [class.active-card]="activeHandle$ | async | match: handle"
+                  [class.svg-card-host--preview-selected]="
+                    quickPreviewHandleNames.has(handle.name)
+                  "
+                  (click)="updateActiveHandle(handle)"
+                  (quickPreviewSelectedChange)="
+                    updateQuickPreviewSelection(handle, $event)
+                  "
+                ></app-svg-card>
+              }
+            </main>
+          }
         </div>
       } @else {
-        <mat-card appearance="outlined" class="empty-state">
+        <section class="empty-state">
           <span class="empty-state__badge">
             {{
               (directoryReviewed$ | async)
@@ -323,8 +489,8 @@
 
             <div class="empty-state__actions">
               <button
-                mat-stroked-button
-                class="toolbar-button toolbar-button--primary"
+                type="button"
+                class="app-button toolbar-button toolbar-button--primary"
                 (click)="openDirectory()"
                 [disabled]="loading$ | async"
               >
@@ -365,7 +531,7 @@
               </div>
             </li>
           </ol>
-        </mat-card>
+        </section>
       }
     </section>
 
@@ -379,4 +545,74 @@
       </aside>
     }
   </div>
+
+  @if (quickPreviewItems$ | async; as quickPreviewItems) {
+    @if (quickPreviewItems.length) {
+      <section class="quick-preview-dock" aria-label="Quick preview selection">
+        <div class="quick-preview-dock__header">
+          <div>
+            <span class="quick-preview-dock__eyebrow">Quick preview</span>
+            <h2>{{ quickPreviewItems.length }} pinned icons</h2>
+          </div>
+
+          <div class="quick-preview-dock__actions">
+            @if (activeHandle$ | async; as activeHandle) {
+              <span class="quick-preview-dock__active">
+                Focused: {{ activeHandle.name }}
+              </span>
+            }
+
+            <button
+              type="button"
+              class="quick-preview-dock__clear"
+              (click)="clearQuickPreviewHandles()"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="quick-preview-dock__strip">
+          @for (item of quickPreviewItems; track item.handle.name) {
+            <article
+              class="quick-preview-tile"
+              [class.quick-preview-tile--active]="
+                activeHandle$ | async | match: item.handle
+              "
+            >
+              <button
+                type="button"
+                class="quick-preview-tile__remove"
+                aria-label="Remove from quick preview"
+                (click)="updateQuickPreviewSelection(item.handle, false)"
+              >
+                ×
+              </button>
+
+              <button
+                type="button"
+                class="quick-preview-tile__body"
+                (click)="updateActiveHandle(item.handle)"
+              >
+                <span class="quick-preview-tile__canvas">
+                  <img
+                    [src]="item.uri"
+                    [alt]="item.name"
+                    [class.invert]="colorInvert"
+                  />
+                </span>
+
+                <span class="quick-preview-tile__meta">
+                  <strong>{{ item.name }}</strong>
+                  <span>{{ item.optimized ? "Optimized" : "Original" }}</span>
+                </span>
+              </button>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  }
 </div>
+
+<app-toast-viewport></app-toast-viewport>

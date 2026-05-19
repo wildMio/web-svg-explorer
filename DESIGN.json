@@ -1,52 +1,52 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-04-25T00:00:00Z",
+  "generatedAt": "2026-05-19T00:00:00Z",
   "title": "Design System: SVGOLOT",
   "extensions": {
     "colorMeta": {
       "base-ink": {
         "role": "neutral",
-        "displayName": "Base Ink",
-        "description": "Application background and outer shell.",
+        "displayName": "Base Soot",
+        "description": "Matte dark application background and outer shell.",
         "tonalRamp": [
-          "#0B1015",
-          "#10161D",
-          "#151D25",
-          "#1B252F",
-          "#22303B",
-          "#31414D",
-          "#5C717C",
-          "#B5C6CD"
+          "#0C0A08",
+          "#12100D",
+          "#1A1713",
+          "#221D17",
+          "#2B241D",
+          "#4D3F30",
+          "#8B7559",
+          "#C9B792"
         ]
       },
       "panel-slate": {
         "role": "neutral",
         "displayName": "Panel Slate",
-        "description": "Primary panel surface for the shell, workspace summary, empty state, and cards."
+        "description": "Primary panel surface, shifting from matte soot in dark mode to warm paper in light mode."
       },
       "control-slate": {
         "role": "neutral",
         "displayName": "Control Slate",
-        "description": "Nested control surface for buttons, chips, inputs, and setting rows."
+        "description": "Nested control surface for buttons, chips, inputs, and setting rows across both themes."
       },
       "raised-slate": {
         "role": "neutral",
         "displayName": "Raised Slate",
-        "description": "Active or hover lift for controls that need stronger separation."
+        "description": "Active or hover lift for controls that need stronger separation without becoming glossy."
       },
       "code-well": {
         "role": "neutral",
         "displayName": "Code Well",
         "description": "Dense code and markup surface.",
         "tonalRamp": [
-          "#0C1319",
-          "#111921",
-          "#18222B",
-          "#23303A",
-          "#34424D",
-          "#556571",
-          "#83919A",
-          "#D5DEE2"
+          "#0F0C09",
+          "#15120F",
+          "#1D1813",
+          "#2B241D",
+          "#3C3329",
+          "#605343",
+          "#938267",
+          "#D9CFBC"
         ]
       },
       "line-soft": {
@@ -74,24 +74,24 @@
         "displayName": "Muted Text",
         "description": "Eyebrows and tertiary status labels."
       },
-      "action-teal": {
+      "action-ochre": {
         "role": "primary",
-        "displayName": "Action Teal",
-        "description": "Primary action, active selection, and focus accent.",
+        "displayName": "Action Ochre",
+        "description": "Primary action, active selection, and focus accent shared by both themes.",
         "tonalRamp": [
-          "#183C37",
-          "#23554D",
-          "#2F7066",
-          "#3F8E81",
-          "#66C3B2",
-          "#7ED0C1",
-          "#A8E1D8",
-          "#E3F6F1"
+          "#3E2F15",
+          "#5B451D",
+          "#765B25",
+          "#997634",
+          "#C6A05A",
+          "#D6B374",
+          "#E7D3A6",
+          "#F5EBD3"
         ]
       },
-      "action-teal-soft": {
+      "action-ochre-soft": {
         "role": "accent",
-        "displayName": "Action Teal Soft",
+        "displayName": "Action Ochre Soft",
         "description": "Quiet primary button fill and active shell tint."
       },
       "warning-amber": {
@@ -143,12 +143,12 @@
     "shadows": [
       {
         "name": "Soft Lift",
-        "value": "0 12px 28px rgba(5, 9, 12, 0.18)",
+        "value": "0 14px 32px rgba(7, 6, 4, 0.24)",
         "purpose": "Popover surfaces and hovered cards."
       },
       {
         "name": "Selected Halo",
-        "value": "0 0 0 1px rgba(102, 195, 178, 0.18), 0 12px 28px rgba(5, 9, 12, 0.18)",
+        "value": "0 0 0 1px rgba(198, 160, 90, 0.2), 0 14px 32px rgba(7, 6, 4, 0.24)",
         "purpose": "Active asset card only."
       }
     ],
@@ -196,7 +196,7 @@
       "refersTo": "button-primary",
       "description": "Main entry point and batch action. The accent stays soft at rest and lifts only on interaction.",
       "html": "<button class=\"ds-btn-primary\">Open SVG directory</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 16px; border: 1px solid rgba(102, 195, 178, 0.3); border-radius: 14px; background: rgba(102, 195, 178, 0.14); color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; } .ds-btn-primary:hover { background: rgba(255, 255, 255, 0.04); border-color: #66c3b2; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); } .ds-btn-primary:focus-visible { outline: 2px solid rgba(102, 195, 178, 0.24); outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 16px; border: 1px solid rgba(198, 160, 90, 0.34); border-radius: 14px; background: rgba(198, 160, 90, 0.14); color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; } .ds-btn-primary:hover { background: rgba(240, 230, 211, 0.045); border-color: #c6a05a; transform: translateY(-1px); box-shadow: 0 14px 32px rgba(7, 6, 4, 0.24); } .ds-btn-primary:focus-visible { outline: 2px solid rgba(198, 160, 90, 0.24); outline-offset: 2px; }"
     },
     {
       "name": "Workspace Chip",
@@ -204,21 +204,56 @@
       "refersTo": "chip-status",
       "description": "Compact summary chip for batch, preview, and optimization state.",
       "html": "<span class=\"ds-chip ds-chip--accent\">12 optimized</span>",
-      "css": ".ds-chip { display: inline-flex; align-items: center; border-radius: 11px; padding: 6px 13px; background: #1b252f; color: rgba(219, 229, 234, 0.76); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.86rem; font-weight: 500; } .ds-chip--accent { background: rgba(102, 195, 178, 0.14); color: #66c3b2; }"
+      "css": ".ds-chip { display: inline-flex; align-items: center; border-radius: 11px; padding: 6px 13px; background: #221d17; color: rgba(240, 230, 211, 0.78); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.86rem; font-weight: 500; } .ds-chip--accent { background: rgba(198, 160, 90, 0.14); color: #c6a05a; }"
+    },
+    {
+      "name": "Theme Switch",
+      "kind": "custom",
+      "description": "Shell-level segmented control for switching between matte dark and warm light workbench modes.",
+      "html": "<div class=\"ds-theme-switch\"><span class=\"ds-theme-switch__label\">Theme</span><button class=\"ds-theme-switch__button ds-theme-switch__button--active\">Dark</button><button class=\"ds-theme-switch__button\">Light</button></div>",
+      "css": ".ds-theme-switch { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 999px; background: #221d17; color: rgba(201, 183, 146, 0.64); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-theme-switch__label { padding: 0 8px 0 10px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-theme-switch__button { border: 1px solid transparent; border-radius: 999px; background: transparent; padding: 9px 13px; color: rgba(240, 230, 211, 0.78); font-size: 0.86rem; font-weight: 600; } .ds-theme-switch__button--active { border-color: rgba(198, 160, 90, 0.34); background: rgba(198, 160, 90, 0.14); color: #c6a05a; }"
+    },
+    {
+      "name": "Compact Toggle",
+      "kind": "custom",
+      "description": "Minimal shell-level toggle that collapses secondary batch context into the display popup and gives the grid more room.",
+      "html": "<button class=\"ds-utility-toggle ds-utility-toggle--active\">Compact</button>",
+      "css": ".ds-utility-toggle { min-height: 42px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 999px; background: #221d17; padding: 9px 14px; color: rgba(240, 230, 211, 0.78); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 0.86rem; font-weight: 600; } .ds-utility-toggle--active { border-color: rgba(198, 160, 90, 0.34); background: rgba(198, 160, 90, 0.14); color: #c6a05a; }"
     },
     {
       "name": "Asset Card",
       "kind": "card",
-      "description": "Signature component. Combines preview, state, actions, and file metadata in one dense review unit.",
+      "description": "Signature component. Combines preview, state, actions, a quick-preview checkbox, and file metadata in one dense review unit.",
       "html": "<article class=\"ds-asset-card\"><div class=\"ds-asset-preview\"><span class=\"ds-asset-state\">Optimized</span><button class=\"ds-asset-action\" aria-label=\"Optimize\">+</button><div class=\"ds-asset-glyph\">SVG</div><span class=\"ds-asset-ratio\">58%</span></div><div class=\"ds-asset-meta\"><strong class=\"ds-asset-name\">system-icon</strong><div class=\"ds-asset-row\"><span>Original</span><strong>14.2 KB</strong></div><div class=\"ds-asset-row\"><span>Optimized</span><strong>8.2 KB</strong></div><div class=\"ds-asset-row ds-asset-row--muted\"><span>Delta</span><strong>6.0 KB saved</strong></div></div></article>",
-      "css": ".ds-asset-card { display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 16px; background: #151e26; color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; } .ds-asset-card:hover { transform: translateY(-1px); border-color: rgba(153, 178, 188, 0.28); box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); } .ds-asset-preview { position: relative; display: grid; place-items: center; min-height: 184px; padding: 16px; border-bottom: 1px solid rgba(153, 178, 188, 0.16); background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.015) 100%); } .ds-asset-state { position: absolute; top: 12px; left: 12px; border-radius: 999px; padding: 5px 10px; background: rgba(114, 191, 149, 0.14); color: #72bf95; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; } .ds-asset-action { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 11px; background: #1b252f; color: #eef3f5; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease; } .ds-asset-action:hover { background: #22303b; border-color: rgba(153, 178, 188, 0.28); transform: translateY(-1px); } .ds-asset-glyph { display: inline-flex; align-items: center; justify-content: center; width: 88px; height: 88px; border-radius: 14px; border: 1px dashed rgba(153, 178, 188, 0.28); color: rgba(219, 229, 234, 0.76); font-size: 0.9rem; font-weight: 600; } .ds-asset-ratio { position: absolute; right: 12px; bottom: 12px; border-radius: 999px; padding: 4px 9px; background: rgba(9, 12, 16, 0.74); color: #72bf95; font-size: 0.75rem; font-weight: 700; } .ds-asset-meta { display: grid; gap: 9px; padding: 15px 16px 16px; } .ds-asset-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.96rem; font-weight: 600; } .ds-asset-row { display: flex; justify-content: space-between; gap: 16px; color: rgba(219, 229, 234, 0.76); font-size: 0.86rem; } .ds-asset-row strong { color: #eef3f5; font-size: 0.86rem; font-weight: 600; text-align: right; } .ds-asset-row--muted strong { color: rgba(219, 229, 234, 0.76); }"
+      "css": ".ds-asset-card { display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 16px; background: #1a1713; color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; } .ds-asset-card:hover { transform: translateY(-1px); border-color: rgba(199, 174, 130, 0.28); box-shadow: 0 14px 32px rgba(7, 6, 4, 0.24); } .ds-asset-preview { position: relative; display: grid; place-items: center; min-height: 184px; padding: 16px; border-bottom: 1px solid rgba(199, 174, 130, 0.16); background: linear-gradient(180deg, rgba(240, 230, 211, 0.03) 0%, rgba(240, 230, 211, 0.012) 100%); } .ds-asset-state { position: absolute; top: 12px; left: 12px; border-radius: 999px; padding: 5px 10px; background: rgba(144, 160, 110, 0.14); color: #90a06e; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; } .ds-asset-action { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 11px; background: #221d17; color: #f0e6d3; cursor: pointer; transition: background 180ms ease, border-color 180ms ease, transform 180ms ease; } .ds-asset-action:hover { background: #2b241d; border-color: rgba(199, 174, 130, 0.28); transform: translateY(-1px); } .ds-asset-glyph { display: inline-flex; align-items: center; justify-content: center; width: 88px; height: 88px; border-radius: 14px; border: 1px dashed rgba(199, 174, 130, 0.28); color: rgba(240, 230, 211, 0.78); font-size: 0.9rem; font-weight: 600; } .ds-asset-ratio { position: absolute; right: 12px; bottom: 12px; border-radius: 999px; padding: 4px 9px; background: rgba(21, 18, 15, 0.82); color: #90a06e; font-size: 0.75rem; font-weight: 700; } .ds-asset-meta { display: grid; gap: 9px; padding: 15px 16px 16px; } .ds-asset-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.96rem; font-weight: 600; } .ds-asset-row { display: flex; justify-content: space-between; gap: 16px; color: rgba(240, 230, 211, 0.78); font-size: 0.86rem; } .ds-asset-row strong { color: #f0e6d3; font-size: 0.86rem; font-weight: 600; text-align: right; } .ds-asset-row--muted strong { color: rgba(240, 230, 211, 0.78); }"
+    },
+    {
+      "name": "Quick Preview Dock",
+      "kind": "custom",
+      "description": "Fixed bottom dock for explicitly picked icons, used for rapid comparison without losing the main grid selection.",
+      "html": "<section class=\"ds-preview-dock\"><header class=\"ds-preview-dock__header\"><span class=\"ds-preview-dock__eyebrow\">Quick preview</span><strong>3 pinned icons</strong></header><div class=\"ds-preview-dock__row\"><article class=\"ds-preview-tile\"><div class=\"ds-preview-tile__canvas\">SVG</div><span class=\"ds-preview-tile__label\">system-icon</span></article></div></section>",
+      "css": ".ds-preview-dock { display: grid; gap: 10px; padding: 16px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 16px; background: rgba(26, 23, 19, 0.94); box-shadow: 0 14px 32px rgba(7, 6, 4, 0.24); color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-preview-dock__header { display: flex; align-items: end; justify-content: space-between; gap: 12px; } .ds-preview-dock__eyebrow { color: rgba(201, 183, 146, 0.64); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-preview-dock__row { display: flex; gap: 12px; overflow-x: auto; } .ds-preview-tile { flex: none; width: 136px; padding: 10px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 14px; background: #1a1713; } .ds-preview-tile__canvas { display: grid; place-items: center; min-height: 76px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 12px; margin-bottom: 8px; } .ds-preview-tile__label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.84rem; font-weight: 600; }"
+    },
+    {
+      "name": "Toast Feedback",
+      "kind": "custom",
+      "description": "Fixed, self-dismissing notification surface for copy and workflow feedback, styled with the same border and blur language as the rest of the bench.",
+      "html": "<section class=\"ds-toast-viewport\"><article class=\"ds-toast ds-toast--success\"><span>Copied optimized SVG for system-icon.</span><button aria-label=\"Dismiss notification\">×</button></article></section>",
+      "css": ".ds-toast-viewport { position: fixed; top: 16px; right: 16px; display: grid; gap: 10px; width: min(352px, calc(100vw - 32px)); } .ds-toast { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 14px 15px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 15px; background: rgba(26, 23, 19, 0.95); backdrop-filter: blur(14px); box-shadow: 0 14px 32px rgba(7, 6, 4, 0.24); color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-toast--success { border-color: rgba(144, 160, 110, 0.28); background: color-mix(in srgb, rgba(26, 23, 19, 0.95) 88%, rgba(144, 160, 110, 0.14)); } .ds-toast button { width: 29px; height: 29px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 10px; background: #221d17; color: rgba(240, 230, 211, 0.78); }"
+    },
+    {
+      "name": "Preset Rail",
+      "kind": "custom",
+      "description": "Three-option preset selector for the compression panel, used to jump between Safe, Balanced, and Max compression before making finer adjustments.",
+      "html": "<div class=\"ds-preset-rail\"><button class=\"ds-preset\"><strong>Safe</strong><span>Preserve more structure.</span></button><button class=\"ds-preset ds-preset--active\"><strong>Balanced</strong><span>Recommended for most icon sets.</span></button><button class=\"ds-preset\"><strong>Max compression</strong><span>Push harder for size.</span></button></div>",
+      "css": ".ds-preset-rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } .ds-preset { display: grid; gap: 6px; min-height: 86px; padding: 14px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 15px; background: #1a1713; color: rgba(240, 230, 211, 0.78); text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-preset strong { color: #f0e6d3; font-size: 0.9rem; font-weight: 700; } .ds-preset span { font-size: 0.82rem; line-height: 1.5; } .ds-preset--active { border-color: rgba(198, 160, 90, 0.34); background: rgba(198, 160, 90, 0.14); color: #f0e6d3; box-shadow: 0 0 0 1px rgba(198, 160, 90, 0.2), 0 14px 32px rgba(7, 6, 4, 0.24); }"
     },
     {
       "name": "Settings Row",
       "kind": "custom",
-      "description": "Shared row pattern for toggles and sliders inside the compression profile panel.",
-      "html": "<label class=\"ds-setting-row\"><span class=\"ds-setting-copy\"><strong>Multipass</strong><small>Run multiple optimization passes to squeeze out redundant markup.</small></span><span class=\"ds-setting-toggle\" aria-hidden=\"true\"></span></label>",
-      "css": ".ds-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 16px; border-radius: 16px; background: #1b252f; color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-setting-copy { display: grid; gap: 4px; } .ds-setting-copy strong { font-size: 0.96rem; font-weight: 600; } .ds-setting-copy small { color: rgba(219, 229, 234, 0.76); font-size: 0.86rem; line-height: 1.55; } .ds-setting-toggle { width: 40px; height: 24px; border-radius: 999px; background: rgba(102, 195, 178, 0.45); position: relative; flex: none; } .ds-setting-toggle::after { content: ''; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%; background: #66c3b2; }"
+      "description": "Shared row pattern for custom switches and precision ranges inside the compression profile panel.",
+      "html": "<label class=\"ds-setting-row\"><span class=\"ds-setting-copy\"><strong>Multipass</strong><small>Run multiple optimization passes to squeeze out redundant markup.</small></span><span class=\"ds-setting-switch\"><span class=\"ds-setting-switch__track\"></span><span class=\"ds-setting-switch__label\">On</span></span></label>",
+      "css": ".ds-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 16px; border-radius: 16px; background: #221d17; color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-setting-copy { display: grid; gap: 4px; } .ds-setting-copy strong { font-size: 0.96rem; font-weight: 600; } .ds-setting-copy small { color: rgba(240, 230, 211, 0.78); font-size: 0.86rem; line-height: 1.55; } .ds-setting-switch { display: inline-flex; align-items: center; gap: 10px; } .ds-setting-switch__track { position: relative; width: 43px; height: 25px; border: 1px solid rgba(199, 174, 130, 0.28); border-radius: 999px; background: rgba(198, 160, 90, 0.14); } .ds-setting-switch__track::after { content: ''; position: absolute; top: 3px; left: 20px; width: 17px; height: 17px; border-radius: 50%; background: #c6a05a; } .ds-setting-switch__label { color: rgba(240, 230, 211, 0.78); font-size: 0.82rem; font-weight: 600; }"
     },
     {
       "name": "Markup Code Well",
@@ -226,23 +261,23 @@
       "refersTo": "code-well",
       "description": "Monospace code surface for original and optimized markup.",
       "html": "<pre class=\"ds-code-well\">&lt;svg viewBox=\"0 0 24 24\"&gt;...&lt;/svg&gt;</pre>",
-      "css": ".ds-code-well { margin: 0; padding: 16px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 14px; background: #111921; color: #eef3f5; font-family: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Monaco, Consolas, monospace; font-size: 0.875rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }"
+      "css": ".ds-code-well { margin: 0; padding: 16px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 14px; background: #15120f; color: #f0e6d3; font-family: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Monaco, Consolas, monospace; font-size: 0.875rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }"
     },
     {
       "name": "Popover Panel",
       "kind": "card",
       "refersTo": "panel-surface",
-      "description": "Floating settings panel. One of the few places where elevation is present at rest.",
+      "description": "Floating custom shell for display and optimization controls, with a softly blurred surface and the same border language as the rest of the bench.",
       "html": "<section class=\"ds-popover\"><span class=\"ds-popover-eyebrow\">Optimization</span><h3 class=\"ds-popover-title\">Compression profile</h3><p class=\"ds-popover-copy\">Tune the shared SVGO profile before applying changes across the current workspace.</p></section>",
-      "css": ".ds-popover { display: grid; gap: 8px; width: min(320px, 100%); padding: 18px; border: 1px solid rgba(153, 178, 188, 0.16); border-radius: 16px; background: #151e26; box-shadow: 0 12px 28px rgba(5, 9, 12, 0.18); color: #eef3f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-popover-eyebrow { color: rgba(181, 198, 205, 0.68); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-popover-title { margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; } .ds-popover-copy { margin: 0; color: rgba(219, 229, 234, 0.76); font-size: 1rem; line-height: 1.55; }"
+      "css": ".ds-popover { display: grid; gap: 8px; width: min(320px, 100%); padding: 18px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 16px; background: rgba(26, 23, 19, 0.96); backdrop-filter: blur(16px); box-shadow: 0 14px 32px rgba(7, 6, 4, 0.24); color: #f0e6d3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-popover-eyebrow { color: rgba(201, 183, 146, 0.64); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-popover-title { margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; } .ds-popover-copy { margin: 0; color: rgba(240, 230, 211, 0.78); font-size: 1rem; line-height: 1.55; }"
     }
   ],
   "narrative": {
     "northStar": "The Asset Review Bench",
-    "overview": "SVGOLOT feels like an inspection bench for production SVG assets, not a gallery or a marketing shell. The interface stays dark, restrained, and operational so previews, metadata, and markup can sit in one workspace without competing for attention. It rejects decorative dashboard tropes and keeps color reserved for action, selection, and state.",
+    "overview": "SVGOLOT feels like an inspection bench for production SVG assets, not a gallery or a marketing shell. The interface stays restrained and operational across both matte dark and warm light themes so previews, metadata, and markup can sit in one workspace without competing for attention. It rejects decorative dashboard tropes and keeps color reserved for action, selection, and state.",
     "keyCharacteristics": [
-      "Dark, low-glare shell with blue-green tinted neutrals.",
-      "One operational teal accent used for action, selection, and active state.",
+      "Matte soot dark mode and warm paper light mode share the same component structure and contrast logic.",
+      "One operational vintage-yellow accent used for action, selection, and active state.",
       "Native sans typography with a compact fixed scale.",
       "Flat resting surfaces, with elevation reserved for hover, popover, and selected state.",
       "Dense workflow where preview, metadata, settings, and markup remain tightly coupled."
@@ -261,7 +296,7 @@
       {
         "name": "The One-Action Accent Rule",
         "section": "colors",
-        "body": "Action Teal is the only high-attention accent. Warning, success, and danger colors are for status only."
+        "body": "Action Ochre is the only high-attention accent. Warning, success, and danger colors are for status only."
       },
       {
         "name": "The One-Family Rule",
@@ -291,7 +326,9 @@
     ],
     "dos": [
       "Do keep the outer app on Base Ink and reserve brighter neutrals for nested working surfaces.",
-      "Do use Action Teal for primary action, current selection, active chips, and focus only.",
+      "Do use Action Ochre for primary action, current selection, active chips, and focus only.",
+      "Do keep the theme switch visible in the shell rather than hiding it inside a secondary settings panel.",
+      "Do move secondary batch facts into the display popup when compact mode is active instead of deleting them.",
       "Do keep important batch state visible in the shell, such as asset count, optimization progress, preview mode, and markup visibility.",
       "Do keep first-run empty states procedural, teaching the workflow rather than advertising the app.",
       "Do use the same rounded and border vocabulary across buttons, chips, cards, settings rows, and inputs.",
@@ -301,7 +338,7 @@
       "Don't make this feel like a marketing landing page, a playful icon toy, or a generic CRUD admin.",
       "Don't introduce decorative dashboards, loud gradients, novelty motion, or cluttered icon galleries.",
       "Don't turn the asset grid into a gallery with hidden file state. Original size, optimized size, and delta remain visible.",
-      "Don't use a second accent color or apply teal broadly to inactive surfaces.",
+      "Don't use a second accent color or apply vintage yellow broadly to inactive surfaces.",
       "Don't hide optimization state behind vague copy, icon-only cues, or hard-to-scan panel hierarchy.",
       "Don't add nested cards, colored side-stripe callouts, glassmorphism, or glowing hero metrics."
     ]

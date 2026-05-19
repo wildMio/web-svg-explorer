@@ -48,9 +48,9 @@
   background:
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.03) 0%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.03) 100%
+      var(--surface-sheen-weak) 0%,
+      var(--surface-sheen-strong) 50%,
+      var(--surface-sheen-weak) 100%
     ),
     var(--surface-2);
   background-size: 240% 100%;

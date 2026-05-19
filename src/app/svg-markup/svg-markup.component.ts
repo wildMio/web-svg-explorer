@@ -6,9 +6,10 @@ import {
   HostBinding,
   inject,
 } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { FileWithDirectoryHandle } from 'browser-fs-access';
+
+import { ToastService } from '../service/toast.service';
 
 @Component({
   selector: 'app-svg-markup',
@@ -18,7 +19,7 @@ import { FileWithDirectoryHandle } from 'browser-fs-access';
 })
 export class SvgMarkupComponent {
   private readonly clipboard = inject(Clipboard);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly toastService = inject(ToastService);
 
   @HostBinding('class') class = 'block h-full';
 
@@ -26,10 +27,8 @@ export class SvgMarkupComponent {
   @Input() originalText?: string | null;
   @Input() optimizedText?: string | null;
 
-  copy(name: string, text: string) {
+  copy(label: string, text: string) {
     this.clipboard.copy(text);
-    this.snackBar.open(`Copy ${name} success.`, 'Dismiss', {
-      duration: 2000,
-    });
+    this.toastService.success(`Copied ${label}.`);
   }
 }

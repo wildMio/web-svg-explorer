@@ -1,8 +1,8 @@
 {
   "name": "web-svg-explorer",
   "short_name": "svg-explorer",
-  "theme_color": "#1976d2",
-  "background_color": "#303030",
+  "theme_color": "#12100d",
+  "background_color": "#12100d",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

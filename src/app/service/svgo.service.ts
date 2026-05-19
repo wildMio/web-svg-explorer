@@ -18,6 +18,20 @@ import {
 
 import type { Output as OptimizedSvg } from 'svgo/browser';
 
+export type CompressionPresetId = 'safe' | 'balanced' | 'extreme';
+export type CompressionPresetState = CompressionPresetId | 'custom';
+export type CompressionPreset = {
+  id: CompressionPresetId;
+  label: string;
+  shortDescription: string;
+  description: string;
+  multipass: boolean;
+  floatPrecision: number;
+  transformPrecision: number;
+  pretty: boolean;
+  activePluginIds: string[];
+};
+
 const setting = {
   plugins: [
     {
@@ -243,14 +257,112 @@ const setting = {
   ],
 };
 
+const defaultActivePluginIds = setting.plugins
+  .filter(({ active }) => active)
+  .map(({ id }) => id);
+
+const safeDisabledPluginIds = new Set<string>([
+  'cleanupIds',
+  'convertShapeToPath',
+  'moveElemsAttrsToGroup',
+  'moveGroupAttrsToElems',
+  'collapseGroups',
+  'mergePaths',
+  'removeTitle',
+  'removeDesc',
+]);
+
+const safeActivePluginIds = defaultActivePluginIds.filter(
+  (id) => !safeDisabledPluginIds.has(id),
+);
+
+const extremeAdditionalPluginIds = [
+  'removeXMLNS',
+  'cleanupListOfValues',
+  'removeUnknownsAndDefaults',
+  'reusePaths',
+  'sortAttrs',
+  'removeDimensions',
+];
+
+const extremeActivePluginIds = setting.plugins
+  .filter(({ id, active }) => active || extremeAdditionalPluginIds.includes(id))
+  .filter(({ id }) => !['removeViewBox', 'removeStyleElement'].includes(id))
+  .map(({ id }) => id);
+
+const compressionPresets: CompressionPreset[] = [
+  {
+    id: 'safe',
+    label: 'Safe',
+    shortDescription: 'Preserve more structure and geometry detail.',
+    description:
+      'Higher precision, readable output, and fewer structural rewrites for sensitive artwork, product icons, and review-heavy batches.',
+    multipass: false,
+    floatPrecision: 5,
+    transformPrecision: 6,
+    pretty: true,
+    activePluginIds: safeActivePluginIds,
+  },
+  {
+    id: 'balanced',
+    label: 'Balanced',
+    shortDescription: 'Recommended starting point for most icon sets.',
+    description:
+      'The default workbench profile. It keeps the usual cleanup wins without pushing too hard on precision or risky transforms.',
+    multipass: true,
+    floatPrecision: 3,
+    transformPrecision: 5,
+    pretty: false,
+    activePluginIds: defaultActivePluginIds,
+  },
+  {
+    id: 'extreme',
+    label: 'Max compression',
+    shortDescription: 'Push harder for size reduction and review the result.',
+    description:
+      'Lower precision and a wider plugin set for the smallest practical output. Use it when bytes matter more than editability.',
+    multipass: true,
+    floatPrecision: 1,
+    transformPrecision: 1,
+    pretty: false,
+    activePluginIds: extremeActivePluginIds,
+  },
+];
+
+const compressionPresetMap = Object.fromEntries(
+  compressionPresets.map((preset) => [preset.id, preset]),
+) as Record<CompressionPresetId, CompressionPreset>;
+
+const arePluginSelectionsEqual = (left: string[], right: string[]): boolean =>
+  left.length === right.length &&
+  left.every((pluginId, index) => pluginId === right[index]);
+
+const createPluginState = (activePluginIds: string[]) => {
+  const activePluginIdSet = new Set(activePluginIds);
+
+  return setting.plugins.map((plugin) => ({
+    ...plugin,
+    active: activePluginIdSet.has(plugin.id),
+  }));
+};
+
+const defaultProfile = {
+  multipass: compressionPresetMap.balanced.multipass,
+  floatPrecision: compressionPresetMap.balanced.floatPrecision,
+  transformPrecision: compressionPresetMap.balanced.transformPrecision,
+  pretty: compressionPresetMap.balanced.pretty,
+};
+
 @Injectable({
   providedIn: 'root',
 })
 export class SvgoService {
+  readonly presetOptions = compressionPresets;
+
   worker$ = defer(() => {
     if (typeof Worker !== 'undefined') {
       return of(
-        new Worker(new URL('../worker/svgo-worker.worker.ts', import.meta.url))
+        new Worker(new URL('../worker/svgo-worker.worker.ts', import.meta.url)),
       );
     }
     return throwError(() => 'Not support');
@@ -260,11 +372,48 @@ export class SvgoService {
     [fingerprint: string]: { [fileName: string]: Observable<OptimizedSvg> };
   } = {};
 
-  multipass$ = new BehaviorSubject(true);
-  floatPrecision$ = new BehaviorSubject(3);
-  transformPrecision$ = new BehaviorSubject(5);
-  pretty$ = new BehaviorSubject(false);
-  plugins$ = new BehaviorSubject(setting.plugins);
+  multipass$ = new BehaviorSubject(defaultProfile.multipass);
+  floatPrecision$ = new BehaviorSubject(defaultProfile.floatPrecision);
+  transformPrecision$ = new BehaviorSubject(defaultProfile.transformPrecision);
+  pretty$ = new BehaviorSubject(defaultProfile.pretty);
+  plugins$ = new BehaviorSubject(
+    createPluginState(compressionPresetMap.balanced.activePluginIds),
+  );
+
+  settingsSnapshot$ = combineLatest([
+    this.multipass$,
+    this.floatPrecision$,
+    this.transformPrecision$,
+    this.pretty$,
+    this.plugins$,
+  ]).pipe(
+    map(([multipass, floatPrecision, transformPrecision, pretty, plugins]) => ({
+      multipass,
+      floatPrecision,
+      transformPrecision,
+      pretty,
+      activePluginIds: plugins
+        .filter(({ active }) => active)
+        .map(({ id }) => id),
+    })),
+    shareReplay(1),
+  );
+
+  activePreset$ = this.settingsSnapshot$.pipe(
+    map(({ activePluginIds, ...snapshot }) => {
+      const matchingPreset = compressionPresets.find(
+        (preset) =>
+          preset.multipass === snapshot.multipass &&
+          preset.floatPrecision === snapshot.floatPrecision &&
+          preset.transformPrecision === snapshot.transformPrecision &&
+          preset.pretty === snapshot.pretty &&
+          arePluginSelectionsEqual(preset.activePluginIds, activePluginIds),
+      );
+
+      return matchingPreset?.id ?? 'custom';
+    }),
+    shareReplay(1),
+  );
 
   options$ = combineLatest([
     this.multipass$,
@@ -288,13 +437,27 @@ export class SvgoService {
         indent: 2,
         pretty,
       },
-    }))
+    })),
   );
 
   fingerprint = '';
 
   constructor() {
     this.monitorFingerprint();
+  }
+
+  applyPreset(presetId: CompressionPresetId) {
+    const preset = compressionPresetMap[presetId];
+
+    this.multipass$.next(preset.multipass);
+    this.floatPrecision$.next(preset.floatPrecision);
+    this.transformPrecision$.next(preset.transformPrecision);
+    this.pretty$.next(preset.pretty);
+    this.plugins$.next(createPluginState(preset.activePluginIds));
+  }
+
+  resetSettings() {
+    this.applyPreset('balanced');
   }
 
   private monitorFingerprint() {
@@ -308,9 +471,9 @@ export class SvgoService {
       }) => {
         const activePluginIdSet = new Set(plugins?.map(({ name }) => name));
         const fingerprint = `${Number(
-          multipass
+          multipass,
         )},${floatPrecision},${transformPrecision},${Number(
-          js2svg?.pretty ?? 0
+          js2svg?.pretty ?? 0,
         )},${setting.plugins
           .map(({ id }) => Number(activePluginIdSet.has(id)))
           .join(',')}`;
@@ -338,12 +501,12 @@ export class SvgoService {
             });
             return fromEvent<MessageEvent>(worker, 'message').pipe(
               filter(({ data: { fileName: name } }) => name === fileName),
-              map(({ data: { optimizedSvg } }) => optimizedSvg)
+              map(({ data: { optimizedSvg } }) => optimizedSvg),
             );
-          })
+          }),
         );
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
     return this.cacheMap[this.fingerprint][fileName];
   }

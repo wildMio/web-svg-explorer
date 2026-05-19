@@ -14,9 +14,7 @@ import {
   DOCUMENT,
   inject,
 } from '@angular/core';
-import { MatButton } from '@angular/material/button';
-import { MatCard } from '@angular/material/card';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
 import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
@@ -46,7 +44,24 @@ import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
 import { SvgCardComponent } from './svg-card/svg-card.component';
 import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
+import { ToastViewportComponent } from './toast-viewport/toast-viewport.component';
+import { encodeSVG } from './util/encodeSvg';
 import { downloadBlob, sliceSvgSuffix } from './util/general';
+
+type ThemeMode = 'dark' | 'light';
+type QuickPreviewItem = {
+  handle: FileWithDirectoryHandle;
+  name: string;
+  optimized: boolean;
+  uri: SafeResourceUrl;
+};
+
+const THEME_STORAGE_KEY = 'svgolot-theme';
+const COMPACT_VIEW_STORAGE_KEY = 'svgolot-compact-view';
+const THEME_COLOR_BY_MODE: Record<ThemeMode, string> = {
+  dark: '#12100d',
+  light: '#efe6d7',
+};
 
 @Component({
   selector: 'app-root',
@@ -54,13 +69,11 @@ import { downloadBlob, sliceSvgSuffix } from './util/general';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatButton,
     CdkOverlayOrigin,
     CdkConnectedOverlay,
-    MatCard,
     CdkTrapFocus,
-    MatCheckbox,
     CompressSettingComponent,
+    ToastViewportComponent,
     SvgCardComponent,
     SvgMarkupComponent,
     AsyncPipe,
@@ -69,6 +82,7 @@ import { downloadBlob, sliceSvgSuffix } from './util/general';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly document = inject<Document>(DOCUMENT);
+  private readonly domSanitizer = inject(DomSanitizer);
   private readonly swUpdate = inject(SwUpdate);
   private readonly appPwaService = inject(AppPwaService);
   private readonly svgoService = inject(SvgoService);
@@ -77,6 +91,9 @@ export class AppComponent implements OnInit, OnDestroy {
   @HostBinding('class') class = 'app-root-host';
 
   private readonly destroy$ = new Subject<void>();
+
+  themeMode: ThemeMode;
+  compactView = this.readStoredCompactView();
 
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     [],
@@ -219,6 +236,52 @@ export class AppComponent implements OnInit, OnDestroy {
     takeUntil(this.destroy$),
     shareReplay(1),
   );
+  quickPreviewHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>([]);
+  hasQuickPreviewHandles$ = this.quickPreviewHandles$.pipe(
+    map((handles) => handles.length > 0),
+  );
+  quickPreviewCount$ = this.quickPreviewHandles$.pipe(
+    map((handles) => handles.length),
+  );
+  quickPreviewHandleNames$ = this.quickPreviewHandles$.pipe(
+    map((handles) => new Set(handles.map((handle) => handle.name))),
+    shareReplay(1),
+  );
+  quickPreviewItems$ = combineLatest([
+    this.quickPreviewHandles$,
+    this.debounceCurrentColor$,
+    this.optimizedSvgMap$,
+  ]).pipe(
+    switchMap(([handles, currentColor, optimizedSvgMap]) => {
+      if (!handles.length) {
+        return of([] as QuickPreviewItem[]);
+      }
+
+      return combineLatest(
+        handles.map((handle) =>
+          from(handle.text()).pipe(
+            map((text) => {
+              const name = sliceSvgSuffix(handle.name);
+
+              return {
+                handle,
+                name,
+                optimized: !!(name && optimizedSvgMap?.[name]),
+                uri: this.createQuickPreviewUri(text, currentColor),
+              } satisfies QuickPreviewItem;
+            }),
+          ),
+        ),
+      );
+    }),
+    takeUntil(this.destroy$),
+    shareReplay(1),
+  );
+
+  constructor() {
+    this.themeMode = this.resolveInitialTheme();
+    this.applyTheme(this.themeMode, false);
+  }
 
   ngOnInit() {
     this.appPwaService.interceptDefaultInstall();
@@ -237,6 +300,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.swUpdate.activateUpdate().then(() => this.document.location.reload());
   }
 
+  setTheme(themeMode: ThemeMode) {
+    this.themeMode = themeMode;
+    this.applyTheme(themeMode, true);
+  }
+
+  toggleCompactView() {
+    this.compactView = !this.compactView;
+    this.persistCompactView();
+  }
+
   openDirectory() {
     if (this.directoryOpening$.getValue()) {
       return;
@@ -252,6 +325,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
           this.directoryReviewed$.next(true);
           this.fileWithDirectoryHandles$.next(svgFiles);
+          this.quickPreviewHandles$.next([]);
           this.activeHandleSubject.next(svgFiles[0] ?? null);
           this.svgStateService.resetOptimizedSvgMap();
         },
@@ -322,5 +396,112 @@ export class AppComponent implements OnInit, OnDestroy {
 
   updateActiveHandle(handle: FileWithDirectoryHandle) {
     this.activeHandleSubject.next(handle);
+  }
+
+  updateQuickPreviewSelection(
+    handle: FileWithDirectoryHandle,
+    selected: boolean,
+  ) {
+    const currentHandles = this.quickPreviewHandles$.getValue();
+    const hasHandle = currentHandles.some(
+      (currentHandle) => currentHandle.name === handle.name,
+    );
+
+    if (selected && !hasHandle) {
+      this.quickPreviewHandles$.next([...currentHandles, handle]);
+      return;
+    }
+
+    if (!selected && hasHandle) {
+      this.quickPreviewHandles$.next(
+        currentHandles.filter(
+          (currentHandle) => currentHandle.name !== handle.name,
+        ),
+      );
+    }
+  }
+
+  clearQuickPreviewHandles() {
+    this.quickPreviewHandles$.next([]);
+  }
+
+  private resolveInitialTheme(): ThemeMode {
+    const storedTheme = this.readStoredTheme();
+
+    if (storedTheme) {
+      return storedTheme;
+    }
+
+    return this.document.defaultView?.matchMedia(
+      '(prefers-color-scheme: light)',
+    ).matches
+      ? 'light'
+      : 'dark';
+  }
+
+  private readStoredTheme(): ThemeMode | null {
+    try {
+      const storedTheme =
+        this.document.defaultView?.localStorage.getItem(THEME_STORAGE_KEY) ??
+        null;
+
+      return storedTheme === 'dark' || storedTheme === 'light'
+        ? storedTheme
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private applyTheme(themeMode: ThemeMode, persist: boolean) {
+    this.document.documentElement.dataset['theme'] = themeMode;
+    this.document
+      .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+      ?.setAttribute('content', THEME_COLOR_BY_MODE[themeMode]);
+
+    if (!persist) {
+      return;
+    }
+
+    try {
+      this.document.defaultView?.localStorage.setItem(
+        THEME_STORAGE_KEY,
+        themeMode,
+      );
+    } catch {
+      return;
+    }
+  }
+
+  private readStoredCompactView(): boolean {
+    try {
+      return (
+        this.document.defaultView?.localStorage.getItem(
+          COMPACT_VIEW_STORAGE_KEY,
+        ) === 'true'
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  private persistCompactView() {
+    try {
+      this.document.defaultView?.localStorage.setItem(
+        COMPACT_VIEW_STORAGE_KEY,
+        String(this.compactView),
+      );
+    } catch {
+      return;
+    }
+  }
+
+  private createQuickPreviewUri(
+    svgText: string,
+    color: string | null,
+  ): SafeResourceUrl {
+    return this.domSanitizer.bypassSecurityTrustResourceUrl(
+      `data:image/svg+xml,${encodeSVG(svgText, color ?? undefined)}`,
+    );
   }
 }

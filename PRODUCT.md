@@ -10,7 +10,7 @@ Primary users are frontend engineers, product designers, design system maintaine
 
 ## Product Purpose
 
-SVGOLOT turns SVG cleanup from a scattered set of one-off tools into one focused review workspace. The product lets users open a directory, inspect previews, compare original and optimized markup, adjust a shared SVGO profile, and export the final batch as a ZIP. Success means faster asset QA, fewer regressions from over-aggressive optimization, and a workflow that makes every change inspectable before handoff.
+SVGOLOT turns SVG cleanup from a scattered set of one-off tools into one focused review workspace. The product lets users open a directory, inspect previews, compare original and optimized markup, adjust a shared SVGO profile, and export the final batch as a ZIP. It also supports a compact inspection mode that shifts secondary batch context into a popup, a quick preview dock for pinned icons, and three profile presets for safe, balanced, or size-first compression. Success means faster asset QA, fewer regressions from over-aggressive optimization, and a workflow that makes every change inspectable before handoff.
 
 ## Brand Personality
 
@@ -25,9 +25,11 @@ This should not feel like a marketing landing page, a playful icon toy, or a gen
 - Keep the operator in control.
 - Make file and batch state legible at a glance.
 - Keep review, settings, and export in one loop.
+- Keep theme choice explicit, with one-click switching between matte dark and warm light workbench modes.
+- Support a dense inspection mode that preserves context by moving secondary status into popups instead of dropping it.
 - Prefer quiet density over decorative polish.
 - Earn trust through inspectable output.
 
 ## Accessibility & Inclusion
 
-Default to WCAG AA contrast. Support keyboard operation for batch actions, cards, settings, and copy/export controls. Respect reduced motion, avoid status that relies on color alone, and keep markup views readable for low-vision and code-review workflows.
+Default to WCAG AA contrast. Support keyboard operation for batch actions, cards, settings, and copy/export controls. Respect reduced motion, avoid status that relies on color alone, keep markup views readable for low-vision and code-review workflows, and preserve equivalent contrast quality in both the matte dark and warm light themes.

@@ -1,13 +1,25 @@
-<mat-card appearance="outlined" appVirtualElement class="asset-card">
+<article appVirtualElement class="asset-card">
   <div class="asset-card__preview">
     @if (svgUri$ | async; as uri) {
       <div class="asset-card__toolbar">
-        <div
-          class="asset-card__state"
-          [class.asset-card__state--success]="optimizedSvg$ | async"
-          [class.asset-card__state--pending]="pending$ | async"
-        >
-          {{ cardStateLabel$ | async }}
+        <div class="asset-card__leading">
+          <label class="asset-card__select" (click)="$event.stopPropagation()">
+            <input
+              type="checkbox"
+              [checked]="quickPreviewSelected"
+              (change)="setQuickPreviewSelection($any($event.target).checked)"
+            />
+            <span class="asset-card__select-indicator"></span>
+            <span class="asset-card__select-label">Quick preview</span>
+          </label>
+
+          <div
+            class="asset-card__state"
+            [class.asset-card__state--success]="optimizedSvg$ | async"
+            [class.asset-card__state--pending]="pending$ | async"
+          >
+            {{ cardStateLabel$ | async }}
+          </div>
         </div>
 
         <div class="asset-card__actions">
@@ -108,19 +120,32 @@
       {{ svgName$ | async }}
     </div>
 
-    <div class="asset-card__detail-row">
-      <span>Original</span>
-      <strong>{{ originalSizeLabel$ | async }}</strong>
-    </div>
+    @if (compact) {
+      <div class="asset-card__detail-row asset-card__detail-row--compact">
+        <span>{{ (optimizedSvg$ | async) ? "Optimized" : "Original" }}</span>
+        <strong>
+          {{
+            (optimizedSvg$ | async)
+              ? (optimizedSizeLabel$ | async)
+              : (originalSizeLabel$ | async)
+          }}
+        </strong>
+      </div>
+    } @else {
+      <div class="asset-card__detail-row">
+        <span>Original</span>
+        <strong>{{ originalSizeLabel$ | async }}</strong>
+      </div>
 
-    <div class="asset-card__detail-row">
-      <span>Optimized</span>
-      <strong>{{ optimizedSizeLabel$ | async }}</strong>
-    </div>
+      <div class="asset-card__detail-row">
+        <span>Optimized</span>
+        <strong>{{ optimizedSizeLabel$ | async }}</strong>
+      </div>
 
-    <div class="asset-card__detail-row asset-card__detail-row--muted">
-      <span>Delta</span>
-      <strong>{{ deltaLabel$ | async }}</strong>
-    </div>
+      <div class="asset-card__detail-row asset-card__detail-row--muted">
+        <span>Delta</span>
+        <strong>{{ deltaLabel$ | async }}</strong>
+      </div>
+    }
   </div>
-</mat-card>
+</article>

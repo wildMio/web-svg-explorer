@@ -3,16 +3,16 @@ import { AsyncPipe } from '@angular/common';
 import {
   Component,
   ChangeDetectionStrategy,
+  EventEmitter,
   Input,
   ElementRef,
   HostBinding,
+  Output,
   OnDestroy,
   ChangeDetectorRef,
   NgZone,
   inject,
 } from '@angular/core';
-import { MatCard } from '@angular/material/card';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { FileWithDirectoryHandle } from 'browser-fs-access';
@@ -36,6 +36,7 @@ import {
 import { VirtualElementDirective } from '../directive/virtual-element.directive';
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
+import { ToastService } from '../service/toast.service';
 import { encodeSVG } from '../util/encodeSvg';
 import {
   downloadBlob,
@@ -51,7 +52,7 @@ import { inView } from '../util/intersection-observer';
   templateUrl: './svg-card.component.html',
   styleUrls: ['./svg-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatCard, VirtualElementDirective, AsyncPipe],
+  imports: [VirtualElementDirective, AsyncPipe],
 })
 export class SvgCardComponent implements OnDestroy {
   private readonly zone = inject(NgZone);
@@ -59,11 +60,15 @@ export class SvgCardComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly domSanitizer = inject(DomSanitizer);
   private readonly clipboard = inject(Clipboard);
-  private readonly snackBar = inject(MatSnackBar);
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
+  private readonly toastService = inject(ToastService);
 
   @HostBinding('class') class = 'block';
+  @HostBinding('class.svg-card--compact')
+  get compactClass() {
+    return this.compact;
+  }
 
   private readonly destroy$ = new Subject<void>();
 
@@ -84,6 +89,15 @@ export class SvgCardComponent implements OnDestroy {
   @InputToSubject()
   @Input()
   colorInvert = false;
+
+  @Input()
+  compact = false;
+
+  @Input()
+  quickPreviewSelected = false;
+
+  @Output()
+  quickPreviewSelectedChange = new EventEmitter<boolean>();
 
   loading$ = new BehaviorSubject(true);
 
@@ -255,6 +269,10 @@ export class SvgCardComponent implements OnDestroy {
     this.colorInvert$.next(!this.colorInvert$.getValue());
   }
 
+  setQuickPreviewSelection(selected: boolean) {
+    this.quickPreviewSelectedChange.emit(selected);
+  }
+
   copy() {
     combineLatest({ svg: this.optimizedSvg$, name: this.svgName$ })
       .pipe(take(1), takeUntil(this.destroy$))
@@ -262,9 +280,7 @@ export class SvgCardComponent implements OnDestroy {
         next: ({ svg, name }) => {
           if (svg?.data) {
             this.clipboard.copy(svg.data);
-            this.snackBar.open(`Copy ${name} success.`, 'Dismiss', {
-              duration: 2000,
-            });
+            this.toastService.success(`Copied optimized SVG for ${name}.`);
           }
         },
       });

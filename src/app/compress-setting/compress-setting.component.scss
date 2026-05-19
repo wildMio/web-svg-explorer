@@ -46,12 +46,17 @@
 .settings-toggle:hover,
 .settings-slider:hover {
   border-color: var(--stroke-strong);
-  background: rgba(34, 48, 59, 0.42);
+  background: var(--surface-active);
 }
 
 .settings-toggle__copy {
   display: grid;
   gap: 0.25rem;
+}
+
+.settings-slider__copy {
+  display: grid;
+  gap: 0.18rem;
 }
 
 .settings-toggle__copy strong,
@@ -73,6 +78,11 @@
 
 .settings-slider__label span {
   color: var(--text-secondary);
+}
+
+.settings-slider__label small,
+.settings-tech-label {
+  color: var(--text-muted);
 }
 
 .settings-slider__control {

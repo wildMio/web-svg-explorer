@@ -1,35 +1,129 @@
+@if (profileSummary$ | async; as profileSummary) {
+  <section class="settings-overview">
+    <div class="settings-overview__header">
+      <div>
+        <span class="settings-section__eyebrow">Profile presets</span>
+        <h3>{{ profileSummary.title }}</h3>
+        <p>{{ profileSummary.description }}</p>
+      </div>
+
+      <button type="button" class="settings-reset" (click)="restoreDefaults()">
+        Back to balanced default
+      </button>
+    </div>
+
+    <div class="preset-switcher" role="group" aria-label="Compression presets">
+      @for (preset of presetOptions; track preset.id) {
+        <button
+          type="button"
+          class="preset-switcher__button"
+          [class.preset-switcher__button--active]="
+            profileSummary.activePreset === preset.id
+          "
+          (click)="applyPreset(preset.id)"
+        >
+          <span class="preset-switcher__title">{{ preset.label }}</span>
+          <span class="preset-switcher__copy">{{
+            preset.shortDescription
+          }}</span>
+        </button>
+      }
+    </div>
+
+    @if (profileSummary.activePreset === "custom") {
+      <p class="settings-overview__custom-note">
+        You are using a custom combination based on one of the presets.
+      </p>
+    }
+
+    <div class="settings-overview__chips">
+      <span class="settings-pill"
+        >Multipass {{ profileSummary.multipassLabel }}</span
+      >
+      <span class="settings-pill">Output {{ profileSummary.prettyLabel }}</span>
+      <span class="settings-pill">
+        Numbers {{ profileSummary.floatPrecision }} ·
+        {{ profileSummary.floatPrecisionHint }}
+      </span>
+      <span class="settings-pill">
+        Transforms {{ profileSummary.transformPrecision }} ·
+        {{ profileSummary.transformPrecisionHint }}
+      </span>
+      <span class="settings-pill settings-pill--accent">
+        {{ profileSummary.activePluginCount }} /
+        {{ profileSummary.pluginCount }} plugins active
+      </span>
+    </div>
+
+    <ul class="settings-guidance">
+      <li>Multipass cleans harder, but adds a little processing time.</li>
+      <li>
+        Readable output helps review and diffs, while minified output stays
+        smaller.
+      </li>
+      <li>
+        Lower precision is smaller, higher precision is safer for detailed
+        curves and transforms.
+      </li>
+    </ul>
+  </section>
+}
+
 <section class="settings-section">
   <div class="settings-section__header">
     <span class="settings-section__eyebrow">Core behavior</span>
-    <p>Define how aggressively the shared SVGO profile rewrites every asset.</p>
+    <p>
+      Choose whether optimized output should favor smaller files, easier review,
+      or a balance of both.
+    </p>
   </div>
 
   <div class="settings-toggle">
     <div class="settings-toggle__copy">
       <strong>Multipass</strong>
       <span
-        >Run multiple optimization passes to squeeze out redundant markup.</span
+        >Run extra cleanup passes when you want the profile to squeeze a little
+        harder.</span
       >
     </div>
-    <mat-slide-toggle
-      aria-label="Toggle multipass optimization"
-      [checked]="multipass$ | async"
-      (change)="updateMultipass($event.checked)"
-    ></mat-slide-toggle>
+    <span class="ui-switch">
+      <input
+        #multipassToggle
+        type="checkbox"
+        class="ui-switch__input"
+        aria-label="Toggle multipass optimization"
+        [checked]="multipass$ | async"
+        (change)="updateMultipass(multipassToggle.checked)"
+      />
+      <span class="ui-switch__track"></span>
+      <span class="ui-switch__state">{{
+        (multipass$ | async) ? "On" : "Off"
+      }}</span>
+    </span>
   </div>
 
   <div class="settings-toggle">
     <div class="settings-toggle__copy">
       <strong>Prettify output</strong>
       <span
-        >Keep optimized markup easier to audit during review and handoff.</span
+        >Keep the optimized markup readable for audits, pull requests, and
+        handoff review.</span
       >
     </div>
-    <mat-slide-toggle
-      aria-label="Toggle pretty output"
-      [checked]="pretty$ | async"
-      (change)="updatePretty($event.checked)"
-    ></mat-slide-toggle>
+    <span class="ui-switch">
+      <input
+        #prettyToggle
+        type="checkbox"
+        class="ui-switch__input"
+        aria-label="Toggle pretty output"
+        [checked]="pretty$ | async"
+        (change)="updatePretty(prettyToggle.checked)"
+      />
+      <span class="ui-switch__track"></span>
+      <span class="ui-switch__state">{{
+        (pretty$ | async) ? "On" : "Off"
+      }}</span>
+    </span>
   </div>
 </section>
 
@@ -37,92 +131,112 @@
   <div class="settings-section__header">
     <span class="settings-section__eyebrow">Precision</span>
     <p>
-      Balance file size and rendering fidelity for numeric and transform values.
+      Lower values reduce file size more aggressively. Raise them if icon edges
+      or transforms start looking off.
     </p>
   </div>
 
   <div class="settings-slider">
     <div class="settings-slider__label">
-      <span>Number precision</span>
+      <div class="settings-slider__copy">
+        <span>Number precision</span>
+        <small
+          >{{ floatPrecisionHint$ | async }} for most coordinate cleanup</small
+        >
+      </div>
       <strong>{{ floatPrecision$ | async }}</strong>
     </div>
-    <mat-slider
-      min="0"
-      max="8"
-      step="1"
-      thumbLabel
-      class="settings-slider__control"
-      #ngSlider
-    >
+    <div class="ui-range">
       <input
-        matSliderThumb
+        #floatPrecisionRange
+        type="range"
+        min="0"
+        max="8"
+        step="1"
+        class="ui-range__input"
+        aria-label="Number precision"
         [value]="floatPrecision$ | async"
-        (change)="
-          updateFloatPrecision(
-            {
-              source: ngSliderThumb,
-              parent: ngSlider,
-              value: ngSliderThumb.value,
-            }.value
-          )
-        "
-        #ngSliderThumb="matSliderThumb"
-        value="3"
-    /></mat-slider>
+        (input)="updateFloatPrecision(floatPrecisionRange.valueAsNumber)"
+      />
+      <div class="ui-range__scale">
+        <span>Smaller</span>
+        <span>Safer</span>
+      </div>
+    </div>
   </div>
 
   <div class="settings-slider">
     <div class="settings-slider__label">
-      <span>Transform precision</span>
+      <div class="settings-slider__copy">
+        <span>Transform precision</span>
+        <small
+          >{{ transformPrecisionHint$ | async }} when transforms need extra
+          safety</small
+        >
+      </div>
       <strong>{{ transformPrecision$ | async }}</strong>
     </div>
-    <mat-slider
-      min="0"
-      max="8"
-      step="1"
-      thumbLabel
-      class="settings-slider__control"
-      #ngSlider
-    >
+    <div class="ui-range">
       <input
-        matSliderThumb
+        #transformPrecisionRange
+        type="range"
+        min="0"
+        max="8"
+        step="1"
+        class="ui-range__input"
+        aria-label="Transform precision"
         [value]="transformPrecision$ | async"
-        (change)="
-          updateTransformPrecision(
-            {
-              source: ngSliderThumb,
-              parent: ngSlider,
-              value: ngSliderThumb.value,
-            }.value
-          )
+        (input)="
+          updateTransformPrecision(transformPrecisionRange.valueAsNumber)
         "
-        #ngSliderThumb="matSliderThumb"
-        value="5"
-    /></mat-slider>
+      />
+      <div class="ui-range__scale">
+        <span>Smaller</span>
+        <span>Safer</span>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="settings-section">
   <div class="settings-section__header">
-    <span class="settings-section__eyebrow">Plugins</span>
+    <span class="settings-section__eyebrow">Advanced transforms</span>
     <p>
-      Enable or disable individual transforms inside the active optimization
-      profile.
+      Leave the default mix alone for most SVG batches. Change individual
+      transforms only when a specific export pattern needs special handling.
     </p>
   </div>
 
   <div class="settings-plugin-grid">
-    @for (plugin of plugins$ | async; track plugin; let index = $index) {
-      <div class="settings-toggle">
+    @for (plugin of pluginCards$ | async; track plugin.id) {
+      <div class="settings-toggle settings-toggle--plugin">
         <div class="settings-toggle__copy">
-          <strong>{{ plugin.name }}</strong>
-          <span>{{ plugin.id }}</span>
+          <div class="settings-toggle__heading">
+            <strong>{{ plugin.name }}</strong>
+            <div class="settings-toggle__meta">
+              <span class="settings-pill">{{ plugin.category }}</span>
+              @if (plugin.caution) {
+                <span class="settings-pill settings-pill--warning">
+                  Review output
+                </span>
+              }
+            </div>
+          </div>
+          <span>{{ plugin.description }}</span>
+          <small class="settings-tech-label">{{ plugin.id }}</small>
         </div>
-        <mat-slide-toggle
-          [name]="plugin.id"
-          [checked]="plugin.active"
-          (change)="updatePlugin(plugin, $event.checked, index)"
-        ></mat-slide-toggle>
+        <span class="ui-switch ui-switch--compact">
+          <input
+            #pluginToggle
+            type="checkbox"
+            class="ui-switch__input"
+            [name]="plugin.id"
+            [attr.aria-label]="plugin.name"
+            [checked]="plugin.active"
+            (change)="updatePlugin(plugin, pluginToggle.checked)"
+          />
+          <span class="ui-switch__track"></span>
+        </span>
       </div>
     }
   </div>
