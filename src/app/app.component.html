@@ -46,10 +46,6 @@
               <dt>Optimized</dt>
               <dd>{{ optimizedCount$ | async }} ready</dd>
             </div>
-            <div class="header-fact">
-              <dt>Markup</dt>
-              <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
-            </div>
           </dl>
         }
 
@@ -120,7 +116,6 @@
       <div class="toolbar-panel__group">
         <button
           type="button"
-          class="toolbar-button toolbar-button--primary"
           class="app-button toolbar-button toolbar-button--primary"
           (click)="openDirectory()"
           [disabled]="loading$ | async"
@@ -152,6 +147,45 @@
       </div>
 
       <div class="toolbar-panel__group">
+        @if (hasHandles$ | async) {
+          <button
+            type="button"
+            class="app-button toolbar-button"
+            [disabled]="(loading$ | async) || (duplicateScanPending$ | async)"
+            (click)="scanLikelyDuplicates()"
+          >
+            {{
+              (duplicateScanPending$ | async)
+                ? "Scanning likely duplicates..."
+                : duplicateScanStarted
+                  ? "Re-scan likely duplicates"
+                  : "Scan likely duplicates"
+            }}
+          </button>
+
+          @if (duplicateScanStarted) {
+            @if (possibleDuplicateCount$ | async; as duplicateCount) {
+              @if (duplicateCount) {
+                <button
+                  type="button"
+                  class="app-button toolbar-button"
+                  [class.toolbar-button--active]="duplicateFilterActive"
+                  (click)="toggleDuplicateFilter()"
+                >
+                  {{
+                    duplicateFilterActive
+                      ? "Showing likely duplicates"
+                      : "Likely duplicates"
+                  }}
+                  <span class="toolbar-button__count">{{
+                    duplicateCount
+                  }}</span>
+                </button>
+              }
+            }
+          }
+        }
+
         <button
           cdkOverlayOrigin
           #trigger="cdkOverlayOrigin"
@@ -213,11 +247,11 @@
 
           <dl class="popover-summary__facts">
             <div>
-              <dt>Preview fill</dt>
-              <dd>{{ currentColor$ | async }}</dd>
+              <dt>Preview tone</dt>
+              <dd>{{ previewToneLabel$ | async }}</dd>
             </div>
             <div>
-              <dt>Invert fill</dt>
+              <dt>Contrast swap</dt>
               <dd>{{ colorInvert ? "On" : "Off" }}</dd>
             </div>
             <div>
@@ -243,7 +277,7 @@
 
         <div class="panel-section">
           <label class="field-group">
-            <span class="field-group__label">Preview fill</span>
+            <span class="field-group__label">Preview tone</span>
             <input
               #colorInput
               type="text"
@@ -253,17 +287,18 @@
               (input)="currentColor$.next(colorInput.value)"
             />
             <span class="field-group__hint">
-              Use a named color or hex value to check icons against light and
-              dark surfaces.
+              Use a named color or hex value for currentColor and single-tone
+              artwork. Contrast swap flips that tone to a light or dark bench
+              color for faster readability checks.
             </span>
           </label>
 
           <label class="panel-toggle-row">
             <div>
-              <span class="panel-toggle-row__title">Invert preview fill</span>
+              <span class="panel-toggle-row__title">Swap to contrast tone</span>
               <p>
-                Helpful when the source artwork was drawn for the opposite
-                background tone.
+                Useful when you want to test the same icon against the opposite
+                light or dark reading condition without changing export output.
               </p>
             </div>
             <span class="ui-switch">
@@ -272,7 +307,7 @@
                 type="checkbox"
                 class="ui-switch__input"
                 [checked]="colorInvert"
-                (change)="colorInvert = invertPreviewToggle.checked"
+                (change)="setPreviewContrast(invertPreviewToggle.checked)"
               />
               <span class="ui-switch__track"></span>
               <span class="ui-switch__state">{{
@@ -380,7 +415,7 @@
           class="workspace-summary"
           [class.workspace-summary--compact]="compactView"
         >
-          <div>
+          <div class="workspace-summary__lead">
             <span class="workspace-summary__eyebrow">Current batch</span>
             @if (activeHandle$ | async; as activeHandle) {
               <h2>{{ activeHandle.name }}</h2>
@@ -388,6 +423,76 @@
                 Review the selected asset while batch optimization and export
                 remain available for the full directory.
               </p>
+
+              <div class="review-shortcuts">
+                <button
+                  type="button"
+                  class="review-shortcuts__button"
+                  [class.review-shortcuts__button--active]="showMarkup"
+                  (click)="toggleMarkup()"
+                >
+                  {{ showMarkup ? "Hide markup" : "Open markup" }}
+                </button>
+
+                @if (duplicateScanPending$ | async) {
+                  <button
+                    type="button"
+                    class="review-shortcuts__button"
+                    disabled
+                  >
+                    Scanning duplicates...
+                  </button>
+                } @else if (
+                  activeHandleDuplicateGroup$ | async;
+                  as activeHandleDuplicateGroup
+                ) {
+                  <button
+                    type="button"
+                    class="review-shortcuts__button"
+                    [class.review-shortcuts__button--active]="
+                      duplicateFilterActive && activeHandleDuplicateGroup.active
+                    "
+                    (click)="openActiveHandleDuplicateGroup()"
+                  >
+                    {{
+                      duplicateFilterActive && activeHandleDuplicateGroup.active
+                        ? "Showing its group"
+                        : "Show its group"
+                    }}
+                  </button>
+                } @else if (!duplicateScanStarted) {
+                  <button
+                    type="button"
+                    class="review-shortcuts__button"
+                    (click)="openActiveHandleDuplicateGroup()"
+                  >
+                    Find its duplicates
+                  </button>
+                } @else if (duplicateGroupCount$ | async) {
+                  <button
+                    type="button"
+                    class="review-shortcuts__button"
+                    [class.review-shortcuts__button--active]="
+                      duplicateFilterActive && !activeDuplicateGroupKey
+                    "
+                    (click)="showAllDuplicateGroups()"
+                  >
+                    {{
+                      duplicateFilterActive && !activeDuplicateGroupKey
+                        ? "Showing all groups"
+                        : "Browse duplicate groups"
+                    }}
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="review-shortcuts__button"
+                    (click)="scanLikelyDuplicates()"
+                  >
+                    Re-scan duplicates
+                  </button>
+                }
+              </div>
             } @else {
               <h2>No SVG selected</h2>
               <p>
@@ -398,29 +503,51 @@
 
           @if (!compactView) {
             <div class="workspace-summary__meta">
-              <div class="workspace-summary__chips">
+              <div class="workspace-summary__stats">
+                <div class="workspace-stat">
+                  <span class="workspace-stat__label">Batch</span>
+                  <strong>{{ fileCount$ | async }} assets loaded</strong>
+                </div>
+
+                <div class="workspace-stat">
+                  <span class="workspace-stat__label">Optimized</span>
+                  <strong>
+                    @if (hasOptimizedSvgMap$ | async) {
+                      {{ optimizedCount$ | async }} ready
+                    } @else {
+                      Awaiting optimization
+                    }
+                  </strong>
+                </div>
+
+                <div class="workspace-stat">
+                  <span class="workspace-stat__label">Quick preview</span>
+                  <strong>{{ quickPreviewCount$ | async }} pinned</strong>
+                </div>
+
+                <div class="workspace-stat">
+                  <span class="workspace-stat__label">Duplicate review</span>
+                  <strong>{{ duplicateStatusLabel$ | async }}</strong>
+                </div>
+              </div>
+
+              <div class="workspace-summary__signals">
                 <span class="workspace-chip"
-                  >{{ fileCount$ | async }} assets loaded</span
+                  >Preview {{ previewToneLabel$ | async }}</span
                 >
-                <span class="workspace-chip"
-                  >Preview {{ currentColor$ | async }}</span
-                >
-                @if (colorInvert) {
-                  <span class="workspace-chip">Inverted preview</span>
-                }
-                @if (hasOptimizedSvgMap$ | async) {
+                @if (duplicateFilterActive) {
                   <span class="workspace-chip workspace-chip--accent">
-                    {{ optimizedCount$ | async }} optimized
+                    Showing likely duplicates only
                   </span>
-                } @else {
-                  <span class="workspace-chip">Awaiting optimization</span>
                 }
-                <span
-                  class="workspace-chip"
-                  [class.workspace-chip--accent]="showMarkup"
-                >
-                  Markup {{ showMarkup ? "visible" : "hidden" }}
-                </span>
+                @if (showMarkup) {
+                  <span class="workspace-chip workspace-chip--accent">
+                    Markup open
+                  </span>
+                }
+                @if (colorInvert) {
+                  <span class="workspace-chip">Contrast preview</span>
+                }
                 @if (quickPreviewCount$ | async) {
                   <span class="workspace-chip">
                     {{ quickPreviewCount$ | async }} in quick preview
@@ -428,40 +555,209 @@
                 }
               </div>
 
-              <p class="workspace-summary__hint">
-                Use card actions for one-off fixes, then switch to the toolbar
-                when the whole batch is ready.
-              </p>
+              <div class="workspace-review">
+                <div class="workspace-review__header">
+                  <span class="workspace-review__eyebrow"
+                    >Duplicate review</span
+                  >
+                  <strong>{{ duplicateReviewHeadline$ | async }}</strong>
+                </div>
+
+                <p>{{ duplicateReviewHint$ | async }}</p>
+              </div>
             </div>
           }
         </div>
 
-        <div class="workspace-grid">
-          @if (quickPreviewHandleNames$ | async; as quickPreviewHandleNames) {
-            <main class="main" [class.main--compact]="compactView">
-              @for (handle of fileWithDirectoryHandles$ | async; track handle) {
-                <app-svg-card
-                  [currentColor]="debounceCurrentColor$ | async"
-                  [fileWithDirectoryHandle]="handle"
-                  [colorInvert]="colorInvert"
-                  [compact]="compactView"
-                  [quickPreviewSelected]="
-                    quickPreviewHandleNames.has(handle.name)
-                  "
-                  class="svg-card-host"
-                  [class.active-card]="activeHandle$ | async | match: handle"
-                  [class.svg-card-host--preview-selected]="
-                    quickPreviewHandleNames.has(handle.name)
-                  "
-                  (click)="updateActiveHandle(handle)"
-                  (quickPreviewSelectedChange)="
-                    updateQuickPreviewSelection(handle, $event)
-                  "
-                ></app-svg-card>
+        @if (duplicateGroupCards$ | async; as duplicateGroupCards) {
+          <div
+            class="workspace-grid"
+            [class.workspace-grid--with-duplicate-rail]="
+              duplicateScanStarted && duplicateGroupCards.length
+            "
+          >
+            @if (duplicateScanStarted && duplicateGroupCards.length) {
+              <aside class="workspace-grid__rail">
+                <section class="duplicate-panel">
+                  <div class="duplicate-panel__header">
+                    <div>
+                      <span class="duplicate-panel__eyebrow"
+                        >Likely duplicate groups</span
+                      >
+                      <h3>
+                        {{ duplicateGroupCards.length }} groups ·
+                        {{ possibleDuplicateCount$ | async }} assets
+                      </h3>
+                      <p>
+                        Review candidates in the rail, then keep the main grid
+                        free for whichever group you want to inspect in detail.
+                      </p>
+                    </div>
+
+                    <div class="duplicate-panel__actions">
+                      <button
+                        type="button"
+                        class="duplicate-panel__action"
+                        (click)="scanLikelyDuplicates()"
+                      >
+                        Re-scan
+                      </button>
+
+                      @if (duplicateFilterActive && activeDuplicateGroupKey) {
+                        <button
+                          type="button"
+                          class="duplicate-panel__action"
+                          (click)="showAllDuplicateGroups()"
+                        >
+                          Show all matches
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="duplicate-panel__groups">
+                    @for (
+                      duplicateGroup of duplicateGroupCards;
+                      track duplicateGroup.fingerprint
+                    ) {
+                      <article
+                        class="duplicate-group"
+                        [class.duplicate-group--active]="duplicateGroup.active"
+                      >
+                        <div class="duplicate-group__header">
+                          <div>
+                            <span class="duplicate-group__eyebrow"
+                              >Group {{ $index + 1 }}</span
+                            >
+                            <h4>{{ duplicateGroup.itemCount }} candidates</h4>
+                            <p>
+                              {{ duplicateGroup.optimizedCount }} optimized ·
+                              heuristic visual match
+                            </p>
+                          </div>
+
+                          <div class="duplicate-group__actions">
+                            <button
+                              type="button"
+                              class="duplicate-group__action"
+                              [class.duplicate-group__action--active]="
+                                duplicateGroup.active
+                              "
+                              (click)="
+                                focusDuplicateGroup(duplicateGroup.fingerprint)
+                              "
+                            >
+                              {{
+                                duplicateGroup.active
+                                  ? "Showing this group"
+                                  : "Show group"
+                              }}
+                            </button>
+
+                            <button
+                              type="button"
+                              class="duplicate-group__action"
+                              (click)="
+                                addDuplicateGroupToQuickPreview(
+                                  duplicateGroup.handles
+                                )
+                              "
+                            >
+                              Pin group
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="duplicate-group__items">
+                          @for (
+                            item of duplicateGroup.items;
+                            track item.handle.name
+                          ) {
+                            <button
+                              type="button"
+                              class="duplicate-group__item"
+                              [class.duplicate-group__item--active]="
+                                item.active
+                              "
+                              (click)="updateActiveHandle(item.handle)"
+                            >
+                              <span class="duplicate-group__item-copy">
+                                <strong>{{ item.name }}</strong>
+                                <span>{{
+                                  item.optimized
+                                    ? "Optimized ready"
+                                    : "Original only"
+                                }}</span>
+                              </span>
+
+                              <span class="duplicate-group__item-badges">
+                                @if (item.quickPreviewSelected) {
+                                  <span class="duplicate-group__badge"
+                                    >Pinned</span
+                                  >
+                                }
+
+                                @if (item.active) {
+                                  <span
+                                    class="duplicate-group__badge duplicate-group__badge--accent"
+                                  >
+                                    Focused
+                                  </span>
+                                }
+                              </span>
+                            </button>
+                          }
+                        </div>
+                      </article>
+                    }
+                  </div>
+                </section>
+              </aside>
+            }
+
+            <div class="workspace-grid__content">
+              @if (
+                quickPreviewHandleNames$ | async;
+                as quickPreviewHandleNames
+              ) {
+                @if (visibleHandles$ | async; as visibleHandles) {
+                  @if (
+                    duplicateGroupSizeByName$ | async;
+                    as duplicateGroupSizeByName
+                  ) {
+                    <main class="main" [class.main--compact]="compactView">
+                      @for (handle of visibleHandles; track handle) {
+                        <app-svg-card
+                          [currentColor]="debounceCurrentColor$ | async"
+                          [fileWithDirectoryHandle]="handle"
+                          [colorInvert]="colorInvert"
+                          [compactMode]="compactView"
+                          [duplicateGroupSize]="
+                            duplicateGroupSizeByName.get(handle.name) ?? 0
+                          "
+                          [quickPreviewSelected]="
+                            quickPreviewHandleNames.has(handle.name)
+                          "
+                          class="svg-card-host"
+                          [class.active-card]="
+                            activeHandle$ | async | match: handle
+                          "
+                          [class.svg-card-host--preview-selected]="
+                            quickPreviewHandleNames.has(handle.name)
+                          "
+                          (click)="updateActiveHandle(handle)"
+                          (quickPreviewSelectedChange)="
+                            updateQuickPreviewSelection(handle, $event)
+                          "
+                        ></app-svg-card>
+                      }
+                    </main>
+                  }
+                }
               }
-            </main>
-          }
-        </div>
+            </div>
+          </div>
+        }
       } @else {
         <section class="empty-state">
           <span class="empty-state__badge">
@@ -536,7 +832,7 @@
     </section>
 
     @if (showMarkup) {
-      <aside class="workspace__markup">
+      <aside class="workspace__markup" aria-label="Markup review panel">
         <app-svg-markup
           [handle]="activeHandle$ | async"
           [originalText]="activeSvgText$ | async"
@@ -595,11 +891,7 @@
                 (click)="updateActiveHandle(item.handle)"
               >
                 <span class="quick-preview-tile__canvas">
-                  <img
-                    [src]="item.uri"
-                    [alt]="item.name"
-                    [class.invert]="colorInvert"
-                  />
+                  <img [src]="item.uri" [alt]="item.name" />
                 </span>
 
                 <span class="quick-preview-tile__meta">

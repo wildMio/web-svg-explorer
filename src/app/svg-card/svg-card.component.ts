@@ -1,17 +1,16 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AsyncPipe } from '@angular/common';
 import {
+  effect,
   Component,
   ChangeDetectionStrategy,
-  EventEmitter,
-  Input,
   ElementRef,
-  HostBinding,
-  Output,
   OnDestroy,
   ChangeDetectorRef,
   NgZone,
   inject,
+  input,
+  output,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -37,21 +36,24 @@ import { VirtualElementDirective } from '../directive/virtual-element.directive'
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
 import { ToastService } from '../service/toast.service';
-import { encodeSVG } from '../util/encodeSvg';
 import {
   downloadBlob,
   formatBytes,
   round,
   sliceSvgSuffix,
 } from '../util/general';
-import { InputToSubject } from '../util/input-to-subject';
 import { inView } from '../util/intersection-observer';
+import { createPreviewSvgDataUri } from '../util/svg-preview';
 
 @Component({
   selector: 'app-svg-card',
   templateUrl: './svg-card.component.html',
   styleUrls: ['./svg-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'block',
+    '[class.svg-card--compact]': 'isCompactMode',
+  },
   imports: [VirtualElementDirective, AsyncPipe],
 })
 export class SvgCardComponent implements OnDestroy {
@@ -64,40 +66,40 @@ export class SvgCardComponent implements OnDestroy {
   private readonly svgStateService = inject(SvgStateService);
   private readonly toastService = inject(ToastService);
 
-  @HostBinding('class') class = 'block';
-  @HostBinding('class.svg-card--compact')
-  get compactClass() {
-    return this.compact;
+  private readonly destroy$ = new Subject<void>();
+
+  readonly fileWithDirectoryHandle = input<FileWithDirectoryHandle | undefined>(
+    undefined,
+  );
+  readonly currentColor = input<string | null | undefined>(undefined);
+  readonly colorInvert = input(false);
+  readonly compactMode = input(false);
+  readonly quickPreviewSelected = input(false);
+  readonly duplicateGroupSize = input(0);
+  readonly quickPreviewSelectedChange = output<boolean>();
+
+  get isCompactMode() {
+    return this.compactMode();
   }
 
-  private readonly destroy$ = new Subject<void>();
+  private readonly syncInputState = effect(() => {
+    const handle = this.fileWithDirectoryHandle();
+
+    if (handle) {
+      this.handle$.next(handle);
+    }
+
+    this.previewColor$.next(this.currentColor() ?? null);
+    this.previewContrast$.next(this.colorInvert());
+  });
 
   handle$ = new ReplaySubject<FileWithDirectoryHandle>(1);
 
-  @InputToSubject('handle$')
-  @Input()
-  fileWithDirectoryHandle: FileWithDirectoryHandle | undefined;
-
-  currentColor$ = new BehaviorSubject<string | null>(null);
-  @InputToSubject()
-  @Input()
-  currentColor: string | null | undefined;
+  previewColor$ = new BehaviorSubject<string | null>(null);
 
   optimizedSvgMap$ = this.svgStateService.optimizedSvgMap$;
 
-  colorInvert$ = new BehaviorSubject(false);
-  @InputToSubject()
-  @Input()
-  colorInvert = false;
-
-  @Input()
-  compact = false;
-
-  @Input()
-  quickPreviewSelected = false;
-
-  @Output()
-  quickPreviewSelectedChange = new EventEmitter<boolean>();
+  previewContrast$ = new BehaviorSubject(false);
 
   loading$ = new BehaviorSubject(true);
 
@@ -117,10 +119,13 @@ export class SvgCardComponent implements OnDestroy {
 
   svgUri$ = this.svgText$.pipe(
     concatMap((data) =>
-      this.currentColor$.pipe(
-        map((color) =>
+      combineLatest([this.previewColor$, this.previewContrast$]).pipe(
+        map(([color, contrastPreview]) =>
           this.domSanitizer.bypassSecurityTrustResourceUrl(
-            `data:image/svg+xml,${encodeSVG(data, color)}`,
+            createPreviewSvgDataUri(data, {
+              color,
+              contrastPreview,
+            }),
           ),
         ),
       ),
@@ -266,7 +271,7 @@ export class SvgCardComponent implements OnDestroy {
   }
 
   invertColor() {
-    this.colorInvert$.next(!this.colorInvert$.getValue());
+    this.previewContrast$.next(!this.previewContrast$.getValue());
   }
 
   setQuickPreviewSelection(selected: boolean) {

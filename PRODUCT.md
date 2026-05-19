@@ -10,7 +10,7 @@ Primary users are frontend engineers, product designers, design system maintaine
 
 ## Product Purpose
 
-SVGOLOT turns SVG cleanup from a scattered set of one-off tools into one focused review workspace. The product lets users open a directory, inspect previews, compare original and optimized markup, adjust a shared SVGO profile, and export the final batch as a ZIP. It also supports a compact inspection mode that shifts secondary batch context into a popup, a quick preview dock for pinned icons, and three profile presets for safe, balanced, or size-first compression. Success means faster asset QA, fewer regressions from over-aggressive optimization, and a workflow that makes every change inspectable before handoff.
+SVGOLOT turns SVG cleanup from a scattered set of one-off tools into one focused review workspace. The product lets users open a directory, inspect previews, compare original and optimized markup, adjust a shared SVGO profile, and export the final batch as a ZIP. It also supports a compact inspection mode that shifts secondary batch context into a popup, summary-local review shortcuts for opening markup or jumping into duplicate review from the selected asset, a quick preview dock for pinned icons, contrast-oriented preview tone checks for monochrome artwork, an on-demand likely-duplicate scan with grouped rail review based on visual fingerprints, and three profile presets for safe, balanced, or size-first compression. Success means faster asset QA, fewer regressions from over-aggressive optimization, and a workflow that makes every change inspectable before handoff.
 
 ## Brand Personality
 
@@ -25,8 +25,10 @@ This should not feel like a marketing landing page, a playful icon toy, or a gen
 - Keep the operator in control.
 - Make file and batch state legible at a glance.
 - Keep review, settings, and export in one loop.
+- Reduce review hops by surfacing local actions beside the selected asset, especially for markup and duplicate inspection.
 - Keep theme choice explicit, with one-click switching between matte dark and warm light workbench modes.
 - Support a dense inspection mode that preserves context by moving secondary status into popups instead of dropping it.
+- Keep heuristic duplicate review opt-in, grouped, and reviewable before any manual cleanup.
 - Prefer quiet density over decorative polish.
 - Earn trust through inspectable output.
 

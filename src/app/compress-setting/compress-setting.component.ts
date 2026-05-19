@@ -1,10 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  Component,
-  ChangeDetectionStrategy,
-  HostBinding,
-  inject,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 
 import { combineLatest, map } from 'rxjs';
 
@@ -85,12 +80,13 @@ const EXPLICIT_PLUGIN_DESCRIPTIONS: Partial<Record<string, string>> = {
   templateUrl: './compress-setting.component.html',
   styleUrls: ['./compress-setting.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'settings-root',
+  },
   imports: [AsyncPipe],
 })
 export class CompressSettingComponent {
   private readonly svgoService = inject(SvgoService);
-
-  @HostBinding('class') class = 'settings-root';
 
   presetOptions = this.svgoService.presetOptions;
   activePreset$ = this.svgoService.activePreset$;

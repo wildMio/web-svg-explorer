@@ -237,15 +237,26 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 
 - **Style:** The header and toolbar behave like one operational strip, not a marketing hero.
 - **Typography:** Workspace facts and tool labels use the same native sans vocabulary as the rest of the app.
+- **Task Zoning:** Batch actions and review tools share the strip, but they should read as separate groups so exporting, scanning duplicates, and opening review controls do not feel like one undifferentiated button run.
 - **App Utility:** The light/dark theme switch stays in the header utility cluster so the operator can change ambient contrast without opening a settings panel.
 - **Compact Mode:** A minimal compact toggle can live beside the theme switch. When enabled, secondary batch context moves into the display popup so the asset grid can take priority.
-- **Responsive Behavior:** On narrow screens, toolbar groups stack structurally rather than shrinking type or inventing a different pattern.
+- **Duplicate Review:** The toolbar should begin with an explicit scan action, then expose filtering only after results exist. The full flow must stay explicit that matches are heuristic and visually derived rather than a destructive exact match.
+- **Responsive Behavior:** On narrow screens, the header should shed secondary copy and facts first, then let toolbar groups wrap into compact multi-column rows before core controls become oversized vertical stacks.
+
+### Workspace Summary
+
+- **Structure:** The selected asset summary should pair with a structured review ledger, not a long chip cloud. Core batch state belongs in repeatable stat cells so the operator can scan it in one pass.
+- **Local Review Actions:** The selected asset block should expose one-tap actions for opening markup and jumping into duplicate review so the operator does not have to bounce back to the toolbar or hunt inside the rail for the current file.
+- **Signal Layer:** Chips still earn a place for temporary modes such as contrast preview, open markup, or active duplicate filtering, but they should stay secondary to the ledger.
+- **Duplicate Feedback:** Duplicate review must report every state clearly: not scanned, scanning, no matches, broad match set, and focused group. A completed scan with no matches should still feel like a resolved outcome.
 
 ### Asset Card
 
 - **Preview Zone:** SVG preview sits in a quiet framed well with the status pill in the top-left and card actions in the top-right.
+- **Preview Tone:** The card-level contrast toggle should change preview readability for currentColor and single-tone artwork without implying that exported SVG colors are being rewritten.
 - **Selection Control:** Each card can expose a small quick-preview checkbox without competing with the primary optimize, copy, and download actions.
 - **State Vocabulary:** Original, optimizing, and optimized states are explicit. Ratio badges and metadata rows make file changes inspectable without opening markup.
+- **Similarity Flag:** If the app marks likely duplicates, that badge should read as a review hint, not as proof that one file is safe to delete.
 - **Compact Density:** In compact mode, cards reduce preview height and footer detail so more assets remain visible in the same viewport.
 - **Interaction:** Hover adds a soft lift. Selection adds the ochre halo. The card must read as both preview and file-state summary.
 
@@ -253,6 +264,15 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 
 - **Placement:** A fixed dock can sit above the bottom edge when the operator has explicitly picked icons for comparison.
 - **Behavior:** The dock should show only chosen items, allow fast removal, and let the operator refocus the main selection without losing the batch grid.
+- **Responsive Density:** On mobile and narrow windows, dock header chrome and tile metadata should compress before the dock grows taller; the pinned strip must stay useful without dominating the viewport.
+
+### Duplicate Group Panel
+
+- **Placement:** When the heuristic finds candidates, the grouped review panel should live as a rail beside the asset grid on wide screens, then collapse into a bounded, scrollable panel above the grid on narrower layouts.
+- **Behavior:** Each group card should offer a focused grid filter and a one-click way to pin the whole group into the quick preview dock for side-by-side comparison.
+- **Item Rows:** Candidate rows act like compact review controls: they focus the main selection, show pinned and focused state, and keep optimization readiness visible.
+- **Height Control:** The panel must protect the main grid from being pushed far below the fold; long result sets should scroll inside the rail instead of expanding the whole page.
+- **Tone:** Copy must keep reminding the operator that these are visually similar candidates, not exact matches or safe-to-delete instructions.
 
 ### Toast Feedback
 

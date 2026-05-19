@@ -1,10 +1,11 @@
-import { Directive, ElementRef, inject, Input } from '@angular/core';
+import { Directive, ElementRef, effect, inject, input } from '@angular/core';
 
 @Directive({ selector: '[appInjectHTML]' })
 export class InjectHTMLDirective {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  readonly appInjectHTML = input<string | null>(null);
 
-  @Input() set appInjectHTML(content: string | null) {
-    this.host.nativeElement.innerHTML = content;
-  }
+  private readonly syncContent = effect(() => {
+    this.host.nativeElement.innerHTML = this.appInjectHTML() ?? '';
+  });
 }

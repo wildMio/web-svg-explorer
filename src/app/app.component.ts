@@ -8,7 +8,6 @@ import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  HostBinding,
   OnDestroy,
   OnInit,
   DOCUMENT,
@@ -21,6 +20,7 @@ import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
 import { strToU8, zipSync } from 'fflate';
 import {
   BehaviorSubject,
+  catchError,
   combineLatest,
   concatMap,
   debounceTime,
@@ -31,6 +31,7 @@ import {
   map,
   of,
   shareReplay,
+  startWith,
   Subject,
   switchMap,
   take,
@@ -45,8 +46,12 @@ import { SvgoService } from './service/svgo.service';
 import { SvgCardComponent } from './svg-card/svg-card.component';
 import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
 import { ToastViewportComponent } from './toast-viewport/toast-viewport.component';
-import { encodeSVG } from './util/encodeSvg';
 import { downloadBlob, sliceSvgSuffix } from './util/general';
+import {
+  createPreviewSvgDataUri,
+  createSvgVisualFingerprint,
+  resolvePreviewTone,
+} from './util/svg-preview';
 
 type ThemeMode = 'dark' | 'light';
 type QuickPreviewItem = {
@@ -54,6 +59,21 @@ type QuickPreviewItem = {
   name: string;
   optimized: boolean;
   uri: SafeResourceUrl;
+};
+type DuplicateGroupByFingerprint = Map<string, FileWithDirectoryHandle[]>;
+type DuplicateGroupCard = {
+  fingerprint: string;
+  handles: FileWithDirectoryHandle[];
+  itemCount: number;
+  optimizedCount: number;
+  active: boolean;
+  items: Array<{
+    handle: FileWithDirectoryHandle;
+    name: string;
+    optimized: boolean;
+    quickPreviewSelected: boolean;
+    active: boolean;
+  }>;
 };
 
 const THEME_STORAGE_KEY = 'svgolot-theme';
@@ -68,6 +88,9 @@ const THEME_COLOR_BY_MODE: Record<ThemeMode, string> = {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'app-root-host',
+  },
   imports: [
     CdkOverlayOrigin,
     CdkConnectedOverlay,
@@ -88,9 +111,9 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
 
-  @HostBinding('class') class = 'app-root-host';
-
   private readonly destroy$ = new Subject<void>();
+  private latestDuplicateGroups: DuplicateGroupByFingerprint = new Map();
+  private pendingDuplicateFocusHandleName: string | null = null;
 
   themeMode: ThemeMode;
   compactView = this.readStoredCompactView();
@@ -109,7 +132,35 @@ export class AppComponent implements OnInit, OnDestroy {
   currentColor$ = new BehaviorSubject('white');
   debounceCurrentColor$ = this.currentColor$.pipe(debounceTime(200));
   colorInvert = false;
+  colorInvert$ = new BehaviorSubject(false);
   showMarkup = false;
+  duplicateScanStarted = false;
+  private readonly duplicateScanStarted$ = new BehaviorSubject(false);
+  private readonly duplicateScanRequestId$ = new BehaviorSubject<number | null>(
+    null,
+  );
+  duplicateFilterActive = false;
+  private readonly duplicateFilterActive$ = new BehaviorSubject(false);
+  activeDuplicateGroupKey: string | null = null;
+  private readonly activeDuplicateGroupKey$ = new BehaviorSubject<
+    string | null
+  >(null);
+  duplicateScanPending$ = new BehaviorSubject(false);
+  previewToneLabel$ = combineLatest([
+    this.currentColor$,
+    this.colorInvert$,
+  ]).pipe(
+    map(([color, contrastPreview]) => {
+      const resolvedTone = resolvePreviewTone(color, contrastPreview);
+
+      if (!resolvedTone) {
+        return 'Original artwork';
+      }
+
+      return contrastPreview ? `${resolvedTone} contrast tone` : resolvedTone;
+    }),
+    shareReplay(1),
+  );
 
   readonly overlayPositions: ConnectedPosition[] = [
     {
@@ -250,9 +301,10 @@ export class AppComponent implements OnInit, OnDestroy {
   quickPreviewItems$ = combineLatest([
     this.quickPreviewHandles$,
     this.debounceCurrentColor$,
+    this.colorInvert$,
     this.optimizedSvgMap$,
   ]).pipe(
-    switchMap(([handles, currentColor, optimizedSvgMap]) => {
+    switchMap(([handles, currentColor, contrastPreview, optimizedSvgMap]) => {
       if (!handles.length) {
         return of([] as QuickPreviewItem[]);
       }
@@ -267,7 +319,11 @@ export class AppComponent implements OnInit, OnDestroy {
                 handle,
                 name,
                 optimized: !!(name && optimizedSvgMap?.[name]),
-                uri: this.createQuickPreviewUri(text, currentColor),
+                uri: this.createQuickPreviewUri(
+                  text,
+                  currentColor,
+                  contrastPreview,
+                ),
               } satisfies QuickPreviewItem;
             }),
           ),
@@ -277,10 +333,330 @@ export class AppComponent implements OnInit, OnDestroy {
     takeUntil(this.destroy$),
     shareReplay(1),
   );
+  duplicateGroups$ = combineLatest([
+    this.fileWithDirectoryHandles$,
+    this.duplicateScanRequestId$,
+  ]).pipe(
+    switchMap(([handles, duplicateScanRequestId]) => {
+      if (!handles.length || duplicateScanRequestId === null) {
+        this.duplicateScanPending$.next(false);
+        return of(new Map<string, FileWithDirectoryHandle[]>());
+      }
+
+      this.duplicateScanPending$.next(true);
+
+      return from(
+        Promise.all(
+          handles.map(async (handle) => ({
+            handle,
+            fingerprint: await createSvgVisualFingerprint(await handle.text()),
+          })),
+        ),
+      ).pipe(
+        map((fingerprints) => this.groupDuplicateFingerprints(fingerprints)),
+        catchError(() => of(new Map<string, FileWithDirectoryHandle[]>())),
+        finalize(() => this.duplicateScanPending$.next(false)),
+      );
+    }),
+    shareReplay(1),
+  );
+  duplicateGroupSizeByName$ = this.duplicateGroups$.pipe(
+    map((groups) => {
+      const groupSizeByName = new Map<string, number>();
+
+      for (const handles of groups.values()) {
+        for (const handle of handles) {
+          groupSizeByName.set(handle.name, handles.length);
+        }
+      }
+
+      return groupSizeByName;
+    }),
+    startWith(new Map<string, number>()),
+    shareReplay(1),
+  );
+  possibleDuplicateNames$ = this.duplicateGroupSizeByName$.pipe(
+    map((groupSizeByName) => new Set(groupSizeByName.keys())),
+    startWith(new Set<string>()),
+    shareReplay(1),
+  );
+  possibleDuplicateCount$ = this.duplicateGroupSizeByName$.pipe(
+    map((groupSizeByName) => groupSizeByName.size),
+    startWith(0),
+    shareReplay(1),
+  );
+  duplicateGroupCount$ = this.duplicateGroups$.pipe(
+    map((groups) => groups.size),
+    startWith(0),
+    shareReplay(1),
+  );
+  duplicateStatusLabel$ = combineLatest([
+    this.duplicateScanStarted$,
+    this.duplicateScanPending$,
+    this.possibleDuplicateCount$,
+  ]).pipe(
+    map(
+      ([
+        duplicateScanStarted,
+        duplicateScanPending,
+        possibleDuplicateCount,
+      ]) => {
+        if (duplicateScanPending) {
+          return 'Scanning';
+        }
+
+        if (!duplicateScanStarted) {
+          return 'Not scanned';
+        }
+
+        if (!possibleDuplicateCount) {
+          return 'No matches';
+        }
+
+        return `${possibleDuplicateCount} likely`;
+      },
+    ),
+    shareReplay(1),
+  );
+  duplicateReviewHeadline$ = combineLatest([
+    this.duplicateScanStarted$,
+    this.duplicateScanPending$,
+    this.possibleDuplicateCount$,
+    this.duplicateGroupCount$,
+    this.duplicateFilterActive$,
+    this.activeDuplicateGroupKey$,
+  ]).pipe(
+    map(
+      ([
+        duplicateScanStarted,
+        duplicateScanPending,
+        possibleDuplicateCount,
+        duplicateGroupCount,
+        duplicateFilterActive,
+        activeDuplicateGroupKey,
+      ]) => {
+        if (duplicateScanPending) {
+          return 'Building duplicate review set';
+        }
+
+        if (!duplicateScanStarted) {
+          return 'Scan on demand';
+        }
+
+        if (!possibleDuplicateCount) {
+          return 'No likely duplicates found';
+        }
+
+        if (duplicateFilterActive && activeDuplicateGroupKey) {
+          return `${possibleDuplicateCount} assets in the focused group`;
+        }
+
+        if (duplicateFilterActive) {
+          return `${possibleDuplicateCount} likely duplicates in view`;
+        }
+
+        return `${duplicateGroupCount} groups ready to review`;
+      },
+    ),
+    shareReplay(1),
+  );
+  duplicateReviewHint$ = combineLatest([
+    this.duplicateScanStarted$,
+    this.duplicateScanPending$,
+    this.possibleDuplicateCount$,
+    this.duplicateFilterActive$,
+    this.activeDuplicateGroupKey$,
+  ]).pipe(
+    map(
+      ([
+        duplicateScanStarted,
+        duplicateScanPending,
+        possibleDuplicateCount,
+        duplicateFilterActive,
+        activeDuplicateGroupKey,
+      ]) => {
+        if (duplicateScanPending) {
+          return 'Rendered fingerprints are being compared across the current batch.';
+        }
+
+        if (!duplicateScanStarted) {
+          return 'Run duplicate review only when you want to compare visually similar assets.';
+        }
+
+        if (!possibleDuplicateCount) {
+          return 'The last scan did not surface any visually matching duplicate groups in this batch.';
+        }
+
+        if (duplicateFilterActive && activeDuplicateGroupKey) {
+          return 'The grid is narrowed to the active group. Use Show all matches in the rail to widen the comparison again.';
+        }
+
+        if (duplicateFilterActive) {
+          return 'The grid is narrowed to assets that share a visual fingerprint.';
+        }
+
+        return 'Use the duplicate rail to step through groups, pin candidates, and compare before deleting anything.';
+      },
+    ),
+    shareReplay(1),
+  );
+  duplicateGroupCards$ = combineLatest([
+    this.duplicateGroups$,
+    this.optimizedSvgMap$,
+    this.quickPreviewHandleNames$,
+    this.activeHandle$,
+    this.activeDuplicateGroupKey$,
+  ]).pipe(
+    map(
+      ([
+        duplicateGroups,
+        optimizedSvgMap,
+        quickPreviewHandleNames,
+        activeHandle,
+        activeDuplicateGroupKey,
+      ]) =>
+        [...duplicateGroups.entries()].map(([fingerprint, handles]) => {
+          const sortedHandles = [...handles].sort((left, right) =>
+            left.name.localeCompare(right.name),
+          );
+
+          return {
+            fingerprint,
+            handles: sortedHandles,
+            itemCount: sortedHandles.length,
+            optimizedCount: sortedHandles.filter((handle) => {
+              const name = sliceSvgSuffix(handle.name);
+              return !!(name && optimizedSvgMap?.[name]);
+            }).length,
+            active: activeDuplicateGroupKey === fingerprint,
+            items: sortedHandles.map((handle) => {
+              const name = sliceSvgSuffix(handle.name);
+
+              return {
+                handle,
+                name: handle.name,
+                optimized: !!(name && optimizedSvgMap?.[name]),
+                quickPreviewSelected: quickPreviewHandleNames.has(handle.name),
+                active: activeHandle?.name === handle.name,
+              };
+            }),
+          } satisfies DuplicateGroupCard;
+        }),
+    ),
+    shareReplay(1),
+  );
+  activeHandleDuplicateGroup$ = combineLatest([
+    this.activeHandle$,
+    this.duplicateGroupCards$,
+  ]).pipe(
+    map(([activeHandle, duplicateGroupCards]) => {
+      if (!activeHandle) {
+        return null;
+      }
+
+      return (
+        duplicateGroupCards.find((duplicateGroupCard) =>
+          duplicateGroupCard.items.some(
+            (item) => item.handle.name === activeHandle.name,
+          ),
+        ) ?? null
+      );
+    }),
+    shareReplay(1),
+  );
+  visibleHandles$ = combineLatest([
+    this.fileWithDirectoryHandles$,
+    this.duplicateFilterActive$,
+    this.activeDuplicateGroupKey$,
+    this.duplicateGroups$,
+    this.possibleDuplicateNames$,
+  ]).pipe(
+    map(
+      ([
+        handles,
+        duplicateFilterActive,
+        activeDuplicateGroupKey,
+        duplicateGroups,
+        possibleDuplicateNames,
+      ]) => {
+        if (!duplicateFilterActive) {
+          return handles;
+        }
+
+        if (activeDuplicateGroupKey) {
+          const activeGroup = duplicateGroups.get(activeDuplicateGroupKey);
+
+          if (activeGroup?.length) {
+            const activeGroupNames = new Set(
+              activeGroup.map((handle) => handle.name),
+            );
+
+            return handles.filter((handle) =>
+              activeGroupNames.has(handle.name),
+            );
+          }
+        }
+
+        return handles.filter((handle) =>
+          possibleDuplicateNames.has(handle.name),
+        );
+      },
+    ),
+    shareReplay(1),
+  );
 
   constructor() {
     this.themeMode = this.resolveInitialTheme();
     this.applyTheme(this.themeMode, false);
+
+    combineLatest([this.visibleHandles$, this.activeHandle$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([visibleHandles, activeHandle]) => {
+        if (!visibleHandles.length) {
+          if (activeHandle) {
+            this.activeHandleSubject.next(null);
+          }
+
+          return;
+        }
+
+        if (
+          !activeHandle ||
+          !visibleHandles.some(({ name }) => name === activeHandle.name)
+        ) {
+          this.activeHandleSubject.next(visibleHandles[0]);
+        }
+      });
+
+    this.possibleDuplicateCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((possibleDuplicateCount) => {
+        if (!possibleDuplicateCount && this.duplicateFilterActive) {
+          this.setDuplicateFilter(false);
+        }
+      });
+
+    combineLatest([this.duplicateGroups$, this.duplicateScanPending$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([duplicateGroups, duplicateScanPending]) => {
+        this.latestDuplicateGroups = duplicateGroups;
+
+        if (!this.pendingDuplicateFocusHandleName || duplicateScanPending) {
+          return;
+        }
+
+        const fingerprint = this.findDuplicateGroupFingerprintByHandleName(
+          this.pendingDuplicateFocusHandleName,
+          duplicateGroups,
+        );
+
+        this.pendingDuplicateFocusHandleName = null;
+
+        if (fingerprint) {
+          this.setDuplicateFilter(true);
+          this.setActiveDuplicateGroup(fingerprint);
+        }
+      });
   }
 
   ngOnInit() {
@@ -310,6 +686,101 @@ export class AppComponent implements OnInit, OnDestroy {
     this.persistCompactView();
   }
 
+  toggleMarkup() {
+    this.showMarkup = !this.showMarkup;
+  }
+
+  setPreviewContrast(enabled: boolean) {
+    this.colorInvert = enabled;
+    this.colorInvert$.next(enabled);
+  }
+
+  toggleDuplicateFilter() {
+    if (!this.duplicateScanStarted) {
+      return;
+    }
+
+    this.setDuplicateFilter(!this.duplicateFilterActive);
+  }
+
+  scanLikelyDuplicates() {
+    if (
+      this.duplicateScanPending$.getValue() ||
+      !this.fileWithDirectoryHandles$.getValue().length
+    ) {
+      return;
+    }
+
+    this.setDuplicateFilter(false);
+    this.setActiveDuplicateGroup(null);
+    this.duplicateScanStarted = true;
+    this.duplicateScanStarted$.next(true);
+
+    const currentScanRequestId = this.duplicateScanRequestId$.getValue();
+
+    this.duplicateScanRequestId$.next((currentScanRequestId ?? 0) + 1);
+  }
+
+  focusDuplicateGroup(fingerprint: string) {
+    if (
+      this.activeDuplicateGroupKey === fingerprint &&
+      this.duplicateFilterActive
+    ) {
+      this.setActiveDuplicateGroup(null);
+      this.setDuplicateFilter(true);
+      return;
+    }
+
+    this.setDuplicateFilter(true);
+    this.setActiveDuplicateGroup(fingerprint);
+  }
+
+  showAllDuplicateGroups() {
+    this.setDuplicateFilter(true);
+    this.setActiveDuplicateGroup(null);
+  }
+
+  addDuplicateGroupToQuickPreview(handles: FileWithDirectoryHandle[]) {
+    const currentHandles = this.quickPreviewHandles$.getValue();
+    const handlesByName = new Map(
+      currentHandles.map((handle) => [handle.name, handle]),
+    );
+
+    for (const handle of handles) {
+      handlesByName.set(handle.name, handle);
+    }
+
+    this.quickPreviewHandles$.next([...handlesByName.values()]);
+  }
+
+  openActiveHandleDuplicateGroup() {
+    const activeHandle = this.activeHandleSubject.getValue();
+
+    if (!activeHandle) {
+      return;
+    }
+
+    if (!this.duplicateScanStarted) {
+      this.pendingDuplicateFocusHandleName = activeHandle.name;
+      this.scanLikelyDuplicates();
+      return;
+    }
+
+    const fingerprint = this.findDuplicateGroupFingerprintByHandleName(
+      activeHandle.name,
+    );
+
+    if (fingerprint) {
+      this.setDuplicateFilter(true);
+      this.setActiveDuplicateGroup(fingerprint);
+      return;
+    }
+
+    if (this.latestDuplicateGroups.size) {
+      this.showAllDuplicateGroups();
+    }
+  }
+
   openDirectory() {
     if (this.directoryOpening$.getValue()) {
       return;
@@ -324,6 +795,7 @@ export class AppComponent implements OnInit, OnDestroy {
           );
 
           this.directoryReviewed$.next(true);
+          this.resetDuplicateReview();
           this.fileWithDirectoryHandles$.next(svgFiles);
           this.quickPreviewHandles$.next([]);
           this.activeHandleSubject.next(svgFiles[0] ?? null);
@@ -499,9 +971,83 @@ export class AppComponent implements OnInit, OnDestroy {
   private createQuickPreviewUri(
     svgText: string,
     color: string | null,
+    contrastPreview: boolean,
   ): SafeResourceUrl {
     return this.domSanitizer.bypassSecurityTrustResourceUrl(
-      `data:image/svg+xml,${encodeSVG(svgText, color ?? undefined)}`,
+      createPreviewSvgDataUri(svgText, {
+        color,
+        contrastPreview,
+      }),
+    );
+  }
+
+  private setDuplicateFilter(enabled: boolean) {
+    this.duplicateFilterActive = enabled;
+    this.duplicateFilterActive$.next(enabled);
+
+    if (!enabled) {
+      this.setActiveDuplicateGroup(null);
+    }
+  }
+
+  private setActiveDuplicateGroup(fingerprint: string | null) {
+    this.activeDuplicateGroupKey = fingerprint;
+    this.activeDuplicateGroupKey$.next(fingerprint);
+  }
+
+  private resetDuplicateReview() {
+    this.latestDuplicateGroups = new Map();
+    this.pendingDuplicateFocusHandleName = null;
+    this.duplicateScanStarted = false;
+    this.duplicateScanStarted$.next(false);
+    this.duplicateScanRequestId$.next(null);
+    this.duplicateScanPending$.next(false);
+    this.setDuplicateFilter(false);
+    this.setActiveDuplicateGroup(null);
+  }
+
+  private findDuplicateGroupFingerprintByHandleName(
+    handleName: string,
+    duplicateGroups: DuplicateGroupByFingerprint = this.latestDuplicateGroups,
+  ) {
+    for (const [fingerprint, handles] of duplicateGroups.entries()) {
+      if (handles.some((handle) => handle.name === handleName)) {
+        return fingerprint;
+      }
+    }
+
+    return null;
+  }
+
+  private groupDuplicateFingerprints(
+    fingerprints: Array<{
+      handle: FileWithDirectoryHandle;
+      fingerprint: string;
+    }>,
+  ): DuplicateGroupByFingerprint {
+    const groupedFingerprints = new Map<string, FileWithDirectoryHandle[]>();
+
+    for (const { handle, fingerprint } of fingerprints) {
+      const currentGroup = groupedFingerprints.get(fingerprint);
+
+      if (currentGroup) {
+        currentGroup.push(handle);
+        continue;
+      }
+
+      groupedFingerprints.set(fingerprint, [handle]);
+    }
+
+    return new Map(
+      [...groupedFingerprints.entries()]
+        .filter(([, handles]) => handles.length > 1)
+        .sort(([, left], [, right]) => {
+          if (right.length !== left.length) {
+            return right.length - left.length;
+          }
+
+          return left[0].name.localeCompare(right[0].name);
+        }),
     );
   }
 }

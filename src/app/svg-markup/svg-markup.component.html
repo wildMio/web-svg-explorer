@@ -1,4 +1,4 @@
-@if (handle) {
+@if (handle(); as handle) {
   <div class="markup-shell">
     <header class="markup-shell__header">
       <div>
@@ -6,8 +6,10 @@
         <h2>{{ handle.name }}</h2>
       </div>
 
-      <span class="markup-pill" [class.markup-pill--accent]="optimizedText">
-        {{ optimizedText ? "Optimized output ready" : "Awaiting optimization" }}
+      <span class="markup-pill" [class.markup-pill--accent]="optimizedText()">
+        {{
+          optimizedText() ? "Optimized output ready" : "Awaiting optimization"
+        }}
       </span>
     </header>
 
@@ -18,18 +20,20 @@
           <p>Raw source currently loaded from the selected file.</p>
         </div>
 
-        @if (originalText) {
+        @if (originalText()) {
           <button
             type="button"
             class="markup-copy"
-            (click)="copy('original markup for ' + handle.name, originalText)"
+            (click)="
+              copy('original markup for ' + handle.name, originalText()!)
+            "
           >
             Copy
           </button>
         }
       </div>
 
-      <pre class="markup-code markup-code--muted">{{ originalText }}</pre>
+      <pre class="markup-code markup-code--muted">{{ originalText() }}</pre>
     </section>
 
     <section class="markup-section">
@@ -38,18 +42,20 @@
           <h3>Optimized</h3>
           <p>
             {{
-              optimizedText
+              optimizedText()
                 ? "Export-ready markup generated from the active profile."
                 : "Run optimization to generate the export-ready result."
             }}
           </p>
         </div>
 
-        @if (optimizedText) {
+        @if (optimizedText()) {
           <button
             type="button"
             class="markup-copy"
-            (click)="copy('optimized markup for ' + handle.name, optimizedText)"
+            (click)="
+              copy('optimized markup for ' + handle.name, optimizedText()!)
+            "
           >
             Copy
           </button>
@@ -57,7 +63,7 @@
       </div>
 
       <pre class="markup-code">{{
-        optimizedText ||
+        optimizedText() ||
           "No optimized SVG yet. Run optimization from the toolbar or directly from a card."
       }}</pre>
     </section>

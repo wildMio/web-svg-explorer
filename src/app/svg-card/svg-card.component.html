@@ -6,7 +6,7 @@
           <label class="asset-card__select" (click)="$event.stopPropagation()">
             <input
               type="checkbox"
-              [checked]="quickPreviewSelected"
+              [checked]="quickPreviewSelected()"
               (change)="setQuickPreviewSelection($any($event.target).checked)"
             />
             <span class="asset-card__select-indicator"></span>
@@ -20,21 +20,26 @@
           >
             {{ cardStateLabel$ | async }}
           </div>
+
+          @if (duplicateGroupSize() > 1) {
+            <div class="asset-card__state asset-card__state--duplicate">
+              {{ duplicateGroupSize() }} matches
+            </div>
+          }
         </div>
 
         <div class="asset-card__actions">
           <button
             type="button"
             class="asset-card__icon-button"
-            aria-label="Invert preview color"
-            [attr.aria-pressed]="colorInvert$ | async"
+            aria-label="Swap to a contrasting preview tone"
+            [attr.aria-pressed]="previewContrast$ | async"
             (click)="invertColor(); $event.stopPropagation()"
           >
             <img
               src="assets/invert_colors.svg"
-              alt="invert svg color"
+              alt="swap preview tone"
               loading="lazy"
-              [class.invert]="colorInvert$ | async"
             />
           </button>
 
@@ -45,12 +50,7 @@
               aria-label="Copy optimized svg"
               (click)="copy(); $event.stopPropagation()"
             >
-              <img
-                src="assets/copy.svg"
-                alt="copy svg"
-                loading="lazy"
-                [class.invert]="colorInvert$ | async"
-              />
+              <img src="assets/copy.svg" alt="copy svg" loading="lazy" />
             </button>
           }
 
@@ -61,12 +61,7 @@
             [disabled]="pending$ | async"
             (click)="optimize(); $event.stopPropagation()"
           >
-            <img
-              src="assets/optimize.svg"
-              alt="optimize svg"
-              loading="lazy"
-              [class.invert]="colorInvert$ | async"
-            />
+            <img src="assets/optimize.svg" alt="optimize svg" loading="lazy" />
           </button>
 
           @if (optimizedSvg$ | async) {
@@ -80,7 +75,6 @@
                 src="assets/download.svg"
                 alt="download svg"
                 loading="lazy"
-                [class.invert]="colorInvert$ | async"
               />
             </button>
           }
@@ -93,7 +87,6 @@
           loading="lazy"
           [src]="uri"
           [alt]="svgName$ | async"
-          [class.invert]="colorInvert$ | async"
         />
       </div>
 
@@ -120,7 +113,7 @@
       {{ svgName$ | async }}
     </div>
 
-    @if (compact) {
+    @if (isCompactMode) {
       <div class="asset-card__detail-row asset-card__detail-row--compact">
         <span>{{ (optimizedSvg$ | async) ? "Optimized" : "Original" }}</span>
         <strong>
