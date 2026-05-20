@@ -1,0 +1,299 @@
+<div class="svg-probe__header">
+  <div>
+    <span class="svg-probe__eyebrow">{{ i18n.t("app.svgProbe.eyebrow") }}</span>
+    <h2>{{ i18n.t("app.svgProbe.title") }}</h2>
+    <p>{{ i18n.t("app.svgProbe.description") }}</p>
+  </div>
+
+  <span
+    class="svg-probe__status"
+    [class.svg-probe__status--pending]="searchPending()"
+    [class.svg-probe__status--accent]="accentStatus()"
+  >
+    {{ statusLabel() }}
+  </span>
+</div>
+
+<div class="svg-probe__body">
+  <div class="svg-probe__editor">
+    <label class="field-group">
+      <span class="field-group__label">{{
+        i18n.t("app.svgProbe.fieldLabel")
+      }}</span>
+      <textarea
+        #svgProbeInput
+        class="panel-input svg-probe__textarea"
+        rows="8"
+        [attr.placeholder]="i18n.t('app.svgProbe.placeholder')"
+        [value]="svgText()"
+        (input)="updateSvgText(svgProbeInput.value)"
+      ></textarea>
+      <span class="field-group__hint">{{
+        i18n.t("app.svgProbe.fieldHint")
+      }}</span>
+    </label>
+
+    <div class="svg-probe__actions">
+      <button
+        type="button"
+        class="app-button toolbar-button"
+        [disabled]="!state().valid || optimizePending()"
+        (click)="optimizeSvg()"
+      >
+        {{
+          optimizePending()
+            ? i18n.t("app.svgProbe.optimizingButton")
+            : i18n.t("app.svgProbe.optimizeButton")
+        }}
+      </button>
+
+      <button
+        type="button"
+        class="app-button toolbar-button"
+        [disabled]="!state().valid || !hasHandles() || searchPending()"
+        (click)="requestSearch()"
+      >
+        {{
+          searchPending()
+            ? i18n.t("app.svgProbe.searchingButton")
+            : i18n.t("app.svgProbe.searchButton")
+        }}
+      </button>
+
+      @if (optimizedSvgText()) {
+        <button
+          type="button"
+          class="app-button toolbar-button"
+          (click)="copyOptimizedSvg()"
+        >
+          {{ i18n.t("app.svgProbe.copyOptimizedButton") }}
+        </button>
+      }
+
+      @if (state().hasValue) {
+        <button
+          type="button"
+          class="app-button toolbar-button"
+          (click)="clearSvgText()"
+        >
+          {{ i18n.t("common.clear") }}
+        </button>
+      }
+    </div>
+
+    <div class="svg-probe__support">
+      <span
+        class="svg-probe__message"
+        [class.svg-probe__message--error]="state().hasValue && !state().valid"
+      >
+        {{ state().message }}
+      </span>
+
+      @if (!hasHandles()) {
+        <span class="svg-probe__message">{{
+          i18n.t("app.svgProbe.batchHint")
+        }}</span>
+      }
+
+      @if (optimizeFailed()) {
+        <span class="svg-probe__message svg-probe__message--error">{{
+          i18n.t("app.svgProbe.optimizeFailed")
+        }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="svg-probe__preview">
+    <span class="svg-probe__preview-eyebrow">{{
+      i18n.t("app.svgProbe.previewEyebrow")
+    }}</span>
+
+    @if (previewUri(); as previewUriValue) {
+      <div class="svg-probe-preview">
+        <span class="svg-probe-preview__canvas">
+          <img
+            [src]="previewUriValue"
+            [alt]="i18n.t('app.svgProbe.previewAlt')"
+          />
+        </span>
+
+        <div class="svg-probe-preview__meta">
+          <strong>{{ i18n.t("app.svgProbe.previewReady") }}</strong>
+          <span>{{ previewToneLabel() }}</span>
+        </div>
+      </div>
+    } @else {
+      <div class="svg-probe-preview svg-probe-preview--placeholder">
+        <strong>
+          {{
+            state().hasValue
+              ? i18n.t("app.svgProbe.previewUnavailable")
+              : i18n.t("app.svgProbe.previewEmpty")
+          }}
+        </strong>
+        <span>
+          {{
+            state().hasValue
+              ? i18n.t("app.svgProbe.previewInvalidHint")
+              : i18n.t("app.svgProbe.previewEmptyHint")
+          }}
+        </span>
+      </div>
+    }
+
+    @if (optimizeAttempted()) {
+      <span class="svg-probe__preview-eyebrow">{{
+        i18n.t("app.svgProbe.optimizedEyebrow")
+      }}</span>
+
+      @if (optimizedPreviewUri(); as optimizedPreviewUriValue) {
+        <div class="svg-probe-preview">
+          <span class="svg-probe-preview__canvas">
+            <img
+              [src]="optimizedPreviewUriValue"
+              [alt]="i18n.t('app.svgProbe.optimizedPreviewAlt')"
+            />
+          </span>
+
+          <div class="svg-probe-preview__meta">
+            <strong>{{ i18n.t("app.svgProbe.optimizedReady") }}</strong>
+            <span>{{ i18n.t("app.svgProbe.optimizedHint") }}</span>
+          </div>
+        </div>
+      } @else {
+        <div class="svg-probe-preview svg-probe-preview--placeholder">
+          <strong>
+            {{
+              optimizePending()
+                ? i18n.t("app.svgProbe.optimizingPreview")
+                : i18n.t("app.svgProbe.optimizedUnavailable")
+            }}
+          </strong>
+          <span>
+            {{
+              optimizePending()
+                ? i18n.t("app.svgProbe.optimizingHint")
+                : i18n.t("app.svgProbe.optimizedUnavailableHint")
+            }}
+          </span>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+@if (optimizedDetails(); as optimizedDetailsValue) {
+  <div class="svg-probe__optimized-report">
+    <div class="svg-probe__results-header">
+      <span class="svg-probe__results-eyebrow">{{
+        i18n.t("app.svgProbe.optimizedDetailsEyebrow")
+      }}</span>
+      <h3>{{ i18n.t("app.svgProbe.optimizedDetailsTitle") }}</h3>
+      <p>{{ i18n.t("app.svgProbe.optimizedDetailsDescription") }}</p>
+    </div>
+
+    <div class="svg-probe__stats">
+      <div class="svg-probe-stat">
+        <span class="svg-probe-stat__label">{{
+          i18n.t("app.svgProbe.metric.originalSize")
+        }}</span>
+        <strong>{{ optimizedDetailsValue.originalSizeLabel }}</strong>
+      </div>
+
+      <div class="svg-probe-stat">
+        <span class="svg-probe-stat__label">{{
+          i18n.t("app.svgProbe.metric.optimizedSize")
+        }}</span>
+        <strong>{{ optimizedDetailsValue.optimizedSizeLabel }}</strong>
+      </div>
+
+      <div class="svg-probe-stat">
+        <span class="svg-probe-stat__label">{{
+          i18n.t("app.svgProbe.metric.compressionRatio")
+        }}</span>
+        <strong>{{ optimizedDetailsValue.compressionRatioLabel }}</strong>
+        <span class="svg-probe-stat__hint">{{
+          i18n.t("app.svgProbe.metric.compressionRatioHint")
+        }}</span>
+      </div>
+
+      <div
+        class="svg-probe-stat"
+        [class.svg-probe-stat--positive]="
+          optimizedDetailsValue.sizeChangeTone === 'positive'
+        "
+        [class.svg-probe-stat--warning]="
+          optimizedDetailsValue.sizeChangeTone === 'warning'
+        "
+      >
+        <span class="svg-probe-stat__label">{{
+          i18n.t("app.svgProbe.metric.sizeChange")
+        }}</span>
+        <strong>{{ optimizedDetailsValue.sizeChangeLabel }}</strong>
+      </div>
+    </div>
+
+    <div class="svg-probe__markup-shell">
+      <div>
+        <span class="svg-probe__results-eyebrow">{{
+          i18n.t("app.svgProbe.optimizedMarkupEyebrow")
+        }}</span>
+        <p>{{ i18n.t("app.svgProbe.optimizedMarkupDescription") }}</p>
+      </div>
+
+      <pre class="svg-probe__markup" tabindex="0">{{
+        optimizedDetailsValue.markup
+      }}</pre>
+    </div>
+  </div>
+}
+
+@if (searchStarted()) {
+  <div class="svg-probe__results">
+    <div class="svg-probe__results-header">
+      <span class="svg-probe__results-eyebrow">{{
+        i18n.t("app.svgProbe.resultsEyebrow")
+      }}</span>
+      <h3>{{ statusLabel() }}</h3>
+      <p>{{ i18n.t("app.svgProbe.resultsDescription") }}</p>
+    </div>
+
+    @if (matchItems().length) {
+      <div class="svg-probe__match-grid">
+        @for (item of matchItems(); track item.handle.name) {
+          <button
+            type="button"
+            class="svg-probe-match"
+            [class.svg-probe-match--active]="item.active"
+            (click)="selectMatch(item.handle)"
+          >
+            <span class="svg-probe-match__canvas">
+              <img [src]="item.uri" [alt]="item.name" />
+            </span>
+
+            <span class="svg-probe-match__meta">
+              <strong>{{ item.name }}</strong>
+              <span>
+                {{
+                  item.optimized
+                    ? i18n.t("app.duplicate.item.optimizedReady")
+                    : i18n.t("app.duplicate.item.originalOnly")
+                }}
+              </span>
+            </span>
+
+            @if (item.active) {
+              <span class="svg-probe-match__badge">{{
+                i18n.t("app.duplicate.badge.focused")
+              }}</span>
+            }
+          </button>
+        }
+      </div>
+    } @else if (!searchPending()) {
+      <p class="svg-probe__empty-results">
+        {{ i18n.t("app.svgProbe.noMatchesHint") }}
+      </p>
+    }
+  </div>
+}

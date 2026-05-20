@@ -32,6 +32,18 @@ export type CompressionPreset = {
   activePluginIds: string[];
 };
 
+type WorkerOptimizeRequest = {
+  requestId: string;
+  svgString: string;
+  fileName: string;
+  options: unknown;
+};
+
+type WorkerOptimizeResponse = {
+  requestId: string;
+  optimizedSvg: OptimizedSvg;
+};
+
 const setting = {
   plugins: [
     {
@@ -353,6 +365,17 @@ const defaultProfile = {
   pretty: compressionPresetMap.balanced.pretty,
 };
 
+const hashSvgCacheKey = (value: string) => {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return `${value.length}:${(hash >>> 0).toString(36)}`;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -369,7 +392,7 @@ export class SvgoService {
   }).pipe(shareReplay(1));
 
   cacheMap: {
-    [fingerprint: string]: { [fileName: string]: Observable<OptimizedSvg> };
+    [fingerprint: string]: { [cacheKey: string]: Observable<OptimizedSvg> };
   } = {};
 
   multipass$ = new BehaviorSubject(defaultProfile.multipass);
@@ -441,6 +464,7 @@ export class SvgoService {
   );
 
   fingerprint = '';
+  private nextRequestId = 0;
 
   constructor() {
     this.monitorFingerprint();
@@ -483,31 +507,44 @@ export class SvgoService {
   }
 
   optimize$(svgString: string, fileName: string) {
+    const cacheKey = `${fileName}:${hashSvgCacheKey(svgString)}`;
+
     if (!this.cacheMap[this.fingerprint]) {
       this.cacheMap[this.fingerprint] = {};
     }
-    if (this.cacheMap[this.fingerprint][fileName]) {
-      return this.cacheMap[this.fingerprint][fileName];
+
+    if (this.cacheMap[this.fingerprint][cacheKey]) {
+      return this.cacheMap[this.fingerprint][cacheKey];
     }
-    this.cacheMap[this.fingerprint][fileName] = this.options$.pipe(
+
+    const requestId = `${this.fingerprint}:${cacheKey}:${this.nextRequestId++}`;
+
+    this.cacheMap[this.fingerprint][cacheKey] = this.options$.pipe(
       take(1),
       mergeMap((options) => {
         return this.worker$.pipe(
           mergeMap((worker) => {
             worker.postMessage({
+              requestId,
               svgString,
               fileName,
               options,
-            });
-            return fromEvent<MessageEvent>(worker, 'message').pipe(
-              filter(({ data: { fileName: name } }) => name === fileName),
-              map(({ data: { optimizedSvg } }) => optimizedSvg),
+            } satisfies WorkerOptimizeRequest);
+
+            return fromEvent<MessageEvent<WorkerOptimizeResponse>>(
+              worker,
+              'message',
+            ).pipe(
+              filter(({ data }) => data.requestId === requestId),
+              map(({ data }) => data.optimizedSvg),
+              take(1),
             );
           }),
         );
       }),
       shareReplay(1),
     );
-    return this.cacheMap[this.fingerprint][fileName];
+
+    return this.cacheMap[this.fingerprint][cacheKey];
   }
 }

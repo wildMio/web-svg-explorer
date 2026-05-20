@@ -60,6 +60,8 @@ export const zhHantDictionary = {
   'app.toolbar.scanningLikelyDuplicates': '正在掃描疑似重複...',
   'app.toolbar.showingLikelyDuplicates': '顯示疑似重複',
   'app.toolbar.likelyDuplicates': '疑似重複',
+  'app.toolbar.showSvgProbe': '顯示 SVG 比對',
+  'app.toolbar.hideSvgProbe': '隱藏 SVG 比對',
   'app.toolbar.reviewDisplay': '檢視顯示',
   'app.toolbar.optimizationProfile': '優化設定檔',
 
@@ -134,6 +136,14 @@ export const zhHantDictionary = {
   'app.workspace.stat.awaitingOptimization': '等待優化',
   'app.workspace.stat.quickPreview': '快速預覽',
   'app.workspace.stat.duplicateReview': '重複檢視',
+  'app.workspace.filter.label': '篩選檔名',
+  'app.workspace.filter.placeholder': '輸入檔名關鍵字',
+  'app.workspace.filter.hint.idle': '留白即可保留整個批次在畫面中。',
+  'app.workspace.filter.hint.matches': (params) =>
+    `目前顯示 ${getNumberParam(params, 'count')} / ${getNumberParam(params, 'total')} 個符合「${getStringParam(params, 'query')}」的素材。`,
+  'app.workspace.filter.emptyTitle': '沒有圖示符合目前的檔名篩選',
+  'app.workspace.filter.emptyDescription':
+    '請嘗試更短的關鍵字，或直接清除篩選，把目前批次重新帶回畫面中。',
   'app.workspace.signal.preview': (params) =>
     `預覽 ${getStringParam(params, 'tone')}`,
   'app.workspace.signal.showingDuplicatesOnly': '只顯示疑似重複',
@@ -213,6 +223,74 @@ export const zhHantDictionary = {
     `焦點：${getStringParam(params, 'name')}`,
   'app.quickPreview.clear': '清除',
   'app.quickPreview.removeAriaLabel': '從快速預覽移除',
+
+  'app.svgProbe.eyebrow': '貼上 SVG',
+  'app.svgProbe.title': '比對外部 SVG',
+  'app.svgProbe.description':
+    '貼上原始 SVG 標記，先用目前的色調設定預覽，再檢查目前批次裡是否有啟發式視覺相似的圖示。',
+  'app.svgProbe.fieldLabel': 'SVG 標記',
+  'app.svgProbe.placeholder': '<svg viewBox="0 0 24 24">...</svg>',
+  'app.svgProbe.fieldHint':
+    '請貼上完整的 <svg>...</svg> 字串。預覽會沿用目前的色調與對比設定。',
+  'app.svgProbe.optimizeButton': '優化貼上的 SVG',
+  'app.svgProbe.optimizingButton': '正在優化貼上的 SVG...',
+  'app.svgProbe.searchButton': '查找相似圖示',
+  'app.svgProbe.searchingButton': '正在查找相似圖示...',
+  'app.svgProbe.copyOptimizedButton': '複製優化後 SVG',
+  'app.svgProbe.batchHint': '請先開啟 SVG 目錄，才能和目前批次比對。',
+  'app.svgProbe.validation.idle':
+    '貼上 SVG 標記後，這裡會顯示預覽，並可和目前批次做比對。',
+  'app.svgProbe.validation.invalid':
+    '目前內容不是有效的 SVG。請貼上完整的 <svg>...</svg> 區塊。',
+  'app.svgProbe.validation.ready':
+    'SVG 已就緒，可以先預覽，再執行啟發式相似比對。',
+  'app.svgProbe.previewEyebrow': '即時預覽',
+  'app.svgProbe.previewAlt': '貼上的 SVG 預覽',
+  'app.svgProbe.previewReady': '已套用目前預覽色調',
+  'app.svgProbe.previewUnavailable': '目前無法預覽',
+  'app.svgProbe.previewInvalidHint': '修正 SVG 標記後，這裡就會顯示圖示預覽。',
+  'app.svgProbe.previewEmpty': '尚未貼上 SVG',
+  'app.svgProbe.previewEmptyHint': '貼上任意 SVG 字串後，這裡會顯示該圖示。',
+  'app.svgProbe.optimizedEyebrow': '優化後預覽',
+  'app.svgProbe.optimizedPreviewAlt': '優化後的貼上 SVG 預覽',
+  'app.svgProbe.optimizedReady': '優化後 SVG 已就緒',
+  'app.svgProbe.optimizedHint':
+    '這個預覽使用目前的優化設定檔。若你想在其他地方重用結果，可以直接複製優化後的標記。',
+  'app.svgProbe.optimizedDetailsEyebrow': '優化資訊',
+  'app.svgProbe.optimizedDetailsTitle': '檢視優化結果',
+  'app.svgProbe.optimizedDetailsDescription':
+    '顯示目前設定檔下的優化前後大小、壓縮比，以及可直接檢查或複製的優化後標記。',
+  'app.svgProbe.metric.originalSize': '優化前大小',
+  'app.svgProbe.metric.optimizedSize': '優化後大小',
+  'app.svgProbe.metric.compressionRatio': '壓縮比',
+  'app.svgProbe.metric.compressionRatioHint': '占原始大小',
+  'app.svgProbe.metric.sizeChange': '大小變化',
+  'app.svgProbe.metric.saved': (params) =>
+    `節省 ${getStringParam(params, 'size')}（${getStringParam(params, 'percent')}%）`,
+  'app.svgProbe.metric.larger': (params) =>
+    `增加 ${getStringParam(params, 'size')}（${getStringParam(params, 'percent')}%）`,
+  'app.svgProbe.metric.sizeUnchanged': '大小沒有變化',
+  'app.svgProbe.optimizedMarkupEyebrow': '優化後內容',
+  'app.svgProbe.optimizedMarkupDescription':
+    '目前優化設定檔產生的精確 SVG 輸出。',
+  'app.svgProbe.optimizingPreview': '正在建立優化後預覽',
+  'app.svgProbe.optimizingHint': '系統正在把目前的優化設定檔套用到貼上的 SVG。',
+  'app.svgProbe.optimizedUnavailable': '目前無法顯示優化後預覽',
+  'app.svgProbe.optimizedUnavailableHint':
+    '請在調整貼上的 SVG 或目前設定檔後，再試著重新優化。',
+  'app.svgProbe.optimizeFailed': '目前的優化設定檔無法成功優化這段貼上的 SVG。',
+  'app.svgProbe.status.idle': '尚未查找',
+  'app.svgProbe.status.searching': '正在和目前批次比對',
+  'app.svgProbe.status.noMatches': '沒有找到相似圖示',
+  'app.svgProbe.status.matches': (params) =>
+    `找到 ${getNumberParam(params, 'count')} 個相似圖示`,
+  'app.svgProbe.resultsEyebrow': '比對結果',
+  'app.svgProbe.resultsDescription':
+    '使用與重複檢視相同的視覺指紋啟發式。點選任一結果即可跳到該素材。',
+  'app.svgProbe.noMatchesHint':
+    '這表示目前批次中，沒有圖示和貼上的 SVG 落在同一個視覺指紋。',
+  'app.svgProbe.loading': '正在載入 SVG 比對工具...',
+  'app.svgProbe.toast.copiedOptimized': '已複製優化後的貼上 SVG。',
 
   'markup.ariaLabel': '標記檢視面板',
   'markup.selectedAsset': '選取的素材',

@@ -32,7 +32,6 @@ import {
   tap,
 } from 'rxjs';
 
-import { VirtualElementDirective } from '../directive/virtual-element.directive';
 import { I18nService } from '../service/i18n.service';
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
@@ -55,7 +54,7 @@ import { createPreviewSvgDataUri } from '../util/svg-preview';
     class: 'block',
     '[class.svg-card--compact]': 'isCompactMode',
   },
-  imports: [VirtualElementDirective, AsyncPipe],
+  imports: [AsyncPipe],
 })
 export class SvgCardComponent implements OnDestroy {
   private readonly zone = inject(NgZone);

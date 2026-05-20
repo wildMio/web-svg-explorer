@@ -229,6 +229,20 @@
         }
 
         <button
+          type="button"
+          class="app-button toolbar-button"
+          [class.toolbar-button--active]="svgProbeEnabled"
+          [attr.aria-pressed]="svgProbeEnabled"
+          (click)="toggleSvgProbeEnabled()"
+        >
+          {{
+            svgProbeEnabled
+              ? i18n.t("app.toolbar.hideSvgProbe")
+              : i18n.t("app.toolbar.showSvgProbe")
+          }}
+        </button>
+
+        <button
           cdkOverlayOrigin
           #trigger="cdkOverlayOrigin"
           type="button"
@@ -465,6 +479,28 @@
     [class.workspace--compact]="compactView"
   >
     <section class="workspace__main">
+      @if (svgProbeEnabled) {
+        @defer (on idle) {
+          <app-svg-probe
+            [handles]="(fileWithDirectoryHandles$ | async) ?? []"
+            [optimizedSvgMap]="(optimizedSvgMap$ | async) ?? null"
+            [activeHandle]="activeHandle$ | async"
+            [currentColor]="(currentColor$ | async) ?? 'white'"
+            [contrastPreview]="(colorInvert$ | async) ?? false"
+            [previewToneLabel]="previewToneLabel$ | async"
+            (matchSelected)="updateActiveHandle($event)"
+          ></app-svg-probe>
+        } @placeholder {
+          <section class="svg-probe-placeholder">
+            <span class="svg-probe-placeholder__eyebrow">{{
+              i18n.t("app.svgProbe.eyebrow")
+            }}</span>
+            <h2>{{ i18n.t("app.svgProbe.title") }}</h2>
+            <p>{{ i18n.t("app.svgProbe.loading") }}</p>
+          </section>
+        }
+      }
+
       @if (hasHandles$ | async) {
         <div
           class="workspace-summary"
@@ -655,6 +691,42 @@
               </div>
             </div>
           }
+
+          <div class="workspace-summary__filter">
+            <label class="field-group">
+              <span class="field-group__label">{{
+                i18n.t("app.workspace.filter.label")
+              }}</span>
+
+              <div class="workspace-filter">
+                <input
+                  #fileNameFilterInput
+                  type="search"
+                  class="panel-input workspace-filter__input"
+                  [value]="(fileNameFilterQuery$ | async) ?? ''"
+                  [attr.placeholder]="
+                    i18n.t('app.workspace.filter.placeholder')
+                  "
+                  [attr.aria-label]="i18n.t('app.workspace.filter.label')"
+                  (input)="updateFileNameFilter(fileNameFilterInput.value)"
+                />
+
+                @if (fileNameFilterActive$ | async) {
+                  <button
+                    type="button"
+                    class="app-button workspace-filter__clear"
+                    (click)="clearFileNameFilter()"
+                  >
+                    {{ i18n.t("common.clear") }}
+                  </button>
+                }
+              </div>
+
+              <span class="field-group__hint">{{
+                fileNameFilterHint$ | async
+              }}</span>
+            </label>
+          </div>
         </div>
 
         @if (duplicateGroupCards$ | async; as duplicateGroupCards) {
@@ -823,37 +895,56 @@
                 as quickPreviewHandleNames
               ) {
                 @if (visibleHandles$ | async; as visibleHandles) {
-                  @if (
-                    duplicateGroupSizeByName$ | async;
-                    as duplicateGroupSizeByName
-                  ) {
-                    <main class="main" [class.main--compact]="compactView">
-                      @for (handle of visibleHandles; track handle) {
-                        <app-svg-card
-                          [currentColor]="debounceCurrentColor$ | async"
-                          [fileWithDirectoryHandle]="handle"
-                          [colorInvert]="colorInvert"
-                          [compactMode]="compactView"
-                          [duplicateGroupSize]="
-                            duplicateGroupSizeByName.get(handle.name) ?? 0
-                          "
-                          [quickPreviewSelected]="
-                            quickPreviewHandleNames.has(handle.name)
-                          "
-                          class="svg-card-host"
-                          [class.active-card]="
-                            activeHandle$ | async | match: handle
-                          "
-                          [class.svg-card-host--preview-selected]="
-                            quickPreviewHandleNames.has(handle.name)
-                          "
-                          (click)="updateActiveHandle(handle)"
-                          (quickPreviewSelectedChange)="
-                            updateQuickPreviewSelection(handle, $event)
-                          "
-                        ></app-svg-card>
+                  @if (visibleHandles.length) {
+                    @if (
+                      duplicateGroupSizeByName$ | async;
+                      as duplicateGroupSizeByName
+                    ) {
+                      <main class="main" [class.main--compact]="compactView">
+                        @for (handle of visibleHandles; track handle) {
+                          <app-svg-card
+                            [currentColor]="debounceCurrentColor$ | async"
+                            [fileWithDirectoryHandle]="handle"
+                            [colorInvert]="colorInvert"
+                            [compactMode]="compactView"
+                            [duplicateGroupSize]="
+                              duplicateGroupSizeByName.get(handle.name) ?? 0
+                            "
+                            [quickPreviewSelected]="
+                              quickPreviewHandleNames.has(handle.name)
+                            "
+                            class="svg-card-host"
+                            [class.active-card]="
+                              activeHandle$ | async | match: handle
+                            "
+                            [class.svg-card-host--preview-selected]="
+                              quickPreviewHandleNames.has(handle.name)
+                            "
+                            (click)="updateActiveHandle(handle)"
+                            (quickPreviewSelectedChange)="
+                              updateQuickPreviewSelection(handle, $event)
+                            "
+                          ></app-svg-card>
+                        }
+                      </main>
+                    }
+                  } @else {
+                    <section class="workspace-empty-results">
+                      <h3>{{ i18n.t("app.workspace.filter.emptyTitle") }}</h3>
+                      <p>
+                        {{ i18n.t("app.workspace.filter.emptyDescription") }}
+                      </p>
+
+                      @if (fileNameFilterActive$ | async) {
+                        <button
+                          type="button"
+                          class="app-button workspace-empty-results__action"
+                          (click)="clearFileNameFilter()"
+                        >
+                          {{ i18n.t("common.clear") }}
+                        </button>
                       }
-                    </main>
+                    </section>
                   }
                 }
               }

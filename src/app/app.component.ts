@@ -46,6 +46,7 @@ import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
 import { SvgCardComponent } from './svg-card/svg-card.component';
 import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
+import { SvgProbeComponent } from './svg-probe/svg-probe.component';
 import { ToastViewportComponent } from './toast-viewport/toast-viewport.component';
 import { downloadBlob, sliceSvgSuffix } from './util/general';
 import {
@@ -79,6 +80,7 @@ type DuplicateGroupCard = {
 
 const THEME_STORAGE_KEY = 'svgolot-theme';
 const COMPACT_VIEW_STORAGE_KEY = 'svgolot-compact-view';
+const SVG_PROBE_ENABLED_STORAGE_KEY = 'svgolot-svg-probe-enabled';
 const THEME_COLOR_BY_MODE: Record<ThemeMode, string> = {
   dark: '#12100d',
   light: '#efe6d7',
@@ -100,6 +102,7 @@ const THEME_COLOR_BY_MODE: Record<ThemeMode, string> = {
     ToastViewportComponent,
     SvgCardComponent,
     SvgMarkupComponent,
+    SvgProbeComponent,
     AsyncPipe,
     MatchPipe,
   ],
@@ -119,9 +122,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
   themeMode: ThemeMode;
   compactView = this.readStoredCompactView();
+  svgProbeEnabled = this.readStoredSvgProbeEnabled();
 
   fileWithDirectoryHandles$ = new BehaviorSubject<FileWithDirectoryHandle[]>(
     [],
+  );
+  fileNameFilterQuery$ = new BehaviorSubject('');
+  normalizedFileNameFilterQuery$ = this.fileNameFilterQuery$.pipe(
+    map((query) => query.trim().toLocaleLowerCase()),
+    distinctUntilChanged(),
+    shareReplay(1),
+  );
+  fileNameFilterActive$ = this.normalizedFileNameFilterQuery$.pipe(
+    map((query) => !!query.length),
+    shareReplay(1),
   );
   fileCount$ = this.fileWithDirectoryHandles$.pipe(
     map((handles) => handles.length),
@@ -589,6 +603,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.activeDuplicateGroupKey$,
     this.duplicateGroups$,
     this.possibleDuplicateNames$,
+    this.normalizedFileNameFilterQuery$,
   ]).pipe(
     map(
       ([
@@ -597,12 +612,13 @@ export class AppComponent implements OnInit, OnDestroy {
         activeDuplicateGroupKey,
         duplicateGroups,
         possibleDuplicateNames,
+        fileNameFilterQuery,
       ]) => {
-        if (!duplicateFilterActive) {
-          return handles;
-        }
+        let filteredHandles = handles;
 
-        if (activeDuplicateGroupKey) {
+        if (!duplicateFilterActive) {
+          filteredHandles = handles;
+        } else if (activeDuplicateGroupKey) {
           const activeGroup = duplicateGroups.get(activeDuplicateGroupKey);
 
           if (activeGroup?.length) {
@@ -610,17 +626,53 @@ export class AppComponent implements OnInit, OnDestroy {
               activeGroup.map((handle) => handle.name),
             );
 
-            return handles.filter((handle) =>
+            filteredHandles = handles.filter((handle) =>
               activeGroupNames.has(handle.name),
             );
+          } else {
+            filteredHandles = handles.filter((handle) =>
+              possibleDuplicateNames.has(handle.name),
+            );
           }
+        } else {
+          filteredHandles = handles.filter((handle) =>
+            possibleDuplicateNames.has(handle.name),
+          );
         }
 
-        return handles.filter((handle) =>
-          possibleDuplicateNames.has(handle.name),
+        if (!fileNameFilterQuery) {
+          return filteredHandles;
+        }
+
+        return filteredHandles.filter((handle) =>
+          this.matchesFileNameFilter(handle, fileNameFilterQuery),
         );
       },
     ),
+    shareReplay(1),
+  );
+  visibleHandleCount$ = this.visibleHandles$.pipe(
+    map((handles) => handles.length),
+    startWith(0),
+    shareReplay(1),
+  );
+  fileNameFilterHint$ = combineLatest([
+    this.normalizedFileNameFilterQuery$,
+    this.visibleHandleCount$,
+    this.fileCount$,
+    this.i18n.language$,
+  ]).pipe(
+    map(([query, visibleHandleCount, totalCount]) => {
+      if (!query) {
+        return this.i18n.t('app.workspace.filter.hint.idle');
+      }
+
+      return this.i18n.t('app.workspace.filter.hint.matches', {
+        count: visibleHandleCount,
+        total: totalCount,
+        query,
+      });
+    }),
     shareReplay(1),
   );
 
@@ -703,6 +755,11 @@ export class AppComponent implements OnInit, OnDestroy {
   toggleCompactView() {
     this.compactView = !this.compactView;
     this.persistCompactView();
+  }
+
+  toggleSvgProbeEnabled() {
+    this.svgProbeEnabled = !this.svgProbeEnabled;
+    this.persistSvgProbeEnabled();
   }
 
   toggleMarkup() {
@@ -916,6 +973,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.quickPreviewHandles$.next([]);
   }
 
+  updateFileNameFilter(value: string) {
+    this.fileNameFilterQuery$.next(value);
+  }
+
+  clearFileNameFilter() {
+    this.fileNameFilterQuery$.next('');
+  }
+
   private resolveInitialTheme(): ThemeMode {
     const storedTheme = this.readStoredTheme();
 
@@ -976,11 +1041,34 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  private readStoredSvgProbeEnabled(): boolean {
+    try {
+      return (
+        this.document.defaultView?.localStorage.getItem(
+          SVG_PROBE_ENABLED_STORAGE_KEY,
+        ) !== 'false'
+      );
+    } catch {
+      return true;
+    }
+  }
+
   private persistCompactView() {
     try {
       this.document.defaultView?.localStorage.setItem(
         COMPACT_VIEW_STORAGE_KEY,
         String(this.compactView),
+      );
+    } catch {
+      return;
+    }
+  }
+
+  private persistSvgProbeEnabled() {
+    try {
+      this.document.defaultView?.localStorage.setItem(
+        SVG_PROBE_ENABLED_STORAGE_KEY,
+        String(this.svgProbeEnabled),
       );
     } catch {
       return;
@@ -998,6 +1086,16 @@ export class AppComponent implements OnInit, OnDestroy {
         contrastPreview,
       }),
     );
+  }
+
+  private matchesFileNameFilter(
+    handle: FileWithDirectoryHandle,
+    query: string,
+  ) {
+    const baseName = sliceSvgSuffix(handle.name).toLocaleLowerCase();
+    const fullName = handle.name.toLocaleLowerCase();
+
+    return baseName.includes(query) || fullName.includes(query);
   }
 
   private setDuplicateFilter(enabled: boolean) {

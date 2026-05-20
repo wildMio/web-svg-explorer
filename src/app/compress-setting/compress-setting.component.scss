@@ -95,11 +95,6 @@
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
 }
 
-.mat-mdc-slider {
-  padding-bottom: 0;
-  height: 40px;
-}
-
 @media (max-width: 720px) {
   .settings-toggle,
   .settings-slider {
