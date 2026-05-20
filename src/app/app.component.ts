@@ -41,6 +41,7 @@ import {
 import { CompressSettingComponent } from './compress-setting/compress-setting.component';
 import { MatchPipe } from './pipe/match.pipe';
 import { AppPwaService } from './service/app-pwa.service';
+import { I18nService } from './service/i18n.service';
 import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
 import { SvgCardComponent } from './svg-card/svg-card.component';
@@ -107,6 +108,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly document = inject<Document>(DOCUMENT);
   private readonly domSanitizer = inject(DomSanitizer);
   private readonly swUpdate = inject(SwUpdate);
+  readonly i18n = inject(I18nService);
   private readonly appPwaService = inject(AppPwaService);
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
@@ -149,15 +151,20 @@ export class AppComponent implements OnInit, OnDestroy {
   previewToneLabel$ = combineLatest([
     this.currentColor$,
     this.colorInvert$,
+    this.i18n.language$,
   ]).pipe(
     map(([color, contrastPreview]) => {
       const resolvedTone = resolvePreviewTone(color, contrastPreview);
 
       if (!resolvedTone) {
-        return 'Original artwork';
+        return this.i18n.t('app.previewTone.originalArtwork');
       }
 
-      return contrastPreview ? `${resolvedTone} contrast tone` : resolvedTone;
+      return contrastPreview
+        ? this.i18n.t('app.previewTone.contrastTone', {
+            tone: resolvedTone,
+          })
+        : resolvedTone;
     }),
     shareReplay(1),
   );
@@ -210,6 +217,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.downloadZipping$,
     this.hasHandles$,
     this.directoryReviewed$,
+    this.i18n.language$,
   ]).pipe(
     map(
       ([
@@ -220,26 +228,26 @@ export class AppComponent implements OnInit, OnDestroy {
         directoryReviewed,
       ]) => {
         if (directoryOpening) {
-          return 'Scanning directory';
+          return this.i18n.t('app.status.scanningDirectory');
         }
 
         if (svgOptimizing) {
-          return 'Optimizing SVG assets';
+          return this.i18n.t('app.status.optimizingAssets');
         }
 
         if (downloadZipping) {
-          return 'Preparing ZIP export';
+          return this.i18n.t('app.status.preparingZip');
         }
 
         if (hasHandles) {
-          return 'Batch ready';
+          return this.i18n.t('app.status.batchReady');
         }
 
         if (directoryReviewed) {
-          return 'No SVG files found';
+          return this.i18n.t('app.status.noSvgFound');
         }
 
-        return 'Awaiting directory';
+        return this.i18n.t('app.status.awaitingDirectory');
       },
     ),
   );
@@ -394,6 +402,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.duplicateScanStarted$,
     this.duplicateScanPending$,
     this.possibleDuplicateCount$,
+    this.i18n.language$,
   ]).pipe(
     map(
       ([
@@ -402,18 +411,20 @@ export class AppComponent implements OnInit, OnDestroy {
         possibleDuplicateCount,
       ]) => {
         if (duplicateScanPending) {
-          return 'Scanning';
+          return this.i18n.t('app.duplicate.status.scanning');
         }
 
         if (!duplicateScanStarted) {
-          return 'Not scanned';
+          return this.i18n.t('app.duplicate.status.notScanned');
         }
 
         if (!possibleDuplicateCount) {
-          return 'No matches';
+          return this.i18n.t('app.duplicate.status.noMatches');
         }
 
-        return `${possibleDuplicateCount} likely`;
+        return this.i18n.t('app.duplicate.status.likelyCount', {
+          count: possibleDuplicateCount,
+        });
       },
     ),
     shareReplay(1),
@@ -425,6 +436,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.duplicateGroupCount$,
     this.duplicateFilterActive$,
     this.activeDuplicateGroupKey$,
+    this.i18n.language$,
   ]).pipe(
     map(
       ([
@@ -436,26 +448,32 @@ export class AppComponent implements OnInit, OnDestroy {
         activeDuplicateGroupKey,
       ]) => {
         if (duplicateScanPending) {
-          return 'Building duplicate review set';
+          return this.i18n.t('app.duplicate.headline.building');
         }
 
         if (!duplicateScanStarted) {
-          return 'Scan on demand';
+          return this.i18n.t('app.duplicate.headline.scanOnDemand');
         }
 
         if (!possibleDuplicateCount) {
-          return 'No likely duplicates found';
+          return this.i18n.t('app.duplicate.headline.noDuplicates');
         }
 
         if (duplicateFilterActive && activeDuplicateGroupKey) {
-          return `${possibleDuplicateCount} assets in the focused group`;
+          return this.i18n.t('app.duplicate.headline.focusedGroupAssets', {
+            count: possibleDuplicateCount,
+          });
         }
 
         if (duplicateFilterActive) {
-          return `${possibleDuplicateCount} likely duplicates in view`;
+          return this.i18n.t('app.duplicate.headline.likelyInView', {
+            count: possibleDuplicateCount,
+          });
         }
 
-        return `${duplicateGroupCount} groups ready to review`;
+        return this.i18n.t('app.duplicate.headline.groupsReady', {
+          count: duplicateGroupCount,
+        });
       },
     ),
     shareReplay(1),
@@ -466,6 +484,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.possibleDuplicateCount$,
     this.duplicateFilterActive$,
     this.activeDuplicateGroupKey$,
+    this.i18n.language$,
   ]).pipe(
     map(
       ([
@@ -476,26 +495,26 @@ export class AppComponent implements OnInit, OnDestroy {
         activeDuplicateGroupKey,
       ]) => {
         if (duplicateScanPending) {
-          return 'Rendered fingerprints are being compared across the current batch.';
+          return this.i18n.t('app.duplicate.hint.building');
         }
 
         if (!duplicateScanStarted) {
-          return 'Run duplicate review only when you want to compare visually similar assets.';
+          return this.i18n.t('app.duplicate.hint.scanOnDemand');
         }
 
         if (!possibleDuplicateCount) {
-          return 'The last scan did not surface any visually matching duplicate groups in this batch.';
+          return this.i18n.t('app.duplicate.hint.noDuplicates');
         }
 
         if (duplicateFilterActive && activeDuplicateGroupKey) {
-          return 'The grid is narrowed to the active group. Use Show all matches in the rail to widen the comparison again.';
+          return this.i18n.t('app.duplicate.hint.focusedGroup');
         }
 
         if (duplicateFilterActive) {
-          return 'The grid is narrowed to assets that share a visual fingerprint.';
+          return this.i18n.t('app.duplicate.hint.filtered');
         }
 
-        return 'Use the duplicate rail to step through groups, pin candidates, and compare before deleting anything.';
+        return this.i18n.t('app.duplicate.hint.default');
       },
     ),
     shareReplay(1),

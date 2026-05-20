@@ -706,6 +706,10 @@ app-root.app-root-host {
   min-height: 0;
 }
 
+.workspace-grid__rail {
+  height: 100%;
+}
+
 .workspace-grid__content {
   padding-right: 0.25rem;
 }
@@ -916,7 +920,10 @@ app-root.app-root-host {
 
 .workspace__markup {
   min-height: 0;
-  overflow: hidden;
+  max-height: 100vh;
+  overflow: auto;
+  position: sticky;
+  top: 0;
 }
 
 .svg-card-host {
@@ -1530,6 +1537,7 @@ app-root
     border-color 180ms ease,
     background 180ms ease,
     transform 180ms ease;
+  pointer-events: none;
 }
 
 .ui-switch__track::after {

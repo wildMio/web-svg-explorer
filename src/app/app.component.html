@@ -7,7 +7,7 @@
     <div class="app-header__main">
       <div class="app-header__copy">
         <div class="eyebrow-row">
-          <span class="eyebrow">SVG Asset Operations</span>
+          <span class="eyebrow">{{ i18n.t("app.header.eyebrow") }}</span>
           <span
             class="status-pill"
             [class.status-pill--busy]="loading$ | async"
@@ -18,20 +18,11 @@
 
         <h1>SVGOLOT</h1>
         @if (compactView) {
-          <p>
-            Compact view keeps the grid in focus while batch context moves into
-            the display popup.
-          </p>
+          <p>{{ i18n.t("app.header.description.compact") }}</p>
         } @else if (hasHandles$ | async) {
-          <p>
-            Keep the active batch in view, inspect the selected asset, and
-            export once the directory is ready.
-          </p>
+          <p>{{ i18n.t("app.header.description.withBatch") }}</p>
         } @else {
-          <p>
-            Batch-review SVG assets, compare output, and export optimized files
-            without leaving the workspace.
-          </p>
+          <p>{{ i18n.t("app.header.description.empty") }}</p>
         }
       </div>
 
@@ -39,12 +30,24 @@
         @if (!compactView) {
           <dl class="header-facts">
             <div class="header-fact">
-              <dt>Batch</dt>
-              <dd>{{ fileCount$ | async }} assets</dd>
+              <dt>{{ i18n.t("app.header.fact.batch") }}</dt>
+              <dd>
+                {{
+                  i18n.t("app.header.fact.batchCount", {
+                    count: (fileCount$ | async) ?? 0,
+                  })
+                }}
+              </dd>
             </div>
             <div class="header-fact">
-              <dt>Optimized</dt>
-              <dd>{{ optimizedCount$ | async }} ready</dd>
+              <dt>{{ i18n.t("app.header.fact.optimized") }}</dt>
+              <dd>
+                {{
+                  i18n.t("app.header.fact.optimizedReady", {
+                    count: (optimizedCount$ | async) ?? 0,
+                  })
+                }}
+              </dd>
             </div>
           </dl>
         }
@@ -57,11 +60,46 @@
             [attr.aria-pressed]="compactView"
             (click)="toggleCompactView()"
           >
-            Compact
+            {{ i18n.t("app.header.compact") }}
           </button>
 
-          <div class="theme-switch" role="group" aria-label="Theme">
-            <span class="theme-switch__label">Theme</span>
+          <div
+            class="theme-switch"
+            role="group"
+            [attr.aria-label]="i18n.t('common.language')"
+          >
+            <span class="theme-switch__label">{{
+              i18n.t("common.language")
+            }}</span>
+
+            <div class="theme-switch__options">
+              @for (
+                languageOption of i18n.languageOptions;
+                track languageOption.id
+              ) {
+                <button
+                  type="button"
+                  class="theme-switch__button"
+                  [class.theme-switch__button--active]="
+                    i18n.language() === languageOption.id
+                  "
+                  [attr.aria-pressed]="i18n.language() === languageOption.id"
+                  (click)="i18n.setLanguage(languageOption.id)"
+                >
+                  {{ i18n.t(languageOption.labelKey) }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div
+            class="theme-switch"
+            role="group"
+            [attr.aria-label]="i18n.t('common.theme')"
+          >
+            <span class="theme-switch__label">{{
+              i18n.t("common.theme")
+            }}</span>
 
             <div class="theme-switch__options">
               <button
@@ -71,7 +109,7 @@
                 [attr.aria-pressed]="themeMode === 'dark'"
                 (click)="setTheme('dark')"
               >
-                Dark
+                {{ i18n.t("common.theme.dark") }}
               </button>
 
               <button
@@ -81,7 +119,7 @@
                 [attr.aria-pressed]="themeMode === 'light'"
                 (click)="setTheme('light')"
               >
-                Light
+                {{ i18n.t("common.theme.light") }}
               </button>
             </div>
           </div>
@@ -92,7 +130,7 @@
             target="_blank"
             rel="noreferrer"
           >
-            View source
+            {{ i18n.t("app.header.viewSource") }}
           </a>
           @if (showInstallPromotion$ | async) {
             <button
@@ -100,12 +138,12 @@
               class="app-button"
               (click)="installPromotion()"
             >
-              Install app
+              {{ i18n.t("app.header.installApp") }}
             </button>
           }
           @if (swUpdateAvailable$ | async) {
             <button type="button" class="app-button" (click)="reloadPage()">
-              Apply update
+              {{ i18n.t("app.header.applyUpdate") }}
             </button>
           }
         </div>
@@ -120,7 +158,7 @@
           (click)="openDirectory()"
           [disabled]="loading$ | async"
         >
-          Open SVG directory
+          {{ i18n.t("app.toolbar.openDirectory") }}
         </button>
 
         @if (hasHandles$ | async) {
@@ -130,7 +168,11 @@
             (click)="svgoAll()"
             [disabled]="loading$ | async"
           >
-            Optimize {{ fileCount$ | async }} files
+            {{
+              i18n.t("app.toolbar.optimizeFiles", {
+                count: (fileCount$ | async) ?? 0,
+              })
+            }}
           </button>
         }
 
@@ -141,7 +183,7 @@
             (click)="downloadAll()"
             [disabled]="loading$ | async"
           >
-            Export optimized ZIP
+            {{ i18n.t("app.toolbar.exportZip") }}
           </button>
         }
       </div>
@@ -156,10 +198,10 @@
           >
             {{
               (duplicateScanPending$ | async)
-                ? "Scanning likely duplicates..."
+                ? i18n.t("app.toolbar.scanningLikelyDuplicates")
                 : duplicateScanStarted
-                  ? "Re-scan likely duplicates"
-                  : "Scan likely duplicates"
+                  ? i18n.t("app.toolbar.rescanLikelyDuplicates")
+                  : i18n.t("app.toolbar.scanLikelyDuplicates")
             }}
           </button>
 
@@ -174,8 +216,8 @@
                 >
                   {{
                     duplicateFilterActive
-                      ? "Showing likely duplicates"
-                      : "Likely duplicates"
+                      ? i18n.t("app.toolbar.showingLikelyDuplicates")
+                      : i18n.t("app.toolbar.likelyDuplicates")
                   }}
                   <span class="toolbar-button__count">{{
                     duplicateCount
@@ -194,7 +236,7 @@
           [class.toolbar-button--active]="displaySettingOpen"
           (click)="displaySettingOpen = !displaySettingOpen"
         >
-          Review display
+          {{ i18n.t("app.toolbar.reviewDisplay") }}
         </button>
         <button
           cdkOverlayOrigin
@@ -204,7 +246,7 @@
           [class.toolbar-button--active]="compressSettingOpen"
           (click)="compressSettingOpen = !compressSettingOpen"
         >
-          Optimization profile
+          {{ i18n.t("app.toolbar.optimizationProfile") }}
         </button>
       </div>
     </div>
@@ -225,51 +267,82 @@
       cdkTrapFocus
       class="popover-panel popover-panel--review"
       role="dialog"
-      aria-label="Display and reference"
+      [attr.aria-label]="i18n.t('app.display.ariaLabel')"
     >
       <div class="panel-heading">
-        <span class="panel-heading__eyebrow">Review</span>
-        <h2>Display & reference</h2>
-        <p>
-          Change only how you inspect the current session. Optimized output and
-          exports stay untouched.
-        </p>
+        <span class="panel-heading__eyebrow">{{
+          i18n.t("app.display.eyebrow")
+        }}</span>
+        <h2>{{ i18n.t("app.display.title") }}</h2>
+        <p>{{ i18n.t("app.display.description") }}</p>
       </div>
 
       <div class="popover-panel__body">
         <div class="popover-summary">
           <div class="popover-summary__header">
-            <span class="field-group__label">Current review setup</span>
+            <span class="field-group__label">{{
+              i18n.t("app.display.currentSetup")
+            }}</span>
             <span class="popover-summary__badge">
-              {{ compactView ? "Compact layout" : "Comfort layout" }}
+              {{
+                compactView
+                  ? i18n.t("app.display.compactLayout")
+                  : i18n.t("app.display.comfortLayout")
+              }}
             </span>
           </div>
 
           <dl class="popover-summary__facts">
             <div>
-              <dt>Preview tone</dt>
+              <dt>{{ i18n.t("app.display.previewTone") }}</dt>
               <dd>{{ previewToneLabel$ | async }}</dd>
             </div>
             <div>
-              <dt>Contrast swap</dt>
-              <dd>{{ colorInvert ? "On" : "Off" }}</dd>
+              <dt>{{ i18n.t("app.display.contrastSwap") }}</dt>
+              <dd>
+                {{ colorInvert ? i18n.t("common.on") : i18n.t("common.off") }}
+              </dd>
             </div>
             <div>
-              <dt>Markup</dt>
-              <dd>{{ showMarkup ? "Visible" : "Hidden" }}</dd>
+              <dt>{{ i18n.t("app.display.markup") }}</dt>
+              <dd>
+                {{
+                  showMarkup
+                    ? i18n.t("common.visible")
+                    : i18n.t("common.hidden")
+                }}
+              </dd>
             </div>
             <div>
-              <dt>Quick preview</dt>
-              <dd>{{ quickPreviewCount$ | async }} pinned</dd>
+              <dt>{{ i18n.t("app.display.quickPreview") }}</dt>
+              <dd>
+                {{
+                  i18n.t("app.display.pinnedCount", {
+                    count: (quickPreviewCount$ | async) ?? 0,
+                  })
+                }}
+              </dd>
             </div>
             @if (compactView) {
               <div>
-                <dt>Batch</dt>
-                <dd>{{ fileCount$ | async }} assets</dd>
+                <dt>{{ i18n.t("app.display.batch") }}</dt>
+                <dd>
+                  {{
+                    i18n.t("app.header.fact.batchCount", {
+                      count: (fileCount$ | async) ?? 0,
+                    })
+                  }}
+                </dd>
               </div>
               <div>
-                <dt>Optimized</dt>
-                <dd>{{ optimizedCount$ | async }} ready</dd>
+                <dt>{{ i18n.t("app.display.optimized") }}</dt>
+                <dd>
+                  {{
+                    i18n.t("app.header.fact.optimizedReady", {
+                      count: (optimizedCount$ | async) ?? 0,
+                    })
+                  }}
+                </dd>
               </div>
             }
           </dl>
@@ -277,29 +350,28 @@
 
         <div class="panel-section">
           <label class="field-group">
-            <span class="field-group__label">Preview tone</span>
+            <span class="field-group__label">{{
+              i18n.t("app.display.previewTone")
+            }}</span>
             <input
               #colorInput
               type="text"
-              placeholder="white / #111111 / currentColor"
+              [attr.placeholder]="i18n.t('app.display.placeholder')"
               class="panel-input"
               [value]="currentColor$ | async"
               (input)="currentColor$.next(colorInput.value)"
             />
             <span class="field-group__hint">
-              Use a named color or hex value for currentColor and single-tone
-              artwork. Contrast swap flips that tone to a light or dark bench
-              color for faster readability checks.
+              {{ i18n.t("app.display.inputHint") }}
             </span>
           </label>
 
           <label class="panel-toggle-row">
             <div>
-              <span class="panel-toggle-row__title">Swap to contrast tone</span>
-              <p>
-                Useful when you want to test the same icon against the opposite
-                light or dark reading condition without changing export output.
-              </p>
+              <span class="panel-toggle-row__title">{{
+                i18n.t("app.display.swapTitle")
+              }}</span>
+              <p>{{ i18n.t("app.display.swapDescription") }}</p>
             </div>
             <span class="ui-switch">
               <input
@@ -311,20 +383,17 @@
               />
               <span class="ui-switch__track"></span>
               <span class="ui-switch__state">{{
-                colorInvert ? "On" : "Off"
+                colorInvert ? i18n.t("common.on") : i18n.t("common.off")
               }}</span>
             </span>
           </label>
 
           <label class="panel-toggle-row">
             <div>
-              <span class="panel-toggle-row__title"
-                >Keep markup beside grid</span
-              >
-              <p>
-                Keep original and optimized markup open beside the asset grid
-                while reviewing changes.
-              </p>
+              <span class="panel-toggle-row__title">{{
+                i18n.t("app.display.keepMarkupTitle")
+              }}</span>
+              <p>{{ i18n.t("app.display.keepMarkupDescription") }}</p>
             </div>
             <span class="ui-switch">
               <input
@@ -336,35 +405,25 @@
               />
               <span class="ui-switch__track"></span>
               <span class="ui-switch__state">{{
-                showMarkup ? "On" : "Off"
+                showMarkup ? i18n.t("common.on") : i18n.t("common.off")
               }}</span>
             </span>
           </label>
         </div>
 
         <div class="panel-guidance">
-          <span class="panel-guidance__eyebrow">How to use it</span>
+          <span class="panel-guidance__eyebrow">{{
+            i18n.t("app.display.guidanceEyebrow")
+          }}</span>
           <ul>
-            <li>
-              Change preview fill when you need to verify dark icons on light
-              surfaces, or the reverse.
-            </li>
-            <li>
-              Tick card checkboxes to pin assets into the quick preview strip at
-              the bottom of the workspace.
-            </li>
-            <li>
-              Use the compact toggle in the header when you want to scan larger
-              batches with less surrounding detail.
-            </li>
+            <li>{{ i18n.t("app.display.guidance.1") }}</li>
+            <li>{{ i18n.t("app.display.guidance.2") }}</li>
+            <li>{{ i18n.t("app.display.guidance.3") }}</li>
           </ul>
         </div>
       </div>
 
-      <p class="panel-note">
-        Display settings only affect preview and inspection in this session.
-        They never rewrite optimized or exported SVG files.
-      </p>
+      <p class="panel-note">{{ i18n.t("app.display.note") }}</p>
     </section>
   </ng-template>
 
@@ -383,24 +442,20 @@
       cdkTrapFocus
       class="popover-panel popover-panel--wide popover-panel--profile compress-setting-panel"
       role="dialog"
-      aria-label="Optimization profile"
+      [attr.aria-label]="i18n.t('app.profile.ariaLabel')"
     >
       <div class="panel-heading">
-        <span class="panel-heading__eyebrow">Optimization</span>
-        <h2>Optimization profile</h2>
-        <p>
-          These settings change how optimized SVG output is rewritten for
-          single-file optimize, batch optimize, and ZIP export.
-        </p>
+        <span class="panel-heading__eyebrow">{{
+          i18n.t("app.profile.eyebrow")
+        }}</span>
+        <h2>{{ i18n.t("app.profile.title") }}</h2>
+        <p>{{ i18n.t("app.profile.description") }}</p>
       </div>
       <div class="popover-panel__body popover-panel__body--dense">
         <app-compress-setting></app-compress-setting>
       </div>
 
-      <p class="panel-note">
-        Profile changes affect optimized output, not just preview. Restore the
-        defaults if a custom combination starts breaking assets.
-      </p>
+      <p class="panel-note">{{ i18n.t("app.profile.note") }}</p>
     </section>
   </ng-template>
 
@@ -416,13 +471,12 @@
           [class.workspace-summary--compact]="compactView"
         >
           <div class="workspace-summary__lead">
-            <span class="workspace-summary__eyebrow">Current batch</span>
+            <span class="workspace-summary__eyebrow">{{
+              i18n.t("app.workspace.currentBatch")
+            }}</span>
             @if (activeHandle$ | async; as activeHandle) {
               <h2>{{ activeHandle.name }}</h2>
-              <p>
-                Review the selected asset while batch optimization and export
-                remain available for the full directory.
-              </p>
+              <p>{{ i18n.t("app.workspace.activeDescription") }}</p>
 
               <div class="review-shortcuts">
                 <button
@@ -431,7 +485,11 @@
                   [class.review-shortcuts__button--active]="showMarkup"
                   (click)="toggleMarkup()"
                 >
-                  {{ showMarkup ? "Hide markup" : "Open markup" }}
+                  {{
+                    showMarkup
+                      ? i18n.t("app.workspace.shortcut.hideMarkup")
+                      : i18n.t("app.workspace.shortcut.openMarkup")
+                  }}
                 </button>
 
                 @if (duplicateScanPending$ | async) {
@@ -440,7 +498,7 @@
                     class="review-shortcuts__button"
                     disabled
                   >
-                    Scanning duplicates...
+                    {{ i18n.t("app.workspace.shortcut.scanningDuplicates") }}
                   </button>
                 } @else if (
                   activeHandleDuplicateGroup$ | async;
@@ -456,8 +514,8 @@
                   >
                     {{
                       duplicateFilterActive && activeHandleDuplicateGroup.active
-                        ? "Showing its group"
-                        : "Show its group"
+                        ? i18n.t("app.workspace.shortcut.showingItsGroup")
+                        : i18n.t("app.workspace.shortcut.showItsGroup")
                     }}
                   </button>
                 } @else if (!duplicateScanStarted) {
@@ -466,7 +524,7 @@
                     class="review-shortcuts__button"
                     (click)="openActiveHandleDuplicateGroup()"
                   >
-                    Find its duplicates
+                    {{ i18n.t("app.workspace.shortcut.findItsDuplicates") }}
                   </button>
                 } @else if (duplicateGroupCount$ | async) {
                   <button
@@ -479,8 +537,8 @@
                   >
                     {{
                       duplicateFilterActive && !activeDuplicateGroupKey
-                        ? "Showing all groups"
-                        : "Browse duplicate groups"
+                        ? i18n.t("app.workspace.shortcut.showingAllGroups")
+                        : i18n.t("app.workspace.shortcut.browseDuplicateGroups")
                     }}
                   </button>
                 } @else {
@@ -489,15 +547,13 @@
                     class="review-shortcuts__button"
                     (click)="scanLikelyDuplicates()"
                   >
-                    Re-scan duplicates
+                    {{ i18n.t("app.workspace.shortcut.rescanDuplicates") }}
                   </button>
                 }
               </div>
             } @else {
-              <h2>No SVG selected</h2>
-              <p>
-                Pick a card to inspect source, output, and compression deltas.
-              </p>
+              <h2>{{ i18n.t("app.workspace.noSelectionTitle") }}</h2>
+              <p>{{ i18n.t("app.workspace.noSelectionDescription") }}</p>
             }
           </div>
 
@@ -505,61 +561,93 @@
             <div class="workspace-summary__meta">
               <div class="workspace-summary__stats">
                 <div class="workspace-stat">
-                  <span class="workspace-stat__label">Batch</span>
-                  <strong>{{ fileCount$ | async }} assets loaded</strong>
+                  <span class="workspace-stat__label">{{
+                    i18n.t("app.workspace.stat.batch")
+                  }}</span>
+                  <strong>
+                    {{
+                      i18n.t("app.workspace.stat.batchLoaded", {
+                        count: (fileCount$ | async) ?? 0,
+                      })
+                    }}
+                  </strong>
                 </div>
 
                 <div class="workspace-stat">
-                  <span class="workspace-stat__label">Optimized</span>
+                  <span class="workspace-stat__label">{{
+                    i18n.t("app.workspace.stat.optimized")
+                  }}</span>
                   <strong>
                     @if (hasOptimizedSvgMap$ | async) {
-                      {{ optimizedCount$ | async }} ready
+                      {{
+                        i18n.t("app.workspace.stat.optimizedReady", {
+                          count: (optimizedCount$ | async) ?? 0,
+                        })
+                      }}
                     } @else {
-                      Awaiting optimization
+                      {{ i18n.t("app.workspace.stat.awaitingOptimization") }}
                     }
                   </strong>
                 </div>
 
                 <div class="workspace-stat">
-                  <span class="workspace-stat__label">Quick preview</span>
-                  <strong>{{ quickPreviewCount$ | async }} pinned</strong>
+                  <span class="workspace-stat__label">{{
+                    i18n.t("app.workspace.stat.quickPreview")
+                  }}</span>
+                  <strong>
+                    {{
+                      i18n.t("app.display.pinnedCount", {
+                        count: (quickPreviewCount$ | async) ?? 0,
+                      })
+                    }}
+                  </strong>
                 </div>
 
                 <div class="workspace-stat">
-                  <span class="workspace-stat__label">Duplicate review</span>
+                  <span class="workspace-stat__label">{{
+                    i18n.t("app.workspace.stat.duplicateReview")
+                  }}</span>
                   <strong>{{ duplicateStatusLabel$ | async }}</strong>
                 </div>
               </div>
 
               <div class="workspace-summary__signals">
-                <span class="workspace-chip"
-                  >Preview {{ previewToneLabel$ | async }}</span
-                >
+                <span class="workspace-chip">{{
+                  i18n.t("app.workspace.signal.preview", {
+                    tone: (previewToneLabel$ | async) ?? "",
+                  })
+                }}</span>
                 @if (duplicateFilterActive) {
                   <span class="workspace-chip workspace-chip--accent">
-                    Showing likely duplicates only
+                    {{ i18n.t("app.workspace.signal.showingDuplicatesOnly") }}
                   </span>
                 }
                 @if (showMarkup) {
                   <span class="workspace-chip workspace-chip--accent">
-                    Markup open
+                    {{ i18n.t("app.workspace.signal.markupOpen") }}
                   </span>
                 }
                 @if (colorInvert) {
-                  <span class="workspace-chip">Contrast preview</span>
+                  <span class="workspace-chip">{{
+                    i18n.t("app.workspace.signal.contrastPreview")
+                  }}</span>
                 }
                 @if (quickPreviewCount$ | async) {
                   <span class="workspace-chip">
-                    {{ quickPreviewCount$ | async }} in quick preview
+                    {{
+                      i18n.t("app.workspace.signal.quickPreviewCount", {
+                        count: (quickPreviewCount$ | async) ?? 0,
+                      })
+                    }}
                   </span>
                 }
               </div>
 
               <div class="workspace-review">
                 <div class="workspace-review__header">
-                  <span class="workspace-review__eyebrow"
-                    >Duplicate review</span
-                  >
+                  <span class="workspace-review__eyebrow">{{
+                    i18n.t("app.workspace.reviewEyebrow")
+                  }}</span>
                   <strong>{{ duplicateReviewHeadline$ | async }}</strong>
                 </div>
 
@@ -581,17 +669,18 @@
                 <section class="duplicate-panel">
                   <div class="duplicate-panel__header">
                     <div>
-                      <span class="duplicate-panel__eyebrow"
-                        >Likely duplicate groups</span
-                      >
+                      <span class="duplicate-panel__eyebrow">{{
+                        i18n.t("app.duplicate.panelEyebrow")
+                      }}</span>
                       <h3>
-                        {{ duplicateGroupCards.length }} groups ·
-                        {{ possibleDuplicateCount$ | async }} assets
+                        {{
+                          i18n.t("app.duplicate.panelSummary", {
+                            groupCount: duplicateGroupCards.length,
+                            assetCount: (possibleDuplicateCount$ | async) ?? 0,
+                          })
+                        }}
                       </h3>
-                      <p>
-                        Review candidates in the rail, then keep the main grid
-                        free for whichever group you want to inspect in detail.
-                      </p>
+                      <p>{{ i18n.t("app.duplicate.panelDescription") }}</p>
                     </div>
 
                     <div class="duplicate-panel__actions">
@@ -600,7 +689,7 @@
                         class="duplicate-panel__action"
                         (click)="scanLikelyDuplicates()"
                       >
-                        Re-scan
+                        {{ i18n.t("app.duplicate.rescan") }}
                       </button>
 
                       @if (duplicateFilterActive && activeDuplicateGroupKey) {
@@ -609,7 +698,7 @@
                           class="duplicate-panel__action"
                           (click)="showAllDuplicateGroups()"
                         >
-                          Show all matches
+                          {{ i18n.t("app.duplicate.showAllMatches") }}
                         </button>
                       }
                     </div>
@@ -626,13 +715,24 @@
                       >
                         <div class="duplicate-group__header">
                           <div>
-                            <span class="duplicate-group__eyebrow"
-                              >Group {{ $index + 1 }}</span
-                            >
-                            <h4>{{ duplicateGroup.itemCount }} candidates</h4>
+                            <span class="duplicate-group__eyebrow">{{
+                              i18n.t("app.duplicate.groupEyebrow", {
+                                index: $index + 1,
+                              })
+                            }}</span>
+                            <h4>
+                              {{
+                                i18n.t("app.duplicate.candidates", {
+                                  count: duplicateGroup.itemCount,
+                                })
+                              }}
+                            </h4>
                             <p>
-                              {{ duplicateGroup.optimizedCount }} optimized ·
-                              heuristic visual match
+                              {{
+                                i18n.t("app.duplicate.optimizedVisualMatch", {
+                                  optimizedCount: duplicateGroup.optimizedCount,
+                                })
+                              }}
                             </p>
                           </div>
 
@@ -649,8 +749,8 @@
                             >
                               {{
                                 duplicateGroup.active
-                                  ? "Showing this group"
-                                  : "Show group"
+                                  ? i18n.t("app.duplicate.showingThisGroup")
+                                  : i18n.t("app.duplicate.showGroup")
                               }}
                             </button>
 
@@ -663,7 +763,7 @@
                                 )
                               "
                             >
-                              Pin group
+                              {{ i18n.t("app.duplicate.pinGroup") }}
                             </button>
                           </div>
                         </div>
@@ -685,23 +785,25 @@
                                 <strong>{{ item.name }}</strong>
                                 <span>{{
                                   item.optimized
-                                    ? "Optimized ready"
-                                    : "Original only"
+                                    ? i18n.t(
+                                        "app.duplicate.item.optimizedReady"
+                                      )
+                                    : i18n.t("app.duplicate.item.originalOnly")
                                 }}</span>
                               </span>
 
                               <span class="duplicate-group__item-badges">
                                 @if (item.quickPreviewSelected) {
-                                  <span class="duplicate-group__badge"
-                                    >Pinned</span
-                                  >
+                                  <span class="duplicate-group__badge">{{
+                                    i18n.t("app.duplicate.badge.pinned")
+                                  }}</span>
                                 }
 
                                 @if (item.active) {
                                   <span
                                     class="duplicate-group__badge duplicate-group__badge--accent"
                                   >
-                                    Focused
+                                    {{ i18n.t("app.duplicate.badge.focused") }}
                                   </span>
                                 }
                               </span>
@@ -763,8 +865,8 @@
           <span class="empty-state__badge">
             {{
               (directoryReviewed$ | async)
-                ? "No SVG files found"
-                : "Workspace ready"
+                ? i18n.t("app.empty.badge.noSvg")
+                : i18n.t("app.empty.badge.ready")
             }}
           </span>
           <div class="empty-state__content">
@@ -772,15 +874,11 @@
               <h2>
                 {{
                   (directoryReviewed$ | async)
-                    ? "Choose another directory with SVG assets"
-                    : "Open a directory to start an SVG review batch"
+                    ? i18n.t("app.empty.title.noSvg")
+                    : i18n.t("app.empty.title.ready")
                 }}
               </h2>
-              <p>
-                SVGOLOT loads each SVG into a focused review workflow so you can
-                inspect output, tune the shared profile, and export only when
-                the batch is ready to ship.
-              </p>
+              <p>{{ i18n.t("app.empty.description") }}</p>
             </div>
 
             <div class="empty-state__actions">
@@ -790,7 +888,7 @@
                 (click)="openDirectory()"
                 [disabled]="loading$ | async"
               >
-                Open SVG directory
+                {{ i18n.t("app.empty.openDirectory") }}
               </button>
             </div>
           </div>
@@ -799,31 +897,22 @@
             <li class="empty-state__step">
               <span class="empty-state__step-index">01</span>
               <div class="empty-state__step-copy">
-                <strong>Load a directory</strong>
-                <span>
-                  Import a folder of SVG assets so the workspace can build a
-                  review batch and select the first file automatically.
-                </span>
+                <strong>{{ i18n.t("app.empty.step1.title") }}</strong>
+                <span>{{ i18n.t("app.empty.step1.description") }}</span>
               </div>
             </li>
             <li class="empty-state__step">
               <span class="empty-state__step-index">02</span>
               <div class="empty-state__step-copy">
-                <strong>Inspect and tune</strong>
-                <span>
-                  Review previews, keep markup beside the asset grid, and tune
-                  the shared SVGO profile before changing the whole batch.
-                </span>
+                <strong>{{ i18n.t("app.empty.step2.title") }}</strong>
+                <span>{{ i18n.t("app.empty.step2.description") }}</span>
               </div>
             </li>
             <li class="empty-state__step">
               <span class="empty-state__step-index">03</span>
               <div class="empty-state__step-copy">
-                <strong>Optimize with control</strong>
-                <span>
-                  Run one-off fixes from a card or optimize the full directory,
-                  then export only when the output is ready to hand off.
-                </span>
+                <strong>{{ i18n.t("app.empty.step3.title") }}</strong>
+                <span>{{ i18n.t("app.empty.step3.description") }}</span>
               </div>
             </li>
           </ol>
@@ -832,7 +921,10 @@
     </section>
 
     @if (showMarkup) {
-      <aside class="workspace__markup" aria-label="Markup review panel">
+      <aside
+        class="workspace__markup"
+        [attr.aria-label]="i18n.t('markup.ariaLabel')"
+      >
         <app-svg-markup
           [handle]="activeHandle$ | async"
           [originalText]="activeSvgText$ | async"
@@ -844,17 +936,32 @@
 
   @if (quickPreviewItems$ | async; as quickPreviewItems) {
     @if (quickPreviewItems.length) {
-      <section class="quick-preview-dock" aria-label="Quick preview selection">
+      <section
+        class="quick-preview-dock"
+        [attr.aria-label]="i18n.t('app.quickPreview.ariaLabel')"
+      >
         <div class="quick-preview-dock__header">
           <div>
-            <span class="quick-preview-dock__eyebrow">Quick preview</span>
-            <h2>{{ quickPreviewItems.length }} pinned icons</h2>
+            <span class="quick-preview-dock__eyebrow">{{
+              i18n.t("app.quickPreview.eyebrow")
+            }}</span>
+            <h2>
+              {{
+                i18n.t("app.quickPreview.pinnedIcons", {
+                  count: quickPreviewItems.length,
+                })
+              }}
+            </h2>
           </div>
 
           <div class="quick-preview-dock__actions">
             @if (activeHandle$ | async; as activeHandle) {
               <span class="quick-preview-dock__active">
-                Focused: {{ activeHandle.name }}
+                {{
+                  i18n.t("app.quickPreview.focused", {
+                    name: activeHandle.name,
+                  })
+                }}
               </span>
             }
 
@@ -863,7 +970,7 @@
               class="quick-preview-dock__clear"
               (click)="clearQuickPreviewHandles()"
             >
-              Clear
+              {{ i18n.t("app.quickPreview.clear") }}
             </button>
           </div>
         </div>
@@ -879,7 +986,7 @@
               <button
                 type="button"
                 class="quick-preview-tile__remove"
-                aria-label="Remove from quick preview"
+                [attr.aria-label]="i18n.t('app.quickPreview.removeAriaLabel')"
                 (click)="updateQuickPreviewSelection(item.handle, false)"
               >
                 ×
@@ -896,7 +1003,11 @@
 
                 <span class="quick-preview-tile__meta">
                   <strong>{{ item.name }}</strong>
-                  <span>{{ item.optimized ? "Optimized" : "Original" }}</span>
+                  <span>{{
+                    item.optimized
+                      ? i18n.t("common.optimized")
+                      : i18n.t("common.original")
+                  }}</span>
                 </span>
               </button>
             </article>

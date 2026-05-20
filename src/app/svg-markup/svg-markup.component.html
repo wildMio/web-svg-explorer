@@ -2,13 +2,17 @@
   <div class="markup-shell">
     <header class="markup-shell__header">
       <div>
-        <span class="markup-shell__eyebrow">Selected asset</span>
+        <span class="markup-shell__eyebrow">{{
+          i18n.t("markup.selectedAsset")
+        }}</span>
         <h2>{{ handle.name }}</h2>
       </div>
 
       <span class="markup-pill" [class.markup-pill--accent]="optimizedText()">
         {{
-          optimizedText() ? "Optimized output ready" : "Awaiting optimization"
+          optimizedText()
+            ? i18n.t("markup.optimizedReady")
+            : i18n.t("markup.awaitingOptimization")
         }}
       </span>
     </header>
@@ -16,19 +20,17 @@
     <section class="markup-section">
       <div class="markup-section__header">
         <div>
-          <h3>Original</h3>
-          <p>Raw source currently loaded from the selected file.</p>
+          <h3>{{ i18n.t("markup.originalTitle") }}</h3>
+          <p>{{ i18n.t("markup.originalDescription") }}</p>
         </div>
 
         @if (originalText()) {
           <button
             type="button"
             class="markup-copy"
-            (click)="
-              copy('original markup for ' + handle.name, originalText()!)
-            "
+            (click)="copy('original', handle.name, originalText()!)"
           >
-            Copy
+            {{ i18n.t("markup.copy") }}
           </button>
         }
       </div>
@@ -39,12 +41,12 @@
     <section class="markup-section">
       <div class="markup-section__header">
         <div>
-          <h3>Optimized</h3>
+          <h3>{{ i18n.t("markup.optimizedTitle") }}</h3>
           <p>
             {{
               optimizedText()
-                ? "Export-ready markup generated from the active profile."
-                : "Run optimization to generate the export-ready result."
+                ? i18n.t("markup.optimizedDescription.ready")
+                : i18n.t("markup.optimizedDescription.awaiting")
             }}
           </p>
         </div>
@@ -53,29 +55,23 @@
           <button
             type="button"
             class="markup-copy"
-            (click)="
-              copy('optimized markup for ' + handle.name, optimizedText()!)
-            "
+            (click)="copy('optimized', handle.name, optimizedText()!)"
           >
-            Copy
+            {{ i18n.t("markup.copy") }}
           </button>
         }
       </div>
 
       <pre class="markup-code">{{
-        optimizedText() ||
-          "No optimized SVG yet. Run optimization from the toolbar or directly from a card."
+        optimizedText() || i18n.t("markup.optimizedEmpty")
       }}</pre>
     </section>
   </div>
 } @else {
   <div class="markup-empty">
     <div>
-      <h2>Markup review stays here</h2>
-      <p>
-        Select an SVG card to compare original and optimized output without
-        leaving the workspace.
-      </p>
+      <h2>{{ i18n.t("markup.empty.title") }}</h2>
+      <p>{{ i18n.t("markup.empty.description") }}</p>
     </div>
   </div>
 }

@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 
 import { combineLatest, map } from 'rxjs';
 
+import { I18nService } from '../service/i18n.service';
 import { type CompressionPresetId, SvgoService } from '../service/svgo.service';
 
 type PluginSetting = {
@@ -16,6 +17,14 @@ type PluginCard = PluginSetting & {
   description: string;
   caution: boolean;
 };
+
+type PluginCategoryId =
+  | 'metadata'
+  | 'style'
+  | 'geometry'
+  | 'structure'
+  | 'order'
+  | 'cleanup';
 
 type ProfileSummary = {
   title: string;
@@ -45,36 +54,6 @@ const CAUTION_PLUGIN_IDS = new Set<string>([
   'reusePaths',
 ]);
 
-const EXPLICIT_PLUGIN_DESCRIPTIONS: Partial<Record<string, string>> = {
-  cleanupIds:
-    'Renames or removes unused IDs. Review carefully if CSS, masks, or scripts target specific IDs.',
-  inlineStyles:
-    'Moves style rules onto elements so the SVG is easier to embed without external CSS.',
-  convertStyleToAttrs:
-    'Rewrites style declarations as SVG attributes when the visual result stays the same.',
-  removeXMLNS:
-    'Drops the xmlns attribute. Useful only when the target environment adds it back or does not require it.',
-  removeRasterImages:
-    'Deletes embedded bitmap images. Turn this on only when raster content should never ship.',
-  removeUnknownsAndDefaults:
-    'Strips unknown or default attributes. Helpful for cleanup, but some design exports rely on those values.',
-  removeViewBox:
-    'Removes viewBox. This can break responsive scaling, so leave it off unless width and height must be authoritative.',
-  removeTitle:
-    'Removes title text. Leave it off if the SVG relies on built-in accessible labeling.',
-  removeDesc:
-    'Removes desc text that can help documentation and accessibility tooling.',
-  removeDimensions:
-    'Drops width and height so viewBox controls scaling. Useful for responsive icon systems.',
-  removeStyleElement:
-    'Deletes <style> blocks. Only enable when styles are already inlined or are no longer needed.',
-  removeScriptElement: 'Deletes embedded scripts to harden exported SVG files.',
-  removeOffCanvasPaths:
-    'Removes artwork outside the canvas. Good for cleanup, risky if overflow content is intentional.',
-  reusePaths:
-    'Replaces duplicate shapes with references. Smaller output, but a little harder to edit manually.',
-};
-
 @Component({
   selector: 'app-compress-setting',
   templateUrl: './compress-setting.component.html',
@@ -87,6 +66,7 @@ const EXPLICIT_PLUGIN_DESCRIPTIONS: Partial<Record<string, string>> = {
 })
 export class CompressSettingComponent {
   private readonly svgoService = inject(SvgoService);
+  readonly i18n = inject(I18nService);
 
   presetOptions = this.svgoService.presetOptions;
   activePreset$ = this.svgoService.activePreset$;
@@ -98,15 +78,17 @@ export class CompressSettingComponent {
   activePluginCount$ = this.plugins$.pipe(
     map((plugins) => plugins.filter(({ active }) => active).length),
   );
-  pluginCards$ = this.plugins$.pipe(
-    map((plugins) => plugins.map((plugin) => this.toPluginCard(plugin))),
+  pluginCards$ = combineLatest([this.plugins$, this.i18n.language$]).pipe(
+    map(([plugins]) => plugins.map((plugin) => this.toPluginCard(plugin))),
   );
-  floatPrecisionHint$ = this.floatPrecision$.pipe(
-    map((value) => this.describePrecision(value)),
-  );
-  transformPrecisionHint$ = this.transformPrecision$.pipe(
-    map((value) => this.describePrecision(value)),
-  );
+  floatPrecisionHint$ = combineLatest([
+    this.floatPrecision$,
+    this.i18n.language$,
+  ]).pipe(map(([value]) => this.describePrecision(value)));
+  transformPrecisionHint$ = combineLatest([
+    this.transformPrecision$,
+    this.i18n.language$,
+  ]).pipe(map(([value]) => this.describePrecision(value)));
   profileSummary$ = combineLatest([
     this.activePreset$,
     this.multipass$,
@@ -115,6 +97,7 @@ export class CompressSettingComponent {
     this.transformPrecision$,
     this.activePluginCount$,
     this.plugins$,
+    this.i18n.language$,
   ]).pipe(
     map(
       ([
@@ -140,8 +123,12 @@ export class CompressSettingComponent {
             transformPrecision,
           ),
           activePreset,
-          multipassLabel: multipass ? 'On' : 'Off',
-          prettyLabel: pretty ? 'Readable' : 'Minified',
+          multipassLabel: multipass
+            ? this.i18n.t('common.on')
+            : this.i18n.t('common.off'),
+          prettyLabel: pretty
+            ? this.i18n.t('compress.overview.outputReadable')
+            : this.i18n.t('compress.overview.outputMinified'),
           floatPrecision,
           floatPrecisionHint: this.describePrecision(floatPrecision),
           transformPrecision,
@@ -173,6 +160,14 @@ export class CompressSettingComponent {
     this.svgoService.resetSettings();
   }
 
+  presetLabel(presetId: CompressionPresetId) {
+    return this.i18n.t(`compress.preset.${presetId}.label`);
+  }
+
+  presetShortDescription(presetId: CompressionPresetId) {
+    return this.i18n.t(`compress.preset.${presetId}.short`);
+  }
+
   updatePlugin(plugin: PluginSetting, active: boolean) {
     this.plugins$.next(
       this.plugins$
@@ -191,26 +186,26 @@ export class CompressSettingComponent {
     transformPrecision: number,
   ) {
     if (activePreset === 'safe') {
-      return 'Safe preset is active';
+      return this.i18n.t('compress.profile.title.safe');
     }
 
     if (activePreset === 'balanced') {
-      return 'Balanced preset is active';
+      return this.i18n.t('compress.profile.title.balanced');
     }
 
     if (activePreset === 'extreme') {
-      return 'Max compression preset is active';
+      return this.i18n.t('compress.profile.title.extreme');
     }
 
     if (floatPrecision <= 1 || transformPrecision <= 1) {
-      return 'Custom profile, leaning toward smaller files';
+      return this.i18n.t('compress.profile.title.customSmaller');
     }
 
     if (floatPrecision >= 5 || transformPrecision >= 6) {
-      return 'Custom profile, leaning toward safer geometry';
+      return this.i18n.t('compress.profile.title.customSafer');
     }
 
-    return 'Custom profile based on the defaults';
+    return this.i18n.t('compress.profile.title.customDefault');
   }
 
   private buildProfileDescription(
@@ -221,79 +216,76 @@ export class CompressSettingComponent {
     transformPrecision: number,
   ) {
     if (activePreset !== 'custom') {
-      return this.presetOptions.find(({ id }) => id === activePreset)
-        ?.description as string;
+      return this.i18n.t(`compress.preset.${activePreset}.description`);
     }
 
     const precisionBias =
       floatPrecision <= 1 || transformPrecision <= 1
-        ? 'Lower precision is tuned for smaller files, so review delicate curves and transforms after optimization.'
+        ? this.i18n.t('compress.profile.description.lowerPrecision')
         : floatPrecision >= 5 || transformPrecision >= 6
-          ? 'Higher precision keeps more numeric detail, which is safer for intricate geometry.'
-          : 'Current precision stays close to the recommended middle ground for product icon sets.';
+          ? this.i18n.t('compress.profile.description.higherPrecision')
+          : this.i18n.t('compress.profile.description.middlePrecision');
 
     const passMode = multipass
-      ? 'Multipass is enabled for deeper cleanup.'
-      : 'Single-pass cleanup stays faster and a little more predictable.';
+      ? this.i18n.t('compress.profile.description.multipassOn')
+      : this.i18n.t('compress.profile.description.multipassOff');
 
     const outputMode = pretty
-      ? 'Readable output is on, which helps reviews and diffs but can add bytes.'
-      : 'Output stays minified for smaller exports.';
+      ? this.i18n.t('compress.profile.description.outputReadable')
+      : this.i18n.t('compress.profile.description.outputMinified');
 
     return `${precisionBias} ${passMode} ${outputMode}`;
   }
 
   private describePrecision(value: number) {
     if (value <= 1) {
-      return 'Aggressive';
+      return this.i18n.t('compress.precision.aggressive');
     }
 
     if (value <= 3) {
-      return 'Balanced';
+      return this.i18n.t('compress.precision.balanced');
     }
 
     if (value <= 5) {
-      return 'Safe';
+      return this.i18n.t('compress.precision.safe');
     }
 
-    return 'Very safe';
+    return this.i18n.t('compress.precision.verySafe');
   }
 
   private toPluginCard(plugin: PluginSetting): PluginCard {
+    const categoryId = this.getPluginCategoryId(plugin.id);
+
     return {
       ...plugin,
-      category: this.getPluginCategory(plugin.id),
-      description: this.describePlugin(plugin),
+      name: this.getPluginName(plugin),
+      category: this.i18n.t(`compress.category.${categoryId}`),
+      description: this.describePlugin(plugin, categoryId),
       caution: CAUTION_PLUGIN_IDS.has(plugin.id),
     };
   }
 
-  private describePlugin(plugin: PluginSetting) {
-    const explicitDescription = EXPLICIT_PLUGIN_DESCRIPTIONS[plugin.id];
+  private getPluginName(plugin: PluginSetting) {
+    const translationKey = `compress.plugin.name.${plugin.id}`;
+    const translatedName = this.i18n.t(translationKey);
 
-    if (explicitDescription) {
+    return translatedName === translationKey ? plugin.name : translatedName;
+  }
+
+  private describePlugin(plugin: PluginSetting, categoryId: PluginCategoryId) {
+    const explicitTranslationKey = `compress.pluginDescription.${plugin.id}`;
+    const explicitDescription = this.i18n.t(explicitTranslationKey);
+
+    if (explicitDescription !== explicitTranslationKey) {
       return explicitDescription;
     }
 
-    switch (this.getPluginCategory(plugin.id)) {
-      case 'Metadata':
-        return 'Removes editor or document metadata that usually does not change how the SVG renders.';
-      case 'Style':
-        return 'Rewrites style or color information into a smaller and more portable form.';
-      case 'Geometry':
-        return 'Rewrites shapes, paths, or transforms into a smaller equivalent form.';
-      case 'Structure':
-        return 'Simplifies grouping and element structure so the markup is easier to optimize.';
-      case 'Order':
-        return 'Normalizes markup order for more consistent output between runs.';
-      default:
-        return 'Removes redundant markup that commonly comes from design-tool exports.';
-    }
+    return this.i18n.t(`compress.categoryDescription.${categoryId}`);
   }
 
-  private getPluginCategory(id: string) {
+  private getPluginCategoryId(id: string): PluginCategoryId {
     if (id.includes('Style') || id.includes('style') || id.includes('Colors')) {
-      return 'Style';
+      return 'style';
     }
 
     if (
@@ -304,7 +296,7 @@ export class CompressSettingComponent {
       id.includes('Numeric') ||
       id.includes('ListOfValues')
     ) {
-      return 'Geometry';
+      return 'geometry';
     }
 
     if (
@@ -316,7 +308,7 @@ export class CompressSettingComponent {
         id.includes('Doctype') ||
         id.includes('XML'))
     ) {
-      return 'Metadata';
+      return 'metadata';
     }
 
     if (
@@ -326,13 +318,13 @@ export class CompressSettingComponent {
       id.includes('Defs') ||
       id === 'collapseGroups'
     ) {
-      return 'Structure';
+      return 'structure';
     }
 
     if (id.startsWith('sort')) {
-      return 'Order';
+      return 'order';
     }
 
-    return 'Cleanup';
+    return 'cleanup';
   }
 }

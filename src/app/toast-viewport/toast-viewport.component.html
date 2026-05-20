@@ -2,7 +2,7 @@
   @if (items.length) {
     <section
       class="toast-viewport"
-      aria-label="Notifications"
+      [attr.aria-label]="i18n.t('toast.notifications')"
       aria-live="polite"
       aria-relevant="additions"
     >
@@ -21,7 +21,7 @@
           <button
             type="button"
             class="toast__dismiss"
-            aria-label="Dismiss notification"
+            [attr.aria-label]="i18n.t('toast.dismiss')"
             (click)="dismiss(toast.id)"
           >
             ×

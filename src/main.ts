@@ -1,12 +1,18 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import {
+  enableProdMode,
+  importProvidersFrom,
+  inject,
+  provideAppInitializer,
+} from '@angular/core';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppComponent } from './app/app.component';
+import { I18nService } from './app/service/i18n.service';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -15,6 +21,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideAppInitializer(() => inject(I18nService).initialize()),
     importProvidersFrom(
       BrowserModule,
       BrowserAnimationsModule,

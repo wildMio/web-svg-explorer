@@ -10,7 +10,9 @@
               (change)="setQuickPreviewSelection($any($event.target).checked)"
             />
             <span class="asset-card__select-indicator"></span>
-            <span class="asset-card__select-label">Quick preview</span>
+            <span class="asset-card__select-label">{{
+              i18n.t("svgCard.quickPreview")
+            }}</span>
           </label>
 
           <div
@@ -23,7 +25,11 @@
 
           @if (duplicateGroupSize() > 1) {
             <div class="asset-card__state asset-card__state--duplicate">
-              {{ duplicateGroupSize() }} matches
+              {{
+                i18n.t("svgCard.duplicateMatches", {
+                  count: duplicateGroupSize(),
+                })
+              }}
             </div>
           }
         </div>
@@ -32,13 +38,13 @@
           <button
             type="button"
             class="asset-card__icon-button"
-            aria-label="Swap to a contrasting preview tone"
+            [attr.aria-label]="i18n.t('svgCard.aria.swapPreviewTone')"
             [attr.aria-pressed]="previewContrast$ | async"
             (click)="invertColor(); $event.stopPropagation()"
           >
             <img
               src="assets/invert_colors.svg"
-              alt="swap preview tone"
+              [attr.alt]="i18n.t('svgCard.alt.swapPreviewTone')"
               loading="lazy"
             />
           </button>
@@ -47,33 +53,41 @@
             <button
               type="button"
               class="asset-card__icon-button"
-              aria-label="Copy optimized svg"
+              [attr.aria-label]="i18n.t('svgCard.aria.copyOptimized')"
               (click)="copy(); $event.stopPropagation()"
             >
-              <img src="assets/copy.svg" alt="copy svg" loading="lazy" />
+              <img
+                src="assets/copy.svg"
+                [attr.alt]="i18n.t('svgCard.alt.copyOptimized')"
+                loading="lazy"
+              />
             </button>
           }
 
           <button
             type="button"
             class="asset-card__icon-button"
-            aria-label="Optimize svg"
+            [attr.aria-label]="i18n.t('svgCard.aria.optimize')"
             [disabled]="pending$ | async"
             (click)="optimize(); $event.stopPropagation()"
           >
-            <img src="assets/optimize.svg" alt="optimize svg" loading="lazy" />
+            <img
+              src="assets/optimize.svg"
+              [attr.alt]="i18n.t('svgCard.alt.optimize')"
+              loading="lazy"
+            />
           </button>
 
           @if (optimizedSvg$ | async) {
             <button
               type="button"
               class="asset-card__icon-button"
-              aria-label="Download optimized svg"
+              [attr.aria-label]="i18n.t('svgCard.aria.downloadOptimized')"
               (click)="download(); $event.stopPropagation()"
             >
               <img
                 src="assets/download.svg"
-                alt="download svg"
+                [attr.alt]="i18n.t('svgCard.alt.downloadOptimized')"
                 loading="lazy"
               />
             </button>
@@ -115,7 +129,11 @@
 
     @if (isCompactMode) {
       <div class="asset-card__detail-row asset-card__detail-row--compact">
-        <span>{{ (optimizedSvg$ | async) ? "Optimized" : "Original" }}</span>
+        <span>{{
+          (optimizedSvg$ | async)
+            ? i18n.t("common.optimized")
+            : i18n.t("common.original")
+        }}</span>
         <strong>
           {{
             (optimizedSvg$ | async)
@@ -126,17 +144,17 @@
       </div>
     } @else {
       <div class="asset-card__detail-row">
-        <span>Original</span>
+        <span>{{ i18n.t("svgCard.detail.original") }}</span>
         <strong>{{ originalSizeLabel$ | async }}</strong>
       </div>
 
       <div class="asset-card__detail-row">
-        <span>Optimized</span>
+        <span>{{ i18n.t("svgCard.detail.optimized") }}</span>
         <strong>{{ optimizedSizeLabel$ | async }}</strong>
       </div>
 
       <div class="asset-card__detail-row asset-card__detail-row--muted">
-        <span>Delta</span>
+        <span>{{ i18n.t("svgCard.detail.delta") }}</span>
         <strong>{{ deltaLabel$ | async }}</strong>
       </div>
     }

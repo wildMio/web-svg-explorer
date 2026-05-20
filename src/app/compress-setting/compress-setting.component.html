@@ -2,17 +2,23 @@
   <section class="settings-overview">
     <div class="settings-overview__header">
       <div>
-        <span class="settings-section__eyebrow">Profile presets</span>
+        <span class="settings-section__eyebrow">{{
+          i18n.t("compress.overview.eyebrow")
+        }}</span>
         <h3>{{ profileSummary.title }}</h3>
         <p>{{ profileSummary.description }}</p>
       </div>
 
       <button type="button" class="settings-reset" (click)="restoreDefaults()">
-        Back to balanced default
+        {{ i18n.t("compress.overview.reset") }}
       </button>
     </div>
 
-    <div class="preset-switcher" role="group" aria-label="Compression presets">
+    <div
+      class="preset-switcher"
+      role="group"
+      [attr.aria-label]="i18n.t('compress.overview.ariaPresets')"
+    >
       @for (preset of presetOptions; track preset.id) {
         <button
           type="button"
@@ -22,9 +28,11 @@
           "
           (click)="applyPreset(preset.id)"
         >
-          <span class="preset-switcher__title">{{ preset.label }}</span>
+          <span class="preset-switcher__title">{{
+            presetLabel(preset.id)
+          }}</span>
           <span class="preset-switcher__copy">{{
-            preset.shortDescription
+            presetShortDescription(preset.id)
           }}</span>
         </button>
       }
@@ -32,66 +40,66 @@
 
     @if (profileSummary.activePreset === "custom") {
       <p class="settings-overview__custom-note">
-        You are using a custom combination based on one of the presets.
+        {{ i18n.t("compress.overview.customNote") }}
       </p>
     }
 
     <div class="settings-overview__chips">
       <span class="settings-pill"
-        >Multipass {{ profileSummary.multipassLabel }}</span
+        >{{ i18n.t("compress.overview.multipass") }}
+        {{ profileSummary.multipassLabel }}</span
       >
-      <span class="settings-pill">Output {{ profileSummary.prettyLabel }}</span>
+      <span class="settings-pill"
+        >{{ i18n.t("compress.overview.output") }}
+        {{ profileSummary.prettyLabel }}</span
+      >
       <span class="settings-pill">
-        Numbers {{ profileSummary.floatPrecision }} ·
+        {{ i18n.t("compress.overview.numbers") }}
+        {{ profileSummary.floatPrecision }} ·
         {{ profileSummary.floatPrecisionHint }}
       </span>
       <span class="settings-pill">
-        Transforms {{ profileSummary.transformPrecision }} ·
+        {{ i18n.t("compress.overview.transforms") }}
+        {{ profileSummary.transformPrecision }} ·
         {{ profileSummary.transformPrecisionHint }}
       </span>
       <span class="settings-pill settings-pill--accent">
-        {{ profileSummary.activePluginCount }} /
-        {{ profileSummary.pluginCount }} plugins active
+        {{
+          i18n.t("compress.overview.pluginsActive", {
+            activeCount: profileSummary.activePluginCount,
+            totalCount: profileSummary.pluginCount,
+          })
+        }}
       </span>
     </div>
 
     <ul class="settings-guidance">
-      <li>Multipass cleans harder, but adds a little processing time.</li>
-      <li>
-        Readable output helps review and diffs, while minified output stays
-        smaller.
-      </li>
-      <li>
-        Lower precision is smaller, higher precision is safer for detailed
-        curves and transforms.
-      </li>
+      <li>{{ i18n.t("compress.overview.guidance.1") }}</li>
+      <li>{{ i18n.t("compress.overview.guidance.2") }}</li>
+      <li>{{ i18n.t("compress.overview.guidance.3") }}</li>
     </ul>
   </section>
 }
 
 <section class="settings-section">
   <div class="settings-section__header">
-    <span class="settings-section__eyebrow">Core behavior</span>
-    <p>
-      Choose whether optimized output should favor smaller files, easier review,
-      or a balance of both.
-    </p>
+    <span class="settings-section__eyebrow">{{
+      i18n.t("compress.core.eyebrow")
+    }}</span>
+    <p>{{ i18n.t("compress.core.description") }}</p>
   </div>
 
   <div class="settings-toggle">
     <div class="settings-toggle__copy">
-      <strong>Multipass</strong>
-      <span
-        >Run extra cleanup passes when you want the profile to squeeze a little
-        harder.</span
-      >
+      <strong>{{ i18n.t("compress.core.multipass.title") }}</strong>
+      <span>{{ i18n.t("compress.core.multipass.description") }}</span>
     </div>
     <span class="ui-switch">
       <input
         #multipassToggle
         type="checkbox"
         class="ui-switch__input"
-        aria-label="Toggle multipass optimization"
+        [attr.aria-label]="i18n.t('compress.core.multipass.aria')"
         [checked]="multipass$ | async"
         (change)="updateMultipass(multipassToggle.checked)"
       />
@@ -104,18 +112,15 @@
 
   <div class="settings-toggle">
     <div class="settings-toggle__copy">
-      <strong>Prettify output</strong>
-      <span
-        >Keep the optimized markup readable for audits, pull requests, and
-        handoff review.</span
-      >
+      <strong>{{ i18n.t("compress.core.pretty.title") }}</strong>
+      <span>{{ i18n.t("compress.core.pretty.description") }}</span>
     </div>
     <span class="ui-switch">
       <input
         #prettyToggle
         type="checkbox"
         class="ui-switch__input"
-        aria-label="Toggle pretty output"
+        [attr.aria-label]="i18n.t('compress.core.pretty.aria')"
         [checked]="pretty$ | async"
         (change)="updatePretty(prettyToggle.checked)"
       />
@@ -129,20 +134,21 @@
 
 <section class="settings-section">
   <div class="settings-section__header">
-    <span class="settings-section__eyebrow">Precision</span>
-    <p>
-      Lower values reduce file size more aggressively. Raise them if icon edges
-      or transforms start looking off.
-    </p>
+    <span class="settings-section__eyebrow">{{
+      i18n.t("compress.precision.eyebrow")
+    }}</span>
+    <p>{{ i18n.t("compress.precision.description") }}</p>
   </div>
 
   <div class="settings-slider">
     <div class="settings-slider__label">
       <div class="settings-slider__copy">
-        <span>Number precision</span>
-        <small
-          >{{ floatPrecisionHint$ | async }} for most coordinate cleanup</small
-        >
+        <span>{{ i18n.t("common.numberPrecision") }}</span>
+        <small>{{
+          i18n.t("compress.precision.number.copy", {
+            hint: (floatPrecisionHint$ | async) ?? "",
+          })
+        }}</small>
       </div>
       <strong>{{ floatPrecision$ | async }}</strong>
     </div>
@@ -154,13 +160,13 @@
         max="8"
         step="1"
         class="ui-range__input"
-        aria-label="Number precision"
+        [attr.aria-label]="i18n.t('compress.precision.number.aria')"
         [value]="floatPrecision$ | async"
         (input)="updateFloatPrecision(floatPrecisionRange.valueAsNumber)"
       />
       <div class="ui-range__scale">
-        <span>Smaller</span>
-        <span>Safer</span>
+        <span>{{ i18n.t("compress.precision.scale.smaller") }}</span>
+        <span>{{ i18n.t("compress.precision.scale.safer") }}</span>
       </div>
     </div>
   </div>
@@ -168,11 +174,12 @@
   <div class="settings-slider">
     <div class="settings-slider__label">
       <div class="settings-slider__copy">
-        <span>Transform precision</span>
-        <small
-          >{{ transformPrecisionHint$ | async }} when transforms need extra
-          safety</small
-        >
+        <span>{{ i18n.t("common.transformPrecision") }}</span>
+        <small>{{
+          i18n.t("compress.precision.transform.copy", {
+            hint: (transformPrecisionHint$ | async) ?? "",
+          })
+        }}</small>
       </div>
       <strong>{{ transformPrecision$ | async }}</strong>
     </div>
@@ -184,15 +191,15 @@
         max="8"
         step="1"
         class="ui-range__input"
-        aria-label="Transform precision"
+        [attr.aria-label]="i18n.t('compress.precision.transform.aria')"
         [value]="transformPrecision$ | async"
         (input)="
           updateTransformPrecision(transformPrecisionRange.valueAsNumber)
         "
       />
       <div class="ui-range__scale">
-        <span>Smaller</span>
-        <span>Safer</span>
+        <span>{{ i18n.t("compress.precision.scale.smaller") }}</span>
+        <span>{{ i18n.t("compress.precision.scale.safer") }}</span>
       </div>
     </div>
   </div>
@@ -200,11 +207,10 @@
 
 <section class="settings-section">
   <div class="settings-section__header">
-    <span class="settings-section__eyebrow">Advanced transforms</span>
-    <p>
-      Leave the default mix alone for most SVG batches. Change individual
-      transforms only when a specific export pattern needs special handling.
-    </p>
+    <span class="settings-section__eyebrow">{{
+      i18n.t("compress.advanced.eyebrow")
+    }}</span>
+    <p>{{ i18n.t("compress.advanced.description") }}</p>
   </div>
 
   <div class="settings-plugin-grid">
@@ -217,7 +223,7 @@
               <span class="settings-pill">{{ plugin.category }}</span>
               @if (plugin.caution) {
                 <span class="settings-pill settings-pill--warning">
-                  Review output
+                  {{ i18n.t("compress.advanced.reviewOutput") }}
                 </span>
               }
             </div>

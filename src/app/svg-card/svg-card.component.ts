@@ -33,6 +33,7 @@ import {
 } from 'rxjs';
 
 import { VirtualElementDirective } from '../directive/virtual-element.directive';
+import { I18nService } from '../service/i18n.service';
 import { SvgStateService } from '../service/svg-state.service';
 import { SvgoService } from '../service/svgo.service';
 import { ToastService } from '../service/toast.service';
@@ -65,6 +66,7 @@ export class SvgCardComponent implements OnDestroy {
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
   private readonly toastService = inject(ToastService);
+  readonly i18n = inject(I18nService);
 
   private readonly destroy$ = new Subject<void>();
 
@@ -178,30 +180,46 @@ export class SvgCardComponent implements OnDestroy {
   );
   optimizedSizeLabel$ = this.optimizedSvg$.pipe(
     map((svg) =>
-      svg?.data ? formatBytes(new Blob([svg.data]).size) : 'Not optimized yet',
+      svg?.data
+        ? formatBytes(new Blob([svg.data]).size)
+        : this.i18n.t('svgCard.notOptimizedYet'),
     ),
   );
-  deltaLabel$ = combineLatest([this.originalSize$, this.optimizedSvg$]).pipe(
+  deltaLabel$ = combineLatest([
+    this.originalSize$,
+    this.optimizedSvg$,
+    this.i18n.language$,
+  ]).pipe(
     map(([originalSize, optimizedSvg]) => {
       if (!optimizedSvg?.data) {
-        return 'Run optimize to compare';
+        return this.i18n.t('svgCard.runOptimizeToCompare');
       }
 
       const optimizedSize = new Blob([optimizedSvg.data]).size;
       const delta = originalSize - optimizedSize;
 
       return delta >= 0
-        ? `${formatBytes(delta)} saved`
-        : `${formatBytes(Math.abs(delta))} larger`;
+        ? this.i18n.t('svgCard.delta.saved', {
+            size: formatBytes(delta),
+          })
+        : this.i18n.t('svgCard.delta.larger', {
+            size: formatBytes(Math.abs(delta)),
+          });
     }),
   );
-  cardStateLabel$ = combineLatest([this.pending$, this.optimizedSvg$]).pipe(
+  cardStateLabel$ = combineLatest([
+    this.pending$,
+    this.optimizedSvg$,
+    this.i18n.language$,
+  ]).pipe(
     map(([pending, optimizedSvg]) => {
       if (pending) {
-        return 'Optimizing';
+        return this.i18n.t('svgCard.state.optimizing');
       }
 
-      return optimizedSvg ? 'Optimized' : 'Original';
+      return optimizedSvg
+        ? this.i18n.t('svgCard.state.optimized')
+        : this.i18n.t('svgCard.state.original');
     }),
   );
 
@@ -285,7 +303,9 @@ export class SvgCardComponent implements OnDestroy {
         next: ({ svg, name }) => {
           if (svg?.data) {
             this.clipboard.copy(svg.data);
-            this.toastService.success(`Copied optimized SVG for ${name}.`);
+            this.toastService.success(
+              this.i18n.t('svgCard.toast.copiedOptimized', { name }),
+            );
           }
         },
       });

@@ -8,6 +8,7 @@ import {
 
 import { FileWithDirectoryHandle } from 'browser-fs-access';
 
+import { I18nService } from '../service/i18n.service';
 import { ToastService } from '../service/toast.service';
 
 @Component({
@@ -22,6 +23,7 @@ import { ToastService } from '../service/toast.service';
 export class SvgMarkupComponent {
   private readonly clipboard = inject(Clipboard);
   private readonly toastService = inject(ToastService);
+  readonly i18n = inject(I18nService);
 
   readonly handle = input<FileWithDirectoryHandle | null | undefined>(
     undefined,
@@ -29,8 +31,15 @@ export class SvgMarkupComponent {
   readonly originalText = input<string | null | undefined>(undefined);
   readonly optimizedText = input<string | null | undefined>(undefined);
 
-  copy(label: string, text: string) {
+  copy(kind: 'original' | 'optimized', name: string, text: string) {
     this.clipboard.copy(text);
-    this.toastService.success(`Copied ${label}.`);
+    this.toastService.success(
+      this.i18n.t(
+        kind === 'original'
+          ? 'markup.toast.original'
+          : 'markup.toast.optimized',
+        { name },
+      ),
+    );
   }
 }

@@ -238,7 +238,7 @@ SVGOLOT is flat at rest. Depth comes from tonal layering first, then from shadow
 - **Style:** The header and toolbar behave like one operational strip, not a marketing hero.
 - **Typography:** Workspace facts and tool labels use the same native sans vocabulary as the rest of the app.
 - **Task Zoning:** Batch actions and review tools share the strip, but they should read as separate groups so exporting, scanning duplicates, and opening review controls do not feel like one undifferentiated button run.
-- **App Utility:** The light/dark theme switch stays in the header utility cluster so the operator can change ambient contrast without opening a settings panel.
+- **App Utility:** The light/dark theme switch and the English / Traditional Chinese language switch both stay in the header utility cluster so the operator can change ambient contrast or interface language without opening a secondary panel.
 - **Compact Mode:** A minimal compact toggle can live beside the theme switch. When enabled, secondary batch context moves into the display popup so the asset grid can take priority.
 - **Duplicate Review:** The toolbar should begin with an explicit scan action, then expose filtering only after results exist. The full flow must stay explicit that matches are heuristic and visually derived rather than a destructive exact match.
 - **Responsive Behavior:** On narrow screens, the header should shed secondary copy and facts first, then let toolbar groups wrap into compact multi-column rows before core controls become oversized vertical stacks.

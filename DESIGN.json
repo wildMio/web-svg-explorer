@@ -221,6 +221,13 @@
       "css": ".ds-theme-switch { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 999px; background: #221d17; color: rgba(201, 183, 146, 0.64); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-theme-switch__label { padding: 0 8px 0 10px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-theme-switch__button { border: 1px solid transparent; border-radius: 999px; background: transparent; padding: 9px 13px; color: rgba(240, 230, 211, 0.78); font-size: 0.86rem; font-weight: 600; } .ds-theme-switch__button--active { border-color: rgba(198, 160, 90, 0.34); background: rgba(198, 160, 90, 0.14); color: #c6a05a; }"
     },
     {
+      "name": "Language Switch",
+      "kind": "custom",
+      "description": "Shell-level segmented control for switching the interface between English and Traditional Chinese at runtime.",
+      "html": "<div class=\"ds-theme-switch\"><span class=\"ds-theme-switch__label\">Language</span><button class=\"ds-theme-switch__button ds-theme-switch__button--active\">English</button><button class=\"ds-theme-switch__button\">繁中</button></div>",
+      "css": ".ds-theme-switch { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 4px; border: 1px solid rgba(199, 174, 130, 0.16); border-radius: 999px; background: #221d17; color: rgba(201, 183, 146, 0.64); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; } .ds-theme-switch__label { padding: 0 8px 0 10px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; } .ds-theme-switch__button { border: 1px solid transparent; border-radius: 999px; background: transparent; padding: 9px 13px; color: rgba(240, 230, 211, 0.78); font-size: 0.86rem; font-weight: 600; } .ds-theme-switch__button--active { border-color: rgba(198, 160, 90, 0.34); background: rgba(198, 160, 90, 0.14); color: #c6a05a; }"
+    },
+    {
       "name": "Compact Toggle",
       "kind": "custom",
       "description": "Minimal shell-level toggle that collapses secondary batch context into the display popup and gives the grid more room.",
