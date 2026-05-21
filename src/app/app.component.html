@@ -900,33 +900,22 @@
                       duplicateGroupSizeByName$ | async;
                       as duplicateGroupSizeByName
                     ) {
-                      <main class="main" [class.main--compact]="compactView">
-                        @for (handle of visibleHandles; track handle) {
-                          <app-svg-card
-                            [currentColor]="debounceCurrentColor$ | async"
-                            [fileWithDirectoryHandle]="handle"
-                            [colorInvert]="colorInvert"
-                            [compactMode]="compactView"
-                            [duplicateGroupSize]="
-                              duplicateGroupSizeByName.get(handle.name) ?? 0
-                            "
-                            [quickPreviewSelected]="
-                              quickPreviewHandleNames.has(handle.name)
-                            "
-                            class="svg-card-host"
-                            [class.active-card]="
-                              activeHandle$ | async | match: handle
-                            "
-                            [class.svg-card-host--preview-selected]="
-                              quickPreviewHandleNames.has(handle.name)
-                            "
-                            (click)="updateActiveHandle(handle)"
-                            (quickPreviewSelectedChange)="
-                              updateQuickPreviewSelection(handle, $event)
-                            "
-                          ></app-svg-card>
-                        }
-                      </main>
+                      <app-svg-virtual-grid
+                        [handles]="visibleHandles"
+                        [currentColor]="debounceCurrentColor$ | async"
+                        [colorInvert]="colorInvert"
+                        [compactMode]="compactView"
+                        [duplicateGroupSizeByName]="duplicateGroupSizeByName"
+                        [quickPreviewHandleNames]="quickPreviewHandleNames"
+                        [activeHandle]="activeHandle$ | async"
+                        (handleSelected)="updateActiveHandle($event)"
+                        (quickPreviewSelectionChanged)="
+                          updateQuickPreviewSelection(
+                            $event.handle,
+                            $event.selected
+                          )
+                        "
+                      ></app-svg-virtual-grid>
                     }
                   } @else {
                     <section class="workspace-empty-results">

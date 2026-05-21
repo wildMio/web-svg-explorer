@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  min-height: 0;
+}
+
+.virtual-grid {
+  position: relative;
+  min-height: 0;
+  overflow-anchor: none;
+}
+
+.virtual-grid__spacer {
+  width: 100%;
+  pointer-events: none;
+}
+
+.virtual-grid__content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  will-change: transform;
+}
+
+.virtual-grid__row {
+  display: grid;
+  gap: 1rem;
+}

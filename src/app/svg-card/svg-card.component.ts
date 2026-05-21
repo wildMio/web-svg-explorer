@@ -1,13 +1,10 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AsyncPipe } from '@angular/common';
 import {
-  effect,
-  Component,
   ChangeDetectionStrategy,
-  ElementRef,
+  Component,
   OnDestroy,
-  ChangeDetectorRef,
-  NgZone,
+  effect,
   inject,
   input,
   output,
@@ -42,8 +39,13 @@ import {
   round,
   sliceSvgSuffix,
 } from '../util/general';
-import { inView } from '../util/intersection-observer';
 import { createPreviewSvgDataUri } from '../util/svg-preview';
+
+const svgTextCache = new WeakMap<FileWithDirectoryHandle, Promise<string>>();
+const svgPreviewUriCache = new WeakMap<
+  FileWithDirectoryHandle,
+  Map<string, string>
+>();
 
 @Component({
   selector: 'app-svg-card',
@@ -57,9 +59,6 @@ import { createPreviewSvgDataUri } from '../util/svg-preview';
   imports: [AsyncPipe],
 })
 export class SvgCardComponent implements OnDestroy {
-  private readonly zone = inject(NgZone);
-  private readonly cdr = inject(ChangeDetectorRef);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly domSanitizer = inject(DomSanitizer);
   private readonly clipboard = inject(Clipboard);
   private readonly svgoService = inject(SvgoService);
@@ -106,38 +105,24 @@ export class SvgCardComponent implements OnDestroy {
 
   svgText$ = this.handle$.pipe(
     tap(() => this.loading$.next(true)),
-    switchMap((handle) =>
-      inView(this.host.nativeElement).pipe(
-        filter((view) => view),
-        take(1),
-        tap(() => handle.size),
-        concatMap(() => from(handle.text())),
-      ),
-    ),
+    switchMap((handle) => from(this.readSvgText(handle))),
     takeUntil(this.destroy$),
     shareReplay(1),
   );
 
-  svgUri$ = this.svgText$.pipe(
-    concatMap((data) =>
-      combineLatest([this.previewColor$, this.previewContrast$]).pipe(
-        map(([color, contrastPreview]) =>
-          this.domSanitizer.bypassSecurityTrustResourceUrl(
-            createPreviewSvgDataUri(data, {
-              color,
-              contrastPreview,
-            }),
-          ),
-        ),
+  svgUri$ = combineLatest([
+    this.handle$,
+    this.svgText$,
+    this.previewColor$,
+    this.previewContrast$,
+  ]).pipe(
+    map(([handle, data, color, contrastPreview]) =>
+      this.domSanitizer.bypassSecurityTrustResourceUrl(
+        this.getOrCreatePreviewUri(handle, data, color, contrastPreview),
       ),
     ),
     tap(() => {
       this.loading$.next(false);
-      this.zone.runOutsideAngular(() => {
-        requestAnimationFrame(() => {
-          this.cdr.detectChanges();
-        });
-      });
     }),
     takeUntil(this.destroy$),
     shareReplay(1),
@@ -308,5 +293,48 @@ export class SvgCardComponent implements OnDestroy {
           }
         },
       });
+  }
+
+  private readSvgText(handle: FileWithDirectoryHandle) {
+    const cachedRequest = svgTextCache.get(handle);
+
+    if (cachedRequest) {
+      return cachedRequest;
+    }
+
+    const request = handle.text();
+
+    svgTextCache.set(handle, request);
+
+    return request;
+  }
+
+  private getOrCreatePreviewUri(
+    handle: FileWithDirectoryHandle,
+    svgText: string,
+    color: string | null,
+    contrastPreview: boolean,
+  ) {
+    const previewKey = `${color ?? ''}::${contrastPreview ? 1 : 0}`;
+    const cachedByPreviewKey = svgPreviewUriCache.get(handle);
+    const cachedPreviewUri = cachedByPreviewKey?.get(previewKey);
+
+    if (cachedPreviewUri) {
+      return cachedPreviewUri;
+    }
+
+    const previewUri = createPreviewSvgDataUri(svgText, {
+      color,
+      contrastPreview,
+    });
+    const nextCachedByPreviewKey = cachedByPreviewKey ?? new Map();
+
+    nextCachedByPreviewKey.set(previewKey, previewUri);
+
+    if (!cachedByPreviewKey) {
+      svgPreviewUriCache.set(handle, nextCachedByPreviewKey);
+    }
+
+    return previewUri;
   }
 }

@@ -48,9 +48,9 @@ import {
 import { I18nService } from './service/i18n.service';
 import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
-import { SvgCardComponent } from './svg-card/svg-card.component';
 import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
 import { SvgProbeComponent } from './svg-probe/svg-probe.component';
+import { SvgVirtualGridComponent } from './svg-virtual-grid/svg-virtual-grid.component';
 import { ToastViewportComponent } from './toast-viewport/toast-viewport.component';
 import { downloadBlob, sliceSvgSuffix } from './util/general';
 import {
@@ -104,9 +104,9 @@ const THEME_COLOR_BY_MODE: Record<ThemeMode, string> = {
     CdkTrapFocus,
     CompressSettingComponent,
     ToastViewportComponent,
-    SvgCardComponent,
     SvgMarkupComponent,
     SvgProbeComponent,
+    SvgVirtualGridComponent,
     AsyncPipe,
     MatchPipe,
   ],

@@ -174,14 +174,6 @@ app-root.app-root-host {
   min-height: 100%;
 }
 
-.main {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
-  align-content: start;
-  justify-content: start;
-  gap: 1rem;
-}
-
 .compress-setting-panel {
   max-height: min(78vh, 720px);
 }
@@ -963,11 +955,6 @@ app-root.app-root-host {
   color: var(--accent);
 }
 
-.main--compact {
-  grid-template-columns: repeat(auto-fill, minmax(12.75rem, 1fr));
-  gap: 0.75rem;
-}
-
 .workspace__markup {
   min-height: 0;
   max-height: 100vh;
@@ -981,8 +968,6 @@ app-root.app-root-host {
   width: 100%;
   padding: 0.1rem;
   border-radius: 1rem;
-  content-visibility: auto;
-  contain-intrinsic-size: 19rem;
 }
 
 .svg-card--compact {
@@ -2435,10 +2420,6 @@ app-toast-viewport {
 
   .empty-state__step {
     grid-template-columns: 1fr;
-  }
-
-  .main--compact {
-    grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
   }
 
   .app-shell--has-preview-dock .workspace {

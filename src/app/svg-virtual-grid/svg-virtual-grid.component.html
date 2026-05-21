@@ -1,0 +1,34 @@
+<div #virtualGridRoot class="virtual-grid">
+  <div class="virtual-grid__spacer" [style.height.px]="totalHeightPx()"></div>
+
+  <div
+    class="virtual-grid__content"
+    [style.transform]="'translateY(' + offsetTopPx() + 'px)'"
+  >
+    @for (row of visibleRows(); track row.index) {
+      <div
+        #rowElement
+        class="virtual-grid__row"
+        [style.grid-template-columns]="rowTemplateColumns()"
+      >
+        @for (item of row.items; track item.handle.name) {
+          <app-svg-card
+            [currentColor]="currentColor()"
+            [fileWithDirectoryHandle]="item.handle"
+            [colorInvert]="colorInvert()"
+            [compactMode]="compactMode()"
+            [duplicateGroupSize]="item.duplicateGroupSize"
+            [quickPreviewSelected]="item.quickPreviewSelected"
+            class="svg-card-host"
+            [class.active-card]="item.active"
+            [class.svg-card-host--preview-selected]="item.quickPreviewSelected"
+            (click)="selectHandle(item.handle)"
+            (quickPreviewSelectedChange)="
+              updateQuickPreviewSelection(item.handle, $event)
+            "
+          ></app-svg-card>
+        }
+      </div>
+    }
+  </div>
+</div>
