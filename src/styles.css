@@ -1339,6 +1339,10 @@ app-root
   gap: 1rem;
 }
 
+.empty-state__reconnect-hint {
+  max-width: 50ch;
+}
+
 .empty-state__flow {
   display: grid;
   gap: 0.85rem;
@@ -2423,6 +2427,10 @@ app-toast-viewport {
 
   .empty-state {
     padding: 1.25rem;
+  }
+
+  .empty-state__reconnect-hint {
+    max-width: none;
   }
 
   .empty-state__step {

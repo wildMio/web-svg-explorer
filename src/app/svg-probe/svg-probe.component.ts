@@ -75,7 +75,7 @@ export class SvgProbeComponent {
   readonly handles = input<readonly FileWithDirectoryHandle[]>([]);
   readonly optimizedSvgMap = input<OptimizedSvgMap | null>(null);
   readonly activeHandle = input<FileWithDirectoryHandle | null>(null);
-  readonly currentColor = input<string | null>('white');
+  readonly currentColor = input<string | null>('');
   readonly contrastPreview = input(false);
   readonly previewToneLabel = input<string | null>(null);
 

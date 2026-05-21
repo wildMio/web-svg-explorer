@@ -16,7 +16,7 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 
-import { directoryOpen, FileWithDirectoryHandle } from 'browser-fs-access';
+import { FileWithDirectoryHandle } from 'browser-fs-access';
 import { strToU8, zipSync } from 'fflate';
 import {
   BehaviorSubject,
@@ -41,6 +41,10 @@ import {
 import { CompressSettingComponent } from './compress-setting/compress-setting.component';
 import { MatchPipe } from './pipe/match.pipe';
 import { AppPwaService } from './service/app-pwa.service';
+import {
+  DirectorySessionService,
+  type RestoredDirectoryResult,
+} from './service/directory-session.service';
 import { I18nService } from './service/i18n.service';
 import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
@@ -113,6 +117,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly swUpdate = inject(SwUpdate);
   readonly i18n = inject(I18nService);
   private readonly appPwaService = inject(AppPwaService);
+  private readonly directorySessionService = inject(DirectorySessionService);
   private readonly svgoService = inject(SvgoService);
   private readonly svgStateService = inject(SvgStateService);
 
@@ -145,7 +150,7 @@ export class AppComponent implements OnInit, OnDestroy {
   );
 
   displaySettingOpen = false;
-  currentColor$ = new BehaviorSubject('white');
+  currentColor$ = new BehaviorSubject('');
   debounceCurrentColor$ = this.currentColor$.pipe(debounceTime(200));
   colorInvert = false;
   colorInvert$ = new BehaviorSubject(false);
@@ -217,16 +222,19 @@ export class AppComponent implements OnInit, OnDestroy {
   compressSettingOpen = false;
 
   directoryOpening$ = new BehaviorSubject(false);
+  directoryRestoring$ = new BehaviorSubject(false);
   svgOptimizing$ = new BehaviorSubject(false);
   downloadZipping$ = new BehaviorSubject(false);
   directoryReviewed$ = new BehaviorSubject(false);
   loading$ = combineLatest([
     this.directoryOpening$,
+    this.directoryRestoring$,
     this.svgOptimizing$,
     this.downloadZipping$,
   ]).pipe(map((loadings) => loadings.some((loading) => loading)));
   statusLabel$ = combineLatest([
     this.directoryOpening$,
+    this.directoryRestoring$,
     this.svgOptimizing$,
     this.downloadZipping$,
     this.hasHandles$,
@@ -236,11 +244,16 @@ export class AppComponent implements OnInit, OnDestroy {
     map(
       ([
         directoryOpening,
+        directoryRestoring,
         svgOptimizing,
         downloadZipping,
         hasHandles,
         directoryReviewed,
       ]) => {
+        if (directoryRestoring) {
+          return this.i18n.t('app.status.restoringDirectory');
+        }
+
         if (directoryOpening) {
           return this.i18n.t('app.status.scanningDirectory');
         }
@@ -316,6 +329,8 @@ export class AppComponent implements OnInit, OnDestroy {
   quickPreviewCount$ = this.quickPreviewHandles$.pipe(
     map((handles) => handles.length),
   );
+  lastDirectoryName$ = new BehaviorSubject<string | null>(null);
+  restoreLastDirectoryAvailable$ = new BehaviorSubject(false);
   quickPreviewHandleNames$ = this.quickPreviewHandles$.pipe(
     map((handles) => new Set(handles.map((handle) => handle.name))),
     shareReplay(1),
@@ -732,6 +747,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.appPwaService.interceptDefaultInstall();
+    void this.initializeStoredDirectory();
   }
 
   ngOnDestroy(): void {
@@ -857,27 +873,52 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  openDirectory() {
-    if (this.directoryOpening$.getValue()) {
+  async openDirectory() {
+    if (
+      this.directoryOpening$.getValue() ||
+      this.directoryRestoring$.getValue()
+    ) {
       return;
     }
-    this.directoryOpening$.next(true);
-    from(directoryOpen())
-      .pipe(finalize(() => this.directoryOpening$.next(false)))
-      .subscribe({
-        next: (files) => {
-          const svgFiles = files.filter(
-            (file) => file.type === 'image/svg+xml',
-          );
 
-          this.directoryReviewed$.next(true);
-          this.resetDuplicateReview();
-          this.fileWithDirectoryHandles$.next(svgFiles);
-          this.quickPreviewHandles$.next([]);
-          this.activeHandleSubject.next(svgFiles[0] ?? null);
-          this.svgStateService.resetOptimizedSvgMap();
-        },
-      });
+    this.directoryOpening$.next(true);
+
+    try {
+      const pickedDirectory =
+        await this.directorySessionService.pickDirectory();
+
+      if (!pickedDirectory) {
+        return;
+      }
+
+      this.lastDirectoryName$.next(pickedDirectory.directoryName);
+      this.restoreLastDirectoryAvailable$.next(false);
+      this.applyDirectoryFiles(pickedDirectory.files);
+    } finally {
+      this.directoryOpening$.next(false);
+    }
+  }
+
+  async reconnectLastDirectory() {
+    if (
+      this.directoryOpening$.getValue() ||
+      this.directoryRestoring$.getValue()
+    ) {
+      return;
+    }
+
+    this.directoryRestoring$.next(true);
+
+    try {
+      const restoredDirectory =
+        await this.directorySessionService.restoreStoredDirectory({
+          promptForPermission: true,
+        });
+
+      this.handleRestoredDirectory(restoredDirectory);
+    } finally {
+      this.directoryRestoring$.next(false);
+    }
   }
 
   svgoAll() {
@@ -1096,6 +1137,58 @@ export class AppComponent implements OnInit, OnDestroy {
     const fullName = handle.name.toLocaleLowerCase();
 
     return baseName.includes(query) || fullName.includes(query);
+  }
+
+  private async initializeStoredDirectory() {
+    const storedDirectory =
+      await this.directorySessionService.getStoredDirectorySnapshot();
+
+    this.lastDirectoryName$.next(storedDirectory.directoryName);
+    this.restoreLastDirectoryAvailable$.next(
+      storedDirectory.access === 'prompt' ||
+        storedDirectory.access === 'denied',
+    );
+
+    if (storedDirectory.access !== 'granted') {
+      return;
+    }
+
+    this.directoryRestoring$.next(true);
+
+    try {
+      const restoredDirectory =
+        await this.directorySessionService.restoreStoredDirectory();
+
+      this.handleRestoredDirectory(restoredDirectory);
+    } finally {
+      this.directoryRestoring$.next(false);
+    }
+  }
+
+  private handleRestoredDirectory(restoredDirectory: RestoredDirectoryResult) {
+    this.lastDirectoryName$.next(restoredDirectory.directoryName);
+
+    if (!restoredDirectory.restored) {
+      this.restoreLastDirectoryAvailable$.next(
+        restoredDirectory.access === 'prompt' ||
+          restoredDirectory.access === 'denied',
+      );
+      return;
+    }
+
+    this.restoreLastDirectoryAvailable$.next(false);
+    this.applyDirectoryFiles(restoredDirectory.files);
+  }
+
+  private applyDirectoryFiles(files: readonly FileWithDirectoryHandle[]) {
+    const svgFiles = files.filter((file) => file.type === 'image/svg+xml');
+
+    this.directoryReviewed$.next(true);
+    this.resetDuplicateReview();
+    this.fileWithDirectoryHandles$.next([...svgFiles]);
+    this.quickPreviewHandles$.next([]);
+    this.activeHandleSubject.next(svgFiles[0] ?? null);
+    this.svgStateService.resetOptimizedSvgMap();
   }
 
   private setDuplicateFilter(enabled: boolean) {

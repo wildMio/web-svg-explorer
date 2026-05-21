@@ -124,7 +124,7 @@
             </div>
           </div>
 
-          <a
+          <!-- <a
             class="app-button"
             href="https://github.com/wildMio/web-svg-explorer"
             target="_blank"
@@ -140,7 +140,7 @@
             >
               {{ i18n.t("app.header.installApp") }}
             </button>
-          }
+          } -->
           @if (swUpdateAvailable$ | async) {
             <button type="button" class="app-button" (click)="reloadPage()">
               {{ i18n.t("app.header.applyUpdate") }}
@@ -485,7 +485,7 @@
             [handles]="(fileWithDirectoryHandles$ | async) ?? []"
             [optimizedSvgMap]="(optimizedSvgMap$ | async) ?? null"
             [activeHandle]="activeHandle$ | async"
-            [currentColor]="(currentColor$ | async) ?? 'white'"
+            [currentColor]="currentColor$ | async"
             [contrastPreview]="(colorInvert$ | async) ?? false"
             [previewToneLabel]="previewToneLabel$ | async"
             (matchSelected)="updateActiveHandle($event)"
@@ -981,7 +981,36 @@
               >
                 {{ i18n.t("app.empty.openDirectory") }}
               </button>
+
+              @if (restoreLastDirectoryAvailable$ | async) {
+                @if (lastDirectoryName$ | async; as lastDirectoryName) {
+                  <button
+                    type="button"
+                    class="app-button toolbar-button"
+                    (click)="reconnectLastDirectory()"
+                    [disabled]="loading$ | async"
+                  >
+                    {{
+                      i18n.t("app.empty.reconnectLastDirectory", {
+                        name: lastDirectoryName,
+                      })
+                    }}
+                  </button>
+                }
+              }
             </div>
+
+            @if (restoreLastDirectoryAvailable$ | async) {
+              @if (lastDirectoryName$ | async; as lastDirectoryName) {
+                <p class="empty-state__reconnect-hint">
+                  {{
+                    i18n.t("app.empty.reconnectLastDirectoryHint", {
+                      name: lastDirectoryName,
+                    })
+                  }}
+                </p>
+              }
+            }
           </div>
 
           <ol class="empty-state__flow">

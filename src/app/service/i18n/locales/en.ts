@@ -30,6 +30,7 @@ export const enDictionary = {
   'common.transformPrecision': 'Transform precision',
 
   'app.status.scanningDirectory': 'Scanning directory',
+  'app.status.restoringDirectory': 'Restoring last directory',
   'app.status.optimizingAssets': 'Optimizing SVG assets',
   'app.status.preparingZip': 'Preparing ZIP export',
   'app.status.batchReady': 'Batch ready',
@@ -235,6 +236,10 @@ export const enDictionary = {
   'app.empty.description':
     'SVGOLOT loads each SVG into a focused review workflow so you can inspect output, tune the shared profile, and export only when the batch is ready to ship.',
   'app.empty.openDirectory': 'Open SVG directory',
+  'app.empty.reconnectLastDirectory': (params) =>
+    `Reconnect ${getStringParam(params, 'name')}`,
+  'app.empty.reconnectLastDirectoryHint': (params) =>
+    `The browser still remembers ${getStringParam(params, 'name')}. Reconnect it without browsing for the folder again.`,
   'app.empty.step1.title': 'Load a directory',
   'app.empty.step1.description':
     'Import a folder of SVG assets so the workspace can build a review batch and select the first file automatically.',

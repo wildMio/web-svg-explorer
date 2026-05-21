@@ -27,6 +27,7 @@ export const zhHantDictionary = {
   'common.transformPrecision': 'Transform 精度',
 
   'app.status.scanningDirectory': '正在掃描目錄',
+  'app.status.restoringDirectory': '正在還原上次的目錄',
   'app.status.optimizingAssets': '正在優化 SVG 素材',
   'app.status.preparingZip': '正在準備 ZIP 匯出',
   'app.status.batchReady': '批次已就緒',
@@ -205,6 +206,10 @@ export const zhHantDictionary = {
   'app.empty.description':
     'SVGOLOT 會把每個 SVG 載入成一個專注的檢視流程，讓你先檢查輸出、調整共用設定檔，再決定是否在批次準備好時匯出。',
   'app.empty.openDirectory': '開啟 SVG 目錄',
+  'app.empty.reconnectLastDirectory': (params) =>
+    `重新連接 ${getStringParam(params, 'name')}`,
+  'app.empty.reconnectLastDirectoryHint': (params) =>
+    `瀏覽器仍記得 ${getStringParam(params, 'name')}。如果權限還在，可以不用重新找資料夾，直接重新連接。`,
   'app.empty.step1.title': '載入目錄',
   'app.empty.step1.description':
     '匯入一個包含 SVG 素材的資料夾，讓工作區建立檢視批次，並自動選取第一個檔案。',
