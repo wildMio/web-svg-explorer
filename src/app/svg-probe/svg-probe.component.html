@@ -34,51 +34,57 @@
     </label>
 
     <div class="svg-probe__actions">
-      <button
-        type="button"
-        class="app-button toolbar-button"
-        [disabled]="!state().valid || optimizePending()"
-        (click)="optimizeSvg()"
-      >
-        {{
-          optimizePending()
-            ? i18n.t("app.svgProbe.optimizingButton")
-            : i18n.t("app.svgProbe.optimizeButton")
-        }}
-      </button>
-
-      <button
-        type="button"
-        class="app-button toolbar-button"
-        [disabled]="!state().valid || !hasHandles() || searchPending()"
-        (click)="requestSearch()"
-      >
-        {{
-          searchPending()
-            ? i18n.t("app.svgProbe.searchingButton")
-            : i18n.t("app.svgProbe.searchButton")
-        }}
-      </button>
-
-      @if (optimizedSvgText()) {
+      <div class="svg-probe__actions-main">
         <button
           type="button"
           class="app-button toolbar-button"
-          (click)="copyOptimizedSvg()"
+          [class.toolbar-button--primary]="hasHandles()"
+          [disabled]="!state().valid || !hasHandles() || searchPending()"
+          (click)="requestSearch()"
         >
-          {{ i18n.t("app.svgProbe.copyOptimizedButton") }}
+          {{
+            searchPending()
+              ? i18n.t("app.svgProbe.searchingButton")
+              : i18n.t("app.svgProbe.searchButton")
+          }}
         </button>
-      }
 
-      @if (state().hasValue) {
         <button
           type="button"
           class="app-button toolbar-button"
-          (click)="clearSvgText()"
+          [class.toolbar-button--primary]="!hasHandles()"
+          [disabled]="!state().valid || optimizePending()"
+          (click)="optimizeSvg()"
         >
-          {{ i18n.t("common.clear") }}
+          {{
+            optimizePending()
+              ? i18n.t("app.svgProbe.optimizingButton")
+              : i18n.t("app.svgProbe.optimizeButton")
+          }}
         </button>
-      }
+      </div>
+
+      <div class="svg-probe__actions-meta">
+        @if (optimizedSvgText()) {
+          <button
+            type="button"
+            class="app-button toolbar-button"
+            (click)="copyOptimizedSvg()"
+          >
+            {{ i18n.t("app.svgProbe.copyOptimizedButton") }}
+          </button>
+        }
+
+        @if (state().hasValue) {
+          <button
+            type="button"
+            class="app-button toolbar-button"
+            (click)="clearSvgText()"
+          >
+            {{ i18n.t("app.svgProbe.clearButton") }}
+          </button>
+        }
+      </div>
     </div>
 
     <div class="svg-probe__support">

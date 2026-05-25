@@ -29,21 +29,21 @@ export const enDictionary = {
   'common.numberPrecision': 'Number precision',
   'common.transformPrecision': 'Transform precision',
 
-  'app.status.scanningDirectory': 'Scanning directory',
-  'app.status.restoringDirectory': 'Restoring last directory',
-  'app.status.optimizingAssets': 'Optimizing SVG assets',
+  'app.status.scanningDirectory': 'Reading SVG directory',
+  'app.status.restoringDirectory': 'Reconnecting last directory',
+  'app.status.optimizingAssets': 'Optimizing current batch',
   'app.status.preparingZip': 'Preparing ZIP export',
-  'app.status.batchReady': 'Batch ready',
-  'app.status.noSvgFound': 'No SVG files found',
-  'app.status.awaitingDirectory': 'Awaiting directory',
+  'app.status.batchReady': 'Batch ready for review',
+  'app.status.noSvgFound': 'This folder has no SVG files',
+  'app.status.awaitingDirectory': 'Open an SVG directory',
 
   'app.header.eyebrow': 'SVG Asset Operations',
   'app.header.description.compact':
-    'Compact view keeps the grid in focus while batch context moves into the display popup.',
+    'Compact view moves secondary details into Display settings so the grid stays front and center.',
   'app.header.description.withBatch':
-    'Keep the active batch in view, inspect the selected asset, and export once the directory is ready.',
+    'Review the current batch, inspect the selected asset, then export when everything looks right.',
   'app.header.description.empty':
-    'Batch-review SVG assets, compare output, and export optimized files without leaving the workspace.',
+    'Load SVGs, review results, and export the final batch from one workspace.',
   'app.header.fact.batch': 'Batch',
   'app.header.fact.batchCount': (params) => {
     const count = getNumberParam(params, 'count');
@@ -66,12 +66,12 @@ export const enDictionary = {
   'app.toolbar.scanLikelyDuplicates': 'Scan likely duplicates',
   'app.toolbar.rescanLikelyDuplicates': 'Re-scan likely duplicates',
   'app.toolbar.scanningLikelyDuplicates': 'Scanning likely duplicates...',
-  'app.toolbar.showingLikelyDuplicates': 'Showing likely duplicates',
-  'app.toolbar.likelyDuplicates': 'Likely duplicates',
-  'app.toolbar.showSvgProbe': 'Show SVG compare',
-  'app.toolbar.hideSvgProbe': 'Hide SVG compare',
-  'app.toolbar.reviewDisplay': 'Review display',
-  'app.toolbar.optimizationProfile': 'Optimization profile',
+  'app.toolbar.showingLikelyDuplicates': 'Likely duplicates only',
+  'app.toolbar.likelyDuplicates': 'View likely duplicates',
+  'app.toolbar.showSvgProbe': 'Show SVG comparison',
+  'app.toolbar.hideSvgProbe': 'Hide SVG comparison',
+  'app.toolbar.reviewDisplay': 'Display settings',
+  'app.toolbar.optimizationProfile': 'Optimization settings',
 
   'app.previewTone.originalArtwork': 'Original artwork',
   'app.previewTone.contrastTone': (params) =>
@@ -81,7 +81,7 @@ export const enDictionary = {
   'app.display.eyebrow': 'Review',
   'app.display.title': 'Display & reference',
   'app.display.description':
-    'Change only how you inspect the current session. Optimized output and exports stay untouched.',
+    'These settings only change what you see on screen. They do not change optimized output or exports.',
   'app.display.currentSetup': 'Current review setup',
   'app.display.compactLayout': 'Compact layout',
   'app.display.comfortLayout': 'Comfort layout',
@@ -95,30 +95,30 @@ export const enDictionary = {
     `${getNumberParam(params, 'count')} pinned`,
   'app.display.placeholder': 'white / #111111 / currentColor',
   'app.display.inputHint':
-    'Use a named color or hex value for currentColor and single-tone artwork. Contrast swap flips that tone to a light or dark bench color for faster readability checks.',
+    'Enter a named color, hex value, or currentColor. Best for currentColor or single-tone icons.',
   'app.display.swapTitle': 'Swap to contrast tone',
   'app.display.swapDescription':
-    'Useful when you want to test the same icon against the opposite light or dark reading condition without changing export output.',
+    'Check the same icon on light and dark surfaces without changing the exported SVG.',
   'app.display.keepMarkupTitle': 'Keep markup beside grid',
   'app.display.keepMarkupDescription':
-    'Keep original and optimized markup open beside the asset grid while reviewing changes.',
+    'Keep original and optimized markup visible beside the grid so you can compare while reviewing.',
   'app.display.guidanceEyebrow': 'How to use it',
   'app.display.guidance.1':
-    'Change preview fill when you need to verify dark icons on light surfaces, or the reverse.',
+    'Adjust the preview tone when you need to check icon readability on lighter or darker backgrounds.',
   'app.display.guidance.2':
-    'Tick card checkboxes to pin assets into the quick preview strip at the bottom of the workspace.',
+    'Use card checkboxes to pin icons into the quick preview strip for side-by-side comparison.',
   'app.display.guidance.3':
-    'Use the compact toggle in the header when you want to scan larger batches with less surrounding detail.',
+    'Switch to Compact mode when you want to scan larger batches with less surrounding detail.',
   'app.display.note':
-    'Display settings only affect preview and inspection in this session. They never rewrite optimized or exported SVG files.',
+    'Display settings affect preview only for this session. They never rewrite SVG files.',
 
   'app.profile.ariaLabel': 'Optimization profile',
   'app.profile.eyebrow': 'Optimization',
   'app.profile.title': 'Optimization profile',
   'app.profile.description':
-    'These settings change how optimized SVG output is rewritten for single-file optimize, batch optimize, and ZIP export.',
+    'These settings directly affect single-file optimization, batch optimization, and ZIP export output.',
   'app.profile.note':
-    'Profile changes affect optimized output, not just preview. Restore the defaults if a custom combination starts breaking assets.',
+    'These settings change real output, not just preview. Restore defaults if a custom setup starts breaking icons.',
 
   'app.workspace.currentBatch': 'Current batch',
   'app.workspace.activeDescription':
@@ -127,14 +127,14 @@ export const enDictionary = {
   'app.workspace.noSelectionDescription':
     'Pick a card to inspect source, output, and compression deltas.',
   'app.workspace.shortcut.hideMarkup': 'Hide markup',
-  'app.workspace.shortcut.openMarkup': 'Open markup',
-  'app.workspace.shortcut.scanningDuplicates': 'Scanning duplicates...',
-  'app.workspace.shortcut.showingItsGroup': 'Showing its group',
-  'app.workspace.shortcut.showItsGroup': 'Show its group',
-  'app.workspace.shortcut.findItsDuplicates': 'Find its duplicates',
-  'app.workspace.shortcut.showingAllGroups': 'Showing all groups',
-  'app.workspace.shortcut.browseDuplicateGroups': 'Browse duplicate groups',
-  'app.workspace.shortcut.rescanDuplicates': 'Re-scan duplicates',
+  'app.workspace.shortcut.openMarkup': 'Show markup',
+  'app.workspace.shortcut.scanningDuplicates': 'Finding similar icons...',
+  'app.workspace.shortcut.showingItsGroup': 'Viewing this group only',
+  'app.workspace.shortcut.showItsGroup': 'View this group',
+  'app.workspace.shortcut.findItsDuplicates': 'Find similar icons',
+  'app.workspace.shortcut.showingAllGroups': 'Viewing all groups',
+  'app.workspace.shortcut.browseDuplicateGroups': 'View all groups',
+  'app.workspace.shortcut.rescanDuplicates': 'Scan again',
   'app.workspace.stat.batch': 'Batch',
   'app.workspace.stat.batchLoaded': (params) => {
     const count = getNumberParam(params, 'count');
@@ -143,7 +143,7 @@ export const enDictionary = {
   'app.workspace.stat.optimized': 'Optimized',
   'app.workspace.stat.optimizedReady': (params) =>
     `${getNumberParam(params, 'count')} ready`,
-  'app.workspace.stat.awaitingOptimization': 'Awaiting optimization',
+  'app.workspace.stat.awaitingOptimization': 'Not optimized yet',
   'app.workspace.stat.quickPreview': 'Quick preview',
   'app.workspace.stat.duplicateReview': 'Duplicate review',
   'app.workspace.filter.label': 'Filter file names',
@@ -159,7 +159,7 @@ export const enDictionary = {
   },
   'app.workspace.filter.emptyTitle': 'No icons match this file-name filter',
   'app.workspace.filter.emptyDescription':
-    'Try a shorter query or clear the filter to bring the current batch back into view.',
+    'Try a shorter query, or clear the filter.',
   'app.workspace.signal.preview': (params) =>
     `Preview ${getStringParam(params, 'tone')}`,
   'app.workspace.signal.showingDuplicatesOnly':
@@ -172,9 +172,9 @@ export const enDictionary = {
 
   'app.duplicate.status.scanning': 'Scanning',
   'app.duplicate.status.notScanned': 'Not scanned',
-  'app.duplicate.status.noMatches': 'No matches',
+  'app.duplicate.status.noMatches': 'No likely duplicates',
   'app.duplicate.status.likelyCount': (params) =>
-    `${getNumberParam(params, 'count')} likely`,
+    `${getNumberParam(params, 'count')} likely matches`,
   'app.duplicate.headline.building': 'Building duplicate review set',
   'app.duplicate.headline.scanOnDemand': 'Scan on demand',
   'app.duplicate.headline.noDuplicates': 'No likely duplicates found',
@@ -191,17 +191,17 @@ export const enDictionary = {
     return `${count} ${pluralizeEn(count, 'group', 'groups')} ready to review`;
   },
   'app.duplicate.hint.building':
-    'Rendered fingerprints are being compared across the current batch.',
+    'Comparing icon appearance. This can take a moment.',
   'app.duplicate.hint.scanOnDemand':
-    'Run duplicate review only when you want to compare visually similar assets.',
+    'Run this scan when you want to find icons that look alike.',
   'app.duplicate.hint.noDuplicates':
-    'The last scan did not surface any visually matching duplicate groups in this batch.',
+    'The last scan did not find any clearly similar groups in this batch.',
   'app.duplicate.hint.focusedGroup':
-    'The grid is narrowed to the active group. Use Show all matches in the rail to widen the comparison again.',
+    'Only this group is showing. Use Show all matches to go back.',
   'app.duplicate.hint.filtered':
-    'The grid is narrowed to assets that share a visual fingerprint.',
+    'The grid is filtered to assets that landed in the same appearance-based group.',
   'app.duplicate.hint.default':
-    'Use the duplicate rail to step through groups, pin candidates, and compare before deleting anything.',
+    'Step through groups, pin the candidates you want to compare, then review them side by side.',
   'app.duplicate.panelEyebrow': 'Likely duplicate groups',
   'app.duplicate.panelSummary': (params) => {
     const groupCount = getNumberParam(params, 'groupCount');
@@ -210,7 +210,7 @@ export const enDictionary = {
     return `${groupCount} ${pluralizeEn(groupCount, 'group', 'groups')} · ${assetCount} ${pluralizeEn(assetCount, 'asset', 'assets')}`;
   },
   'app.duplicate.panelDescription':
-    'Review candidates in the rail, then keep the main grid free for whichever group you want to inspect in detail.',
+    'Use the rail to choose a group, then use the main grid for closer review and comparison.',
   'app.duplicate.rescan': 'Re-scan',
   'app.duplicate.showAllMatches': 'Show all matches',
   'app.duplicate.groupEyebrow': (params) =>
@@ -220,10 +220,10 @@ export const enDictionary = {
     return `${count} ${pluralizeEn(count, 'candidate', 'candidates')}`;
   },
   'app.duplicate.optimizedVisualMatch': (params) =>
-    `${getNumberParam(params, 'optimizedCount')} optimized · heuristic visual match`,
-  'app.duplicate.showingThisGroup': 'Showing this group',
-  'app.duplicate.showGroup': 'Show group',
-  'app.duplicate.pinGroup': 'Pin group',
+    `${getNumberParam(params, 'optimizedCount')} optimized · may look similar`,
+  'app.duplicate.showingThisGroup': 'Viewing group',
+  'app.duplicate.showGroup': 'View group',
+  'app.duplicate.pinGroup': 'Pin whole group',
   'app.duplicate.item.optimizedReady': 'Optimized ready',
   'app.duplicate.item.originalOnly': 'Original only',
   'app.duplicate.badge.pinned': 'Pinned',
@@ -234,21 +234,21 @@ export const enDictionary = {
   'app.empty.title.noSvg': 'Choose another directory with SVG assets',
   'app.empty.title.ready': 'Open a directory to start an SVG review batch',
   'app.empty.description':
-    'SVGOLOT loads each SVG into a focused review workflow so you can inspect output, tune the shared profile, and export only when the batch is ready to ship.',
+    'Open an SVG folder to preview files, compare results, and export the final batch.',
   'app.empty.openDirectory': 'Open SVG directory',
   'app.empty.reconnectLastDirectory': (params) =>
     `Reconnect ${getStringParam(params, 'name')}`,
   'app.empty.reconnectLastDirectoryHint': (params) =>
-    `The browser still remembers ${getStringParam(params, 'name')}. Reconnect it without browsing for the folder again.`,
+    `The browser still remembers ${getStringParam(params, 'name')}. If permission is still available, you can reconnect right away.`,
   'app.empty.step1.title': 'Load a directory',
   'app.empty.step1.description':
-    'Import a folder of SVG assets so the workspace can build a review batch and select the first file automatically.',
+    'Choose a folder with SVG files. The workspace builds a batch and selects the first file.',
   'app.empty.step2.title': 'Inspect and tune',
   'app.empty.step2.description':
-    'Review previews, keep markup beside the asset grid, and tune the shared SVGO profile before changing the whole batch.',
-  'app.empty.step3.title': 'Optimize with control',
+    'Review previews and markup first, then adjust shared optimization settings if needed.',
+  'app.empty.step3.title': 'Optimize when ready',
   'app.empty.step3.description':
-    'Run one-off fixes from a card or optimize the full directory, then export only when the output is ready to hand off.',
+    'Optimize one icon or the full folder, then export after checking the result.',
 
   'app.quickPreview.ariaLabel': 'Quick preview selection',
   'app.quickPreview.eyebrow': 'Quick preview',
@@ -258,48 +258,48 @@ export const enDictionary = {
   },
   'app.quickPreview.focused': (params) =>
     `Focused: ${getStringParam(params, 'name')}`,
-  'app.quickPreview.clear': 'Clear',
+  'app.quickPreview.clear': 'Clear pinned icons',
   'app.quickPreview.removeAriaLabel': 'Remove from quick preview',
 
   'app.svgProbe.eyebrow': 'Paste SVG',
   'app.svgProbe.title': 'Compare an external SVG',
   'app.svgProbe.description':
-    'Paste raw SVG markup, preview it with the current tone settings, then check whether the current batch contains heuristic visual matches.',
+    'Paste an SVG, preview it, then check whether the current batch has similar icons.',
   'app.svgProbe.fieldLabel': 'SVG markup',
   'app.svgProbe.placeholder': '<svg viewBox="0 0 24 24">...</svg>',
   'app.svgProbe.fieldHint':
-    'Paste a complete <svg>...</svg> string. The preview uses the current tone and contrast settings.',
-  'app.svgProbe.optimizeButton': 'Optimize pasted SVG',
-  'app.svgProbe.optimizingButton': 'Optimizing pasted SVG...',
+    'Paste the full <svg>...</svg> content. The preview uses your current display settings.',
+  'app.svgProbe.optimizeButton': 'Optimize this SVG',
+  'app.svgProbe.optimizingButton': 'Optimizing this SVG...',
   'app.svgProbe.searchButton': 'Find similar icons',
   'app.svgProbe.searchingButton': 'Finding similar icons...',
-  'app.svgProbe.copyOptimizedButton': 'Copy optimized SVG',
+  'app.svgProbe.copyOptimizedButton': 'Copy optimized result',
+  'app.svgProbe.clearButton': 'Clear SVG',
   'app.svgProbe.batchHint':
-    'Open an SVG directory first to compare against the current batch.',
-  'app.svgProbe.validation.idle':
-    'Paste SVG markup to preview it here and compare it against the loaded batch.',
+    'Open an SVG directory first to compare with the current batch.',
+  'app.svgProbe.validation.idle': 'Paste SVG here to preview it first.',
   'app.svgProbe.validation.invalid':
-    'This content is not valid SVG. Paste a complete <svg>...</svg> block.',
+    'This is not valid SVG. Make sure you pasted a complete <svg>...</svg> block.',
   'app.svgProbe.validation.ready':
-    'SVG is ready. Preview it and run a heuristic similarity check against the current batch.',
+    'Your SVG is ready. You can optimize it or look for similar icons.',
   'app.svgProbe.previewEyebrow': 'Live preview',
   'app.svgProbe.previewAlt': 'Pasted SVG preview',
   'app.svgProbe.previewReady': 'Preview ready with current tone',
   'app.svgProbe.previewUnavailable': 'Preview unavailable',
   'app.svgProbe.previewInvalidHint':
-    'Fix the SVG markup and the icon preview will appear here.',
+    'Fix the SVG markup and the preview will appear here.',
   'app.svgProbe.previewEmpty': 'No SVG pasted yet',
   'app.svgProbe.previewEmptyHint':
-    'Paste any SVG string and the icon will appear here.',
+    'Paste an SVG string and the icon will appear here.',
   'app.svgProbe.optimizedEyebrow': 'Optimized preview',
   'app.svgProbe.optimizedPreviewAlt': 'Optimized pasted SVG preview',
   'app.svgProbe.optimizedReady': 'Optimized SVG is ready',
   'app.svgProbe.optimizedHint':
-    'This preview uses the current optimization profile. Copy the optimized markup when you want to reuse it elsewhere.',
+    'This uses the current optimization settings. Copy it if you want to reuse it.',
   'app.svgProbe.optimizedDetailsEyebrow': 'Optimization details',
   'app.svgProbe.optimizedDetailsTitle': 'Review the optimized result',
   'app.svgProbe.optimizedDetailsDescription':
-    'Shows the before-and-after sizes, the resulting compression ratio, and the exact optimized markup from the current profile.',
+    'Shows before-and-after sizes, compression ratio, and the result you can copy.',
   'app.svgProbe.metric.originalSize': 'Original size',
   'app.svgProbe.metric.optimizedSize': 'Optimized size',
   'app.svgProbe.metric.compressionRatio': 'Compression ratio',
@@ -312,34 +312,35 @@ export const enDictionary = {
   'app.svgProbe.metric.sizeUnchanged': 'No size change',
   'app.svgProbe.optimizedMarkupEyebrow': 'Optimized markup',
   'app.svgProbe.optimizedMarkupDescription':
-    'Exact SVG output generated by the current optimization profile.',
+    'SVG output generated by the current optimization settings.',
   'app.svgProbe.optimizingPreview': 'Building optimized preview',
   'app.svgProbe.optimizingHint':
-    'The current optimization profile is being applied to the pasted SVG.',
+    'Applying the current optimization settings to the pasted SVG.',
   'app.svgProbe.optimizedUnavailable': 'Optimized preview unavailable',
   'app.svgProbe.optimizedUnavailableHint':
-    'Try optimizing again after adjusting the pasted SVG or the current profile.',
+    'Adjust the SVG or optimization settings and try again.',
   'app.svgProbe.optimizeFailed':
-    'The current optimization profile could not optimize this pasted SVG.',
-  'app.svgProbe.status.idle': 'Not searched yet',
-  'app.svgProbe.status.searching': 'Comparing against current batch',
-  'app.svgProbe.status.noMatches': 'No similar icons found',
+    'The current optimization settings could not process this SVG. Check the content or adjust the settings and try again.',
+  'app.svgProbe.status.idle': 'Not compared yet',
+  'app.svgProbe.status.searching': 'Comparing with current batch',
+  'app.svgProbe.status.noMatches': 'No similar icons',
   'app.svgProbe.status.matches': (params) => {
     const count = getNumberParam(params, 'count');
-    return `${count} heuristic ${pluralizeEn(count, 'match', 'matches')} found`;
+    return `${count} similar ${pluralizeEn(count, 'icon', 'icons')} found`;
   },
   'app.svgProbe.resultsEyebrow': 'Match results',
   'app.svgProbe.resultsDescription':
-    'Uses the same visual fingerprint heuristic as duplicate review. Select a result to jump to that asset.',
+    'These are candidate icons that look similar. Select one to jump to it.',
   'app.svgProbe.noMatchesHint':
-    'Nothing in the current batch landed on the same visual fingerprint as the pasted SVG.',
+    'No icon in the current batch looks close to the pasted SVG.',
   'app.svgProbe.loading': 'Loading the SVG probe tools...',
-  'app.svgProbe.toast.copiedOptimized': 'Copied optimized pasted SVG.',
+  'app.svgProbe.toast.copiedOptimized':
+    'Copied optimized result for the pasted SVG.',
 
   'markup.ariaLabel': 'Markup review panel',
   'markup.selectedAsset': 'Selected asset',
-  'markup.optimizedReady': 'Optimized output ready',
-  'markup.awaitingOptimization': 'Awaiting optimization',
+  'markup.optimizedReady': 'Optimized result ready',
+  'markup.awaitingOptimization': 'Not optimized yet',
   'markup.originalTitle': 'Original',
   'markup.originalDescription':
     'Raw source currently loaded from the selected file.',
@@ -350,10 +351,10 @@ export const enDictionary = {
     'Run optimization to generate the export-ready result.',
   'markup.copy': 'Copy',
   'markup.optimizedEmpty':
-    'No optimized SVG yet. Run optimization from the toolbar or directly from a card.',
+    'No optimized SVG yet. Run optimization from the toolbar or a card.',
   'markup.empty.title': 'Markup review stays here',
   'markup.empty.description':
-    'Select an SVG card to compare original and optimized output without leaving the workspace.',
+    'Select an SVG card to compare original and optimized output here.',
   'markup.toast.original': (params) =>
     `Copied original markup for ${getStringParam(params, 'name')}.`,
   'markup.toast.optimized': (params) =>
@@ -365,13 +366,13 @@ export const enDictionary = {
     return `${count} ${pluralizeEn(count, 'match', 'matches')}`;
   },
   'svgCard.aria.swapPreviewTone': 'Swap to a contrasting preview tone',
-  'svgCard.alt.swapPreviewTone': 'swap preview tone',
+  'svgCard.alt.swapPreviewTone': 'Swap preview tone',
   'svgCard.aria.copyOptimized': 'Copy optimized SVG',
-  'svgCard.alt.copyOptimized': 'copy svg',
+  'svgCard.alt.copyOptimized': 'Copy optimized SVG',
   'svgCard.aria.optimize': 'Optimize SVG',
-  'svgCard.alt.optimize': 'optimize svg',
+  'svgCard.alt.optimize': 'Optimize SVG',
   'svgCard.aria.downloadOptimized': 'Download optimized SVG',
-  'svgCard.alt.downloadOptimized': 'download svg',
+  'svgCard.alt.downloadOptimized': 'Download optimized SVG',
   'svgCard.notOptimizedYet': 'Not optimized yet',
   'svgCard.runOptimizeToCompare': 'Run optimize to compare',
   'svgCard.delta.saved': (params) => `${getStringParam(params, 'size')} saved`,
@@ -379,7 +380,7 @@ export const enDictionary = {
     `${getStringParam(params, 'size')} larger`,
   'svgCard.state.optimizing': 'Optimizing',
   'svgCard.state.optimized': 'Optimized',
-  'svgCard.state.original': 'Original',
+  'svgCard.state.original': 'Not optimized',
   'svgCard.detail.original': 'Original',
   'svgCard.detail.optimized': 'Optimized',
   'svgCard.detail.delta': 'Delta',
@@ -390,7 +391,7 @@ export const enDictionary = {
   'compress.overview.reset': 'Back to balanced default',
   'compress.overview.ariaPresets': 'Compression presets',
   'compress.overview.customNote':
-    'You are using a custom combination based on one of the presets.',
+    'You are using a custom version of one of the presets.',
   'compress.overview.multipass': 'Multipass',
   'compress.overview.output': 'Output',
   'compress.overview.outputReadable': 'Readable',
@@ -400,36 +401,36 @@ export const enDictionary = {
   'compress.overview.pluginsActive': (params) =>
     `${getNumberParam(params, 'activeCount')} / ${getNumberParam(params, 'totalCount')} plugins active`,
   'compress.overview.guidance.1':
-    'Multipass cleans harder, but adds a little processing time.',
+    'Multipass runs extra cleanup rounds. It usually makes files smaller, but it takes longer.',
   'compress.overview.guidance.2':
-    'Readable output helps review and diffs, while minified output stays smaller.',
+    'Readable output is easier to inspect and diff, while minified output keeps files smaller.',
   'compress.overview.guidance.3':
-    'Lower precision is smaller, higher precision is safer for detailed curves and transforms.',
+    'Lower precision saves more space, while higher precision is safer for detailed curves and transforms.',
   'compress.core.eyebrow': 'Core behavior',
   'compress.core.description':
-    'Choose whether optimized output should favor smaller files, easier review, or a balance of both.',
+    'Choose whether optimization should favor smaller files, easier review, or a balance of both.',
   'compress.core.multipass.title': 'Multipass',
   'compress.core.multipass.description':
-    'Run extra cleanup passes when you want the profile to squeeze a little harder.',
+    'Turn this on when you want to squeeze files a little harder and do not mind extra processing time.',
   'compress.core.multipass.aria': 'Toggle multipass optimization',
-  'compress.core.pretty.title': 'Prettify output',
+  'compress.core.pretty.title': 'Readable output',
   'compress.core.pretty.description':
-    'Keep the optimized markup readable for audits, pull requests, and handoff review.',
+    'Keep the optimized SVG readable for inspection, code review, and handoff.',
   'compress.core.pretty.aria': 'Toggle pretty output',
   'compress.precision.eyebrow': 'Precision',
   'compress.precision.description':
-    'Lower values reduce file size more aggressively. Raise them if icon edges or transforms start looking off.',
+    'Lower values compress more aggressively. Raise them if icon edges or transforms start to look wrong.',
   'compress.precision.number.copy': (params) =>
-    `${getStringParam(params, 'hint')} for most coordinate cleanup`,
+    `${getStringParam(params, 'hint')} for general coordinate cleanup`,
   'compress.precision.number.aria': 'Number precision',
   'compress.precision.transform.copy': (params) =>
-    `${getStringParam(params, 'hint')} when transforms need extra safety`,
+    `${getStringParam(params, 'hint')} when transforms need a more conservative setting`,
   'compress.precision.transform.aria': 'Transform precision',
   'compress.precision.scale.smaller': 'Smaller',
   'compress.precision.scale.safer': 'Safer',
   'compress.advanced.eyebrow': 'Advanced transforms',
   'compress.advanced.description':
-    'Leave the default mix alone for most SVG batches. Change individual transforms only when a specific export pattern needs special handling.',
+    'The defaults are right for most SVG batches. Change individual transforms only when a specific output issue needs extra handling.',
   'compress.advanced.reviewOutput': 'Review output',
   'compress.preset.safe.label': 'Safe',
   'compress.preset.safe.short': 'Preserve more structure and geometry detail.',

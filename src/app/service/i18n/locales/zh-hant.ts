@@ -26,21 +26,21 @@ export const zhHantDictionary = {
   'common.numberPrecision': '數值精度',
   'common.transformPrecision': 'Transform 精度',
 
-  'app.status.scanningDirectory': '正在掃描目錄',
-  'app.status.restoringDirectory': '正在還原上次的目錄',
-  'app.status.optimizingAssets': '正在優化 SVG 素材',
+  'app.status.scanningDirectory': '正在讀取 SVG 目錄',
+  'app.status.restoringDirectory': '正在重新連接上次的目錄',
+  'app.status.optimizingAssets': '正在優化目前批次',
   'app.status.preparingZip': '正在準備 ZIP 匯出',
-  'app.status.batchReady': '批次已就緒',
-  'app.status.noSvgFound': '找不到 SVG 檔案',
-  'app.status.awaitingDirectory': '等待開啟目錄',
+  'app.status.batchReady': '批次可開始檢查',
+  'app.status.noSvgFound': '這個資料夾沒有 SVG 檔案',
+  'app.status.awaitingDirectory': '請先開啟 SVG 目錄',
 
   'app.header.eyebrow': 'SVG 資產操作',
   'app.header.description.compact':
-    '精簡檢視會讓格線保持在焦點，並把批次脈絡移到顯示彈窗中。',
+    '精簡檢視會把次要資訊收進顯示設定，讓你先專注在素材格線。',
   'app.header.description.withBatch':
-    '保持批次內容在視線中、檢視目前選取的素材，等目錄準備好後再匯出。',
+    '檢查目前批次、查看選取中的素材，確認沒問題後再匯出。',
   'app.header.description.empty':
-    '在不離開工作區的情況下批次檢視 SVG、比較輸出，並匯出優化後的檔案。',
+    '在同一個工作區載入 SVG、檢查結果，最後匯出整批檔案。',
   'app.header.fact.batch': '批次',
   'app.header.fact.batchCount': (params) =>
     `${getNumberParam(params, 'count')} 個素材`,
@@ -59,12 +59,12 @@ export const zhHantDictionary = {
   'app.toolbar.scanLikelyDuplicates': '掃描疑似重複',
   'app.toolbar.rescanLikelyDuplicates': '重新掃描疑似重複',
   'app.toolbar.scanningLikelyDuplicates': '正在掃描疑似重複...',
-  'app.toolbar.showingLikelyDuplicates': '顯示疑似重複',
-  'app.toolbar.likelyDuplicates': '疑似重複',
+  'app.toolbar.showingLikelyDuplicates': '只看疑似重複',
+  'app.toolbar.likelyDuplicates': '查看疑似重複',
   'app.toolbar.showSvgProbe': '顯示 SVG 比對',
   'app.toolbar.hideSvgProbe': '隱藏 SVG 比對',
-  'app.toolbar.reviewDisplay': '檢視顯示',
-  'app.toolbar.optimizationProfile': '優化設定檔',
+  'app.toolbar.reviewDisplay': '顯示設定',
+  'app.toolbar.optimizationProfile': '優化設定',
 
   'app.previewTone.originalArtwork': '原始圖稿',
   'app.previewTone.contrastTone': (params) =>
@@ -74,7 +74,7 @@ export const zhHantDictionary = {
   'app.display.eyebrow': '檢視',
   'app.display.title': '顯示與參考',
   'app.display.description':
-    '這裡只會改變你檢視目前工作階段的方式，不會影響優化輸出與匯出內容。',
+    '這些設定只影響目前畫面的看法，不會改動優化結果或匯出的檔案。',
   'app.display.currentSetup': '目前檢視設定',
   'app.display.compactLayout': '精簡版面',
   'app.display.comfortLayout': '舒適版面',
@@ -88,30 +88,30 @@ export const zhHantDictionary = {
     `已釘選 ${getNumberParam(params, 'count')} 個`,
   'app.display.placeholder': 'white / #111111 / currentColor',
   'app.display.inputHint':
-    '對於 currentColor 與單色圖稿，可輸入命名色或十六進位色值。對比切換會把這個色調翻成淺色或深色工作台顏色，方便快速檢查可讀性。',
+    '可輸入命名色、十六進位色值或 currentColor。最適合 currentColor 或單色圖示。',
   'app.display.swapTitle': '切換為對比色調',
   'app.display.swapDescription':
-    '當你想在不改變匯出結果的前提下，測試同一個圖示在相反明暗閱讀情境下的表現時很有用。',
+    '快速檢查同一個圖示在淺底和深底上的可讀性，不會改動匯出結果。',
   'app.display.keepMarkupTitle': '讓標記固定在格線旁',
   'app.display.keepMarkupDescription':
-    '在檢視變更時，讓原始與優化後的標記持續顯示在素材格線旁。',
+    '讓原始與優化後的標記持續顯示在格線旁，方便一邊看圖一邊比對。',
   'app.display.guidanceEyebrow': '使用方式',
   'app.display.guidance.1':
-    '當你需要驗證深色圖示在淺色背景上的可讀性，或反過來時，可以調整預覽填色。',
+    '想確認圖示在不同明暗背景上的可讀性時，先調整預覽色調。',
   'app.display.guidance.2':
-    '勾選卡片上的核取方塊，可把素材釘選到工作區底部的快速預覽列。',
+    '勾選卡片上的核取方塊，可把圖示釘選到底部快速預覽列，方便並排比較。',
   'app.display.guidance.3':
-    '想在較大的批次裡快速掃描時，可使用 header 的精簡切換，減少周邊細節。',
+    '大量檢查時可切換成精簡模式，把注意力留給格線與目前選取項目。',
   'app.display.note':
-    '顯示設定只會影響這次工作階段中的預覽與檢視，不會改寫優化或匯出的 SVG 檔案。',
+    '這些顯示設定只影響這次操作時的預覽，不會修改 SVG 檔案內容。',
 
   'app.profile.ariaLabel': '優化設定檔',
   'app.profile.eyebrow': '優化',
   'app.profile.title': '優化設定檔',
   'app.profile.description':
-    '這些設定會改變單檔優化、批次優化與 ZIP 匯出時，優化後的 SVG 如何被重寫。',
+    '這些設定會直接影響單檔優化、整批優化與 ZIP 匯出的結果。',
   'app.profile.note':
-    '設定檔變更會直接影響優化輸出，而不只是預覽。如果自訂組合開始破壞素材，請恢復預設值。',
+    '這裡改的是實際輸出，不只是預覽。若自訂後讓圖示出問題，請回到預設值。',
 
   'app.workspace.currentBatch': '目前批次',
   'app.workspace.activeDescription':
@@ -120,21 +120,21 @@ export const zhHantDictionary = {
   'app.workspace.noSelectionDescription':
     '選一張卡片即可檢視來源、輸出與壓縮差異。',
   'app.workspace.shortcut.hideMarkup': '隱藏標記',
-  'app.workspace.shortcut.openMarkup': '開啟標記',
-  'app.workspace.shortcut.scanningDuplicates': '正在掃描重複...',
-  'app.workspace.shortcut.showingItsGroup': '正在顯示其群組',
-  'app.workspace.shortcut.showItsGroup': '顯示其群組',
-  'app.workspace.shortcut.findItsDuplicates': '找出它的重複項',
-  'app.workspace.shortcut.showingAllGroups': '正在顯示所有群組',
-  'app.workspace.shortcut.browseDuplicateGroups': '瀏覽重複群組',
-  'app.workspace.shortcut.rescanDuplicates': '重新掃描重複',
+  'app.workspace.shortcut.openMarkup': '顯示標記',
+  'app.workspace.shortcut.scanningDuplicates': '正在找相似圖示...',
+  'app.workspace.shortcut.showingItsGroup': '只看這一組',
+  'app.workspace.shortcut.showItsGroup': '查看這一組',
+  'app.workspace.shortcut.findItsDuplicates': '找相似圖示',
+  'app.workspace.shortcut.showingAllGroups': '目前顯示所有群組',
+  'app.workspace.shortcut.browseDuplicateGroups': '查看所有群組',
+  'app.workspace.shortcut.rescanDuplicates': '重新掃描',
   'app.workspace.stat.batch': '批次',
   'app.workspace.stat.batchLoaded': (params) =>
     `已載入 ${getNumberParam(params, 'count')} 個素材`,
   'app.workspace.stat.optimized': '已優化',
   'app.workspace.stat.optimizedReady': (params) =>
     `${getNumberParam(params, 'count')} 個可用`,
-  'app.workspace.stat.awaitingOptimization': '等待優化',
+  'app.workspace.stat.awaitingOptimization': '尚未優化',
   'app.workspace.stat.quickPreview': '快速預覽',
   'app.workspace.stat.duplicateReview': '重複檢視',
   'app.workspace.filter.label': '篩選檔名',
@@ -143,8 +143,7 @@ export const zhHantDictionary = {
   'app.workspace.filter.hint.matches': (params) =>
     `目前顯示 ${getNumberParam(params, 'count')} / ${getNumberParam(params, 'total')} 個符合「${getStringParam(params, 'query')}」的素材。`,
   'app.workspace.filter.emptyTitle': '沒有圖示符合目前的檔名篩選',
-  'app.workspace.filter.emptyDescription':
-    '請嘗試更短的關鍵字，或直接清除篩選，把目前批次重新帶回畫面中。',
+  'app.workspace.filter.emptyDescription': '試試更短的關鍵字，或直接清除篩選。',
   'app.workspace.signal.preview': (params) =>
     `預覽 ${getStringParam(params, 'tone')}`,
   'app.workspace.signal.showingDuplicatesOnly': '只顯示疑似重複',
@@ -156,9 +155,9 @@ export const zhHantDictionary = {
 
   'app.duplicate.status.scanning': '掃描中',
   'app.duplicate.status.notScanned': '尚未掃描',
-  'app.duplicate.status.noMatches': '沒有相符項',
+  'app.duplicate.status.noMatches': '沒有疑似重複',
   'app.duplicate.status.likelyCount': (params) =>
-    `${getNumberParam(params, 'count')} 個疑似重複`,
+    `${getNumberParam(params, 'count')} 個疑似項目`,
   'app.duplicate.headline.building': '正在建立重複檢視集合',
   'app.duplicate.headline.scanOnDemand': '按需掃描',
   'app.duplicate.headline.noDuplicates': '未找到疑似重複',
@@ -168,21 +167,18 @@ export const zhHantDictionary = {
     `目前畫面中有 ${getNumberParam(params, 'count')} 個疑似重複`,
   'app.duplicate.headline.groupsReady': (params) =>
     `已有 ${getNumberParam(params, 'count')} 組待檢視`,
-  'app.duplicate.hint.building': '系統正在比對目前批次中的渲染指紋。',
-  'app.duplicate.hint.scanOnDemand':
-    '只有在你想比較視覺相似素材時，再啟動重複檢視即可。',
-  'app.duplicate.hint.noDuplicates':
-    '上一次掃描沒有在這個批次中找到視覺上相符的重複群組。',
+  'app.duplicate.hint.building': '正在比對圖示外觀，可能需要一點時間。',
+  'app.duplicate.hint.scanOnDemand': '想找外觀相近的圖示時，再執行這個掃描。',
+  'app.duplicate.hint.noDuplicates': '上次掃描沒有找到外觀明顯相近的群組。',
   'app.duplicate.hint.focusedGroup':
-    '目前格線已縮小到焦點群組。若想重新展開比較範圍，請使用側欄中的「顯示所有相符項」。',
-  'app.duplicate.hint.filtered': '目前格線只顯示共享視覺指紋的素材。',
-  'app.duplicate.hint.default':
-    '使用重複群組側欄逐組檢視、釘選候選項目，並在刪除前完成比對。',
+    '目前只顯示這一組。要看全部結果，請按「顯示所有相符項」。',
+  'app.duplicate.hint.filtered': '目前格線只顯示外觀比對後落在同一組的素材。',
+  'app.duplicate.hint.default': '先逐組查看，再把候選項釘選到快速預覽比較。',
   'app.duplicate.panelEyebrow': '疑似重複群組',
   'app.duplicate.panelSummary': (params) =>
     `${getNumberParam(params, 'groupCount')} 組 · ${getNumberParam(params, 'assetCount')} 個素材`,
   'app.duplicate.panelDescription':
-    '先在側欄檢視候選項目，再把主格線留給你想深入比對的群組。',
+    '先在側欄挑出要看的群組，再用主格線做細看與比對。',
   'app.duplicate.rescan': '重新掃描',
   'app.duplicate.showAllMatches': '顯示所有相符項',
   'app.duplicate.groupEyebrow': (params) =>
@@ -190,10 +186,10 @@ export const zhHantDictionary = {
   'app.duplicate.candidates': (params) =>
     `${getNumberParam(params, 'count')} 個候選項`,
   'app.duplicate.optimizedVisualMatch': (params) =>
-    `${getNumberParam(params, 'optimizedCount')} 個已優化 · 啟發式視覺相似`,
-  'app.duplicate.showingThisGroup': '正在顯示此群組',
-  'app.duplicate.showGroup': '顯示群組',
-  'app.duplicate.pinGroup': '釘選群組',
+    `${getNumberParam(params, 'optimizedCount')} 個已優化 · 外觀可能相近`,
+  'app.duplicate.showingThisGroup': '目前查看中',
+  'app.duplicate.showGroup': '查看這一組',
+  'app.duplicate.pinGroup': '釘選整組',
   'app.duplicate.item.optimizedReady': '已優化可檢視',
   'app.duplicate.item.originalOnly': '只有原始版本',
   'app.duplicate.badge.pinned': '已釘選',
@@ -204,21 +200,20 @@ export const zhHantDictionary = {
   'app.empty.title.noSvg': '請改選其他含有 SVG 素材的目錄',
   'app.empty.title.ready': '開啟目錄以開始 SVG 檢視批次',
   'app.empty.description':
-    'SVGOLOT 會把每個 SVG 載入成一個專注的檢視流程，讓你先檢查輸出、調整共用設定檔，再決定是否在批次準備好時匯出。',
+    '開啟 SVG 資料夾後，你可以預覽、比對結果，最後匯出整批檔案。',
   'app.empty.openDirectory': '開啟 SVG 目錄',
   'app.empty.reconnectLastDirectory': (params) =>
     `重新連接 ${getStringParam(params, 'name')}`,
   'app.empty.reconnectLastDirectoryHint': (params) =>
-    `瀏覽器仍記得 ${getStringParam(params, 'name')}。如果權限還在，可以不用重新找資料夾，直接重新連接。`,
+    `瀏覽器還記得 ${getStringParam(params, 'name')}。如果權限還在，可以直接重新連接。`,
   'app.empty.step1.title': '載入目錄',
   'app.empty.step1.description':
-    '匯入一個包含 SVG 素材的資料夾，讓工作區建立檢視批次，並自動選取第一個檔案。',
+    '選擇包含 SVG 的資料夾，工作區會建立批次並選取第一個檔案。',
   'app.empty.step2.title': '檢視並調整',
-  'app.empty.step2.description':
-    '檢查預覽、讓標記固定在格線旁，並在變更整個批次前先調整共用的 SVGO 設定檔。',
-  'app.empty.step3.title': '受控優化',
+  'app.empty.step2.description': '先看預覽與標記，需要時再調整共用優化設定。',
+  'app.empty.step3.title': '確認後再優化',
   'app.empty.step3.description':
-    '你可以從單一卡片做單次修正，也可以優化整個目錄，最後只在輸出真正可交付時才匯出。',
+    '可先優化單一圖示，或一次處理整個資料夾，確認後再匯出。',
 
   'app.quickPreview.ariaLabel': '快速預覽選取區',
   'app.quickPreview.eyebrow': '快速預覽',
@@ -226,45 +221,43 @@ export const zhHantDictionary = {
     `已釘選 ${getNumberParam(params, 'count')} 個圖示`,
   'app.quickPreview.focused': (params) =>
     `焦點：${getStringParam(params, 'name')}`,
-  'app.quickPreview.clear': '清除',
+  'app.quickPreview.clear': '清空釘選',
   'app.quickPreview.removeAriaLabel': '從快速預覽移除',
 
   'app.svgProbe.eyebrow': '貼上 SVG',
   'app.svgProbe.title': '比對外部 SVG',
   'app.svgProbe.description':
-    '貼上原始 SVG 標記，先用目前的色調設定預覽，再檢查目前批次裡是否有啟發式視覺相似的圖示。',
+    '貼上 SVG 後，可先預覽，再查找批次中外觀接近的圖示。',
   'app.svgProbe.fieldLabel': 'SVG 標記',
   'app.svgProbe.placeholder': '<svg viewBox="0 0 24 24">...</svg>',
   'app.svgProbe.fieldHint':
-    '請貼上完整的 <svg>...</svg> 字串。預覽會沿用目前的色調與對比設定。',
-  'app.svgProbe.optimizeButton': '優化貼上的 SVG',
-  'app.svgProbe.optimizingButton': '正在優化貼上的 SVG...',
-  'app.svgProbe.searchButton': '查找相似圖示',
-  'app.svgProbe.searchingButton': '正在查找相似圖示...',
-  'app.svgProbe.copyOptimizedButton': '複製優化後 SVG',
+    '請貼上完整的 <svg>...</svg> 內容。預覽會沿用目前顯示設定。',
+  'app.svgProbe.optimizeButton': '優化這段 SVG',
+  'app.svgProbe.optimizingButton': '正在優化這段 SVG...',
+  'app.svgProbe.searchButton': '找相似圖示',
+  'app.svgProbe.searchingButton': '正在找相似圖示...',
+  'app.svgProbe.copyOptimizedButton': '複製優化結果',
+  'app.svgProbe.clearButton': '清除 SVG',
   'app.svgProbe.batchHint': '請先開啟 SVG 目錄，才能和目前批次比對。',
-  'app.svgProbe.validation.idle':
-    '貼上 SVG 標記後，這裡會顯示預覽，並可和目前批次做比對。',
+  'app.svgProbe.validation.idle': '貼上 SVG 後，這裡會先顯示預覽。',
   'app.svgProbe.validation.invalid':
-    '目前內容不是有效的 SVG。請貼上完整的 <svg>...</svg> 區塊。',
-  'app.svgProbe.validation.ready':
-    'SVG 已就緒，可以先預覽，再執行啟發式相似比對。',
+    '這段內容不是有效的 SVG。請確認有貼上完整的 <svg>...</svg>。',
+  'app.svgProbe.validation.ready': 'SVG 已可預覽，接著可優化，或找相似圖示。',
   'app.svgProbe.previewEyebrow': '即時預覽',
   'app.svgProbe.previewAlt': '貼上的 SVG 預覽',
   'app.svgProbe.previewReady': '已套用目前預覽色調',
   'app.svgProbe.previewUnavailable': '目前無法預覽',
-  'app.svgProbe.previewInvalidHint': '修正 SVG 標記後，這裡就會顯示圖示預覽。',
+  'app.svgProbe.previewInvalidHint': '修正 SVG 後，這裡就會顯示預覽。',
   'app.svgProbe.previewEmpty': '尚未貼上 SVG',
-  'app.svgProbe.previewEmptyHint': '貼上任意 SVG 字串後，這裡會顯示該圖示。',
+  'app.svgProbe.previewEmptyHint': '貼上 SVG 後，這裡會顯示圖示。',
   'app.svgProbe.optimizedEyebrow': '優化後預覽',
   'app.svgProbe.optimizedPreviewAlt': '優化後的貼上 SVG 預覽',
   'app.svgProbe.optimizedReady': '優化後 SVG 已就緒',
-  'app.svgProbe.optimizedHint':
-    '這個預覽使用目前的優化設定檔。若你想在其他地方重用結果，可以直接複製優化後的標記。',
+  'app.svgProbe.optimizedHint': '這個結果使用目前的優化設定，可直接複製帶走。',
   'app.svgProbe.optimizedDetailsEyebrow': '優化資訊',
   'app.svgProbe.optimizedDetailsTitle': '檢視優化結果',
   'app.svgProbe.optimizedDetailsDescription':
-    '顯示目前設定檔下的優化前後大小、壓縮比，以及可直接檢查或複製的優化後標記。',
+    '顯示優化前後大小、壓縮比例與可複製的結果。',
   'app.svgProbe.metric.originalSize': '優化前大小',
   'app.svgProbe.metric.optimizedSize': '優化後大小',
   'app.svgProbe.metric.compressionRatio': '壓縮比',
@@ -276,42 +269,39 @@ export const zhHantDictionary = {
     `增加 ${getStringParam(params, 'size')}（${getStringParam(params, 'percent')}%）`,
   'app.svgProbe.metric.sizeUnchanged': '大小沒有變化',
   'app.svgProbe.optimizedMarkupEyebrow': '優化後內容',
-  'app.svgProbe.optimizedMarkupDescription':
-    '目前優化設定檔產生的精確 SVG 輸出。',
+  'app.svgProbe.optimizedMarkupDescription': '目前優化設定產生的 SVG 內容。',
   'app.svgProbe.optimizingPreview': '正在建立優化後預覽',
-  'app.svgProbe.optimizingHint': '系統正在把目前的優化設定檔套用到貼上的 SVG。',
+  'app.svgProbe.optimizingHint': '正在把目前的優化設定套用到你貼上的 SVG。',
   'app.svgProbe.optimizedUnavailable': '目前無法顯示優化後預覽',
-  'app.svgProbe.optimizedUnavailableHint':
-    '請在調整貼上的 SVG 或目前設定檔後，再試著重新優化。',
-  'app.svgProbe.optimizeFailed': '目前的優化設定檔無法成功優化這段貼上的 SVG。',
-  'app.svgProbe.status.idle': '尚未查找',
-  'app.svgProbe.status.searching': '正在和目前批次比對',
-  'app.svgProbe.status.noMatches': '沒有找到相似圖示',
+  'app.svgProbe.optimizedUnavailableHint': '請調整 SVG 或優化設定後再試一次。',
+  'app.svgProbe.optimizeFailed':
+    '目前的優化設定無法處理這段 SVG。請先檢查內容，或調整優化設定後再試一次。',
+  'app.svgProbe.status.idle': '尚未比對',
+  'app.svgProbe.status.searching': '正在比對目前批次',
+  'app.svgProbe.status.noMatches': '沒有找到相近圖示',
   'app.svgProbe.status.matches': (params) =>
-    `找到 ${getNumberParam(params, 'count')} 個相似圖示`,
+    `找到 ${getNumberParam(params, 'count')} 個相近圖示`,
   'app.svgProbe.resultsEyebrow': '比對結果',
   'app.svgProbe.resultsDescription':
-    '使用與重複檢視相同的視覺指紋啟發式。點選任一結果即可跳到該素材。',
-  'app.svgProbe.noMatchesHint':
-    '這表示目前批次中，沒有圖示和貼上的 SVG 落在同一個視覺指紋。',
+    '這裡列出外觀接近的候選項目。點一下即可跳到該素材。',
+  'app.svgProbe.noMatchesHint': '目前批次裡沒有外觀接近這段 SVG 的圖示。',
   'app.svgProbe.loading': '正在載入 SVG 比對工具...',
-  'app.svgProbe.toast.copiedOptimized': '已複製優化後的貼上 SVG。',
+  'app.svgProbe.toast.copiedOptimized': '已複製貼上 SVG 的優化結果。',
 
   'markup.ariaLabel': '標記檢視面板',
   'markup.selectedAsset': '選取的素材',
-  'markup.optimizedReady': '優化輸出已準備好',
-  'markup.awaitingOptimization': '等待優化',
+  'markup.optimizedReady': '優化結果已就緒',
+  'markup.awaitingOptimization': '尚未優化',
   'markup.originalTitle': '原始',
   'markup.originalDescription': '目前從所選檔案載入的原始內容。',
   'markup.optimizedTitle': '優化後',
   'markup.optimizedDescription.ready': '依照目前設定檔產生、可直接匯出的標記。',
   'markup.optimizedDescription.awaiting': '執行優化以產生可匯出的結果。',
   'markup.copy': '複製',
-  'markup.optimizedEmpty':
-    '尚未產生優化後的 SVG。請從工具列或直接在卡片上執行優化。',
+  'markup.optimizedEmpty': '尚未產生優化後 SVG。請從工具列或卡片上執行優化。',
   'markup.empty.title': '標記檢視會顯示在這裡',
   'markup.empty.description':
-    '選取一張 SVG 卡片後，就能在不離開工作區的情況下比較原始與優化後的輸出。',
+    '選取一張 SVG 卡片後，就能在這裡比較原始與優化後的輸出。',
   'markup.toast.original': (params) =>
     `已複製 ${getStringParam(params, 'name')} 的原始標記。`,
   'markup.toast.optimized': (params) =>
@@ -323,18 +313,18 @@ export const zhHantDictionary = {
   'svgCard.aria.swapPreviewTone': '切換到對比預覽色調',
   'svgCard.alt.swapPreviewTone': '切換預覽色調',
   'svgCard.aria.copyOptimized': '複製優化後 SVG',
-  'svgCard.alt.copyOptimized': '複製 svg',
+  'svgCard.alt.copyOptimized': '複製優化後 SVG',
   'svgCard.aria.optimize': '優化 SVG',
-  'svgCard.alt.optimize': '優化 svg',
+  'svgCard.alt.optimize': '優化 SVG',
   'svgCard.aria.downloadOptimized': '下載優化後 SVG',
-  'svgCard.alt.downloadOptimized': '下載 svg',
+  'svgCard.alt.downloadOptimized': '下載優化後 SVG',
   'svgCard.notOptimizedYet': '尚未優化',
   'svgCard.runOptimizeToCompare': '先執行優化再比較',
   'svgCard.delta.saved': (params) => `節省 ${getStringParam(params, 'size')}`,
   'svgCard.delta.larger': (params) => `增加 ${getStringParam(params, 'size')}`,
   'svgCard.state.optimizing': '優化中',
   'svgCard.state.optimized': '已優化',
-  'svgCard.state.original': '原始',
+  'svgCard.state.original': '未優化',
   'svgCard.detail.original': '原始',
   'svgCard.detail.optimized': '已優化',
   'svgCard.detail.delta': '差異',
@@ -344,7 +334,7 @@ export const zhHantDictionary = {
   'compress.overview.eyebrow': '設定檔預設',
   'compress.overview.reset': '回到平衡預設值',
   'compress.overview.ariaPresets': '壓縮預設',
-  'compress.overview.customNote': '你正在使用以某個預設為基礎的自訂組合。',
+  'compress.overview.customNote': '你目前使用的是自行調整過的版本。',
   'compress.overview.multipass': '多次處理',
   'compress.overview.output': '輸出',
   'compress.overview.outputReadable': '可讀',
@@ -354,36 +344,36 @@ export const zhHantDictionary = {
   'compress.overview.pluginsActive': (params) =>
     `已啟用 ${getNumberParam(params, 'activeCount')} / ${getNumberParam(params, 'totalCount')} 個外掛`,
   'compress.overview.guidance.1':
-    '多次處理能更積極清理，但會增加一些處理時間。',
+    '多次處理會多跑幾輪清理，通常能再縮小一些，但會慢一點。',
   'compress.overview.guidance.2':
-    '可讀輸出較利於檢視與 diff，而最小化輸出則更節省體積。',
+    '可讀輸出方便檢查與比對，最小化輸出則更省體積。',
   'compress.overview.guidance.3':
-    '較低精度可縮小檔案，較高精度則對複雜曲線與 transform 更安全。',
+    '精度越低越省空間，精度越高越不容易讓曲線或 transform 走樣。',
   'compress.core.eyebrow': '核心行為',
   'compress.core.description':
-    '決定優化後輸出要偏向更小的檔案、更容易檢視，或在兩者之間取得平衡。',
+    '這裡決定優化結果要偏向更小、更好讀，或兩者折衷。',
   'compress.core.multipass.title': '多次處理',
   'compress.core.multipass.description':
-    '當你想讓設定檔再多擠出一點空間時，可啟用額外清理輪次。',
+    '想再多擠一點體積時再開啟，會多花一些處理時間。',
   'compress.core.multipass.aria': '切換多次處理優化',
-  'compress.core.pretty.title': '輸出排版',
+  'compress.core.pretty.title': '可讀輸出',
   'compress.core.pretty.description':
-    '讓優化後的標記保持可讀，方便審查、PR 與交接檢視。',
+    '讓優化後的 SVG 比較好讀，方便檢查、程式碼審查與交接。',
   'compress.core.pretty.aria': '切換可讀輸出',
   'compress.precision.eyebrow': '精度',
   'compress.precision.description':
-    '較低的數值會更積極地縮小檔案。若圖示邊緣或 transform 開始失真，就把它們調高。',
+    '數值越低，壓縮越積極。如果圖示邊緣或 transform 看起來不對，就把數值調高。',
   'compress.precision.number.copy': (params) =>
-    `${getStringParam(params, 'hint')}，適合大多數座標清理`,
+    `${getStringParam(params, 'hint')}，適合一般座標清理`,
   'compress.precision.number.aria': '數值精度',
   'compress.precision.transform.copy': (params) =>
-    `${getStringParam(params, 'hint')}，適合需要額外安全性的 transform`,
+    `${getStringParam(params, 'hint')}，適合需要保守一點的 transform`,
   'compress.precision.transform.aria': 'Transform 精度',
   'compress.precision.scale.smaller': '更小',
   'compress.precision.scale.safer': '更安全',
   'compress.advanced.eyebrow': '進階轉換',
   'compress.advanced.description':
-    '大多數 SVG 批次都可以維持預設組合。只有在特定匯出模式需要特殊處理時，再調整個別轉換。',
+    '大多數情況維持預設即可，只有遇到特定輸出問題時再調整個別轉換。',
   'compress.advanced.reviewOutput': '檢查輸出',
   'compress.preset.safe.label': '安全',
   'compress.preset.safe.short': '保留更多結構與幾何細節。',

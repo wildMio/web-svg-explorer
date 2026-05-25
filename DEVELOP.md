@@ -46,6 +46,7 @@ There is no active Karma or Jasmine workflow in this repository. Do not reintrod
 - `DESIGN.json`: machine-readable design sidecar for tooling.
 - `AGENTS.md`: repo-specific guardrails for contributors and coding agents.
 - `HARNESSES.md`: runtime and delivery surface reference.
+- `doc/svg-virtual-grid.md`: row-based virtual scrolling architecture, constraints, and extension notes.
 
 When the product vocabulary or interface behavior changes, keep those files aligned with the implementation. Remove stale alternates instead of leaving multiple conflicting docs in the root.
 

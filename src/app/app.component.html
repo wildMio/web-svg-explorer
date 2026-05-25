@@ -962,20 +962,11 @@
             </div>
 
             <div class="empty-state__actions">
-              <button
-                type="button"
-                class="app-button toolbar-button toolbar-button--primary"
-                (click)="openDirectory()"
-                [disabled]="loading$ | async"
-              >
-                {{ i18n.t("app.empty.openDirectory") }}
-              </button>
-
               @if (restoreLastDirectoryAvailable$ | async) {
                 @if (lastDirectoryName$ | async; as lastDirectoryName) {
                   <button
                     type="button"
-                    class="app-button toolbar-button"
+                    class="app-button toolbar-button toolbar-button--primary"
                     (click)="reconnectLastDirectory()"
                     [disabled]="loading$ | async"
                   >
@@ -985,7 +976,34 @@
                       })
                     }}
                   </button>
+
+                  <button
+                    type="button"
+                    class="app-button toolbar-button"
+                    (click)="openDirectory()"
+                    [disabled]="loading$ | async"
+                  >
+                    {{ i18n.t("app.empty.openDirectory") }}
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="app-button toolbar-button toolbar-button--primary"
+                    (click)="openDirectory()"
+                    [disabled]="loading$ | async"
+                  >
+                    {{ i18n.t("app.empty.openDirectory") }}
+                  </button>
                 }
+              } @else {
+                <button
+                  type="button"
+                  class="app-button toolbar-button toolbar-button--primary"
+                  (click)="openDirectory()"
+                  [disabled]="loading$ | async"
+                >
+                  {{ i18n.t("app.empty.openDirectory") }}
+                </button>
               }
             </div>
 

@@ -106,7 +106,14 @@
   resize: vertical;
 }
 
-.svg-probe__actions,
+.svg-probe__actions {
+  display: grid;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.svg-probe__actions-main,
+.svg-probe__actions-meta,
 .svg-probe__support {
   display: flex;
   flex-wrap: wrap;
@@ -114,8 +121,12 @@
   align-items: center;
 }
 
-.svg-probe__actions {
+.svg-probe__actions-main {
   align-items: stretch;
+}
+
+.svg-probe__actions-meta {
+  gap: 0.55rem;
 }
 
 .svg-probe__message {
