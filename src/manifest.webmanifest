@@ -1,6 +1,9 @@
 {
-  "name": "web-svg-explorer",
-  "short_name": "svg-explorer",
+  "name": "SVGOLOT",
+  "short_name": "SVGOLOT",
+  "description": "Batch SVG inspection, optimization, duplicate review, and ZIP export workspace.",
+  "lang": "en",
+  "categories": ["developer", "graphics", "productivity"],
   "theme_color": "#12100d",
   "background_color": "#12100d",
   "display": "standalone",

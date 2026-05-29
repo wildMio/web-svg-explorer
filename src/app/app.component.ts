@@ -46,6 +46,7 @@ import {
   type RestoredDirectoryResult,
 } from './service/directory-session.service';
 import { I18nService } from './service/i18n.service';
+import { SeoService } from './service/seo.service';
 import { SvgStateService } from './service/svg-state.service';
 import { SvgoService } from './service/svgo.service';
 import { SvgMarkupComponent } from './svg-markup/svg-markup.component';
@@ -116,6 +117,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly domSanitizer = inject(DomSanitizer);
   private readonly swUpdate = inject(SwUpdate);
   readonly i18n = inject(I18nService);
+  private readonly seoService = inject(SeoService);
   private readonly appPwaService = inject(AppPwaService);
   private readonly directorySessionService = inject(DirectorySessionService);
   private readonly svgoService = inject(SvgoService);
@@ -692,6 +694,7 @@ export class AppComponent implements OnInit, OnDestroy {
   );
 
   constructor() {
+    this.seoService.initialize();
     this.themeMode = this.resolveInitialTheme();
     this.applyTheme(this.themeMode, false);
 

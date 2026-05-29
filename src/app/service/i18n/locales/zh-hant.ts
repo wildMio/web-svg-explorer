@@ -51,6 +51,10 @@ export const zhHantDictionary = {
   'app.header.viewSource': '查看原始碼',
   'app.header.installApp': '安裝應用',
   'app.header.applyUpdate': '套用更新',
+  'app.seo.title': 'SVGOLOT | SVG 批次檢查、優化與匯出工作台',
+  'app.seo.description':
+    '在同一個瀏覽器工作台中開啟 SVG 目錄、檢查預覽與標記、調整 SVGO 設定、找出疑似重複素材，並匯出優化 ZIP。',
+  'app.seo.imageAlt': 'SVGOLOT SVG 批次檢查與優化工作台畫面',
 
   'app.toolbar.openDirectory': '開啟 SVG 目錄',
   'app.toolbar.optimizeFiles': (params) =>

@@ -56,6 +56,10 @@ export const enDictionary = {
   'app.header.viewSource': 'View source',
   'app.header.installApp': 'Install app',
   'app.header.applyUpdate': 'Apply update',
+  'app.seo.title': 'SVGOLOT | Batch SVG inspection, optimization, and export',
+  'app.seo.description':
+    'Open an SVG directory, inspect previews and markup, tune SVGO settings, detect likely duplicates, and export an optimized ZIP from one browser workspace.',
+  'app.seo.imageAlt': 'SVGOLOT batch SVG inspection and optimization workspace',
 
   'app.toolbar.openDirectory': 'Open SVG directory',
   'app.toolbar.optimizeFiles': (params) => {
