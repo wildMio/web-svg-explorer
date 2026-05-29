@@ -53,7 +53,7 @@
               "src/manifest.webmanifest",
               "src/robots.txt",
               "src/sitemap.xml",
-              "src/google92f1ee01e16c2285.html",
+              "google92f1ee01e16c2285.html",
               {
                 "glob": "preview.webp",
                 "input": "doc",
